@@ -3,35 +3,139 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nans Dev — Web Development & Visual Design</title>
+  <title>Nans Dev — Enterprise Web Engineering & Visual Architecture</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
   <header class="navbar">
-    <div class="brand">NANS<span>DEV</span></div>
-    <div class="status-pill" id="build-timestamp">Multi-Lang Pipeline</div>
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <div class="logo-mark">N</div>
+        NANS<span>DEV</span>
+      </a>
+
+      <nav class="nav-links" id="nav-links">
+        <a href="#services">Arsitektur Layanan</a>
+        <a href="#vector-lab">Vector Lab</a>
+        <a href="#portfolio">Portofolio Live</a>
+        <a href="#estimator">Estimasi Proyek</a>
+      </nav>
+
+      <div class="build-badge">
+        <span class="dot"></span>
+        <span id="build-time">SYS.ONLINE</span>
+      </div>
+
+      <button class="menu-toggle" id="menu-toggle" aria-label="Menu">☰</button>
+    </div>
   </header>
 
-  <main>
+  <main class="container">
     <section class="hero">
-      <div class="eyebrow">Digital Creative & Web Engineering</div>
-      <h1>Membangun Website Modern & Identitas Visual Berkelas.</h1>
-      <p>Solusi pengembangan website custom, vektorisasi logo presisi, dan desain antarmuka profesional untuk meningkatkan kredibilitas bisnis Anda.</p>
-      <a href="https://wa.me/6281234567890" target="_blank" class="cta-btn">Konsultasi Proyek</a>
+      <div class="pill-announcement">⚡ Multi-Language Web & Brand Architecture</div>
+      <h1>Membangun Sistem Web & Identitas Visual Standar Korporat.</h1>
+      <p>Dari pengembangan website custom berperforma tinggi hingga rekonstruksi aset vektor presisi—dirancang untuk meningkatkan kredibilitas dan konversi bisnis Anda.</p>
+      <div class="hero-actions">
+        <a href="#estimator" class="btn-primary">Hitung Estimasi Proyek</a>
+        <a href="#portfolio" class="btn-secondary">Eksplorasi Live Demo</a>
+      </div>
     </section>
 
-    <section class="services-section">
-      <div class="grid" id="services-grid"></div>
+    <section class="metrics-strip" id="metrics-strip"></section>
+
+    <section id="services">
+      <div class="section-header">
+        <div class="kicker">Core Capabilities</div>
+        <h2>Solusi Digital Terintegrasi</h2>
+      </div>
+      <div class="bento-grid" id="services-bento"></div>
+    </section>
+
+    <section id="vector-lab">
+      <div class="section-header">
+        <div class="kicker">Interactive Comparison</div>
+        <h2>Raster-to-Vector Precision Lab</h2>
+      </div>
+      <div class="vector-lab">
+        <div>
+          <h3 style="margin-bottom:0.75rem; font-size:1.35rem;">Geser untuk Melihat Perbedaan Ketajaman</h3>
+          <p style="color:#94a3b8; font-size:0.92rem; margin-bottom:1.25rem;">
+            Logo pecah atau buram merusak citra bisnis. Kami menggambar ulang aset visual Anda secara manual menjadi geometri vektor murni yang tajam di segala ukuran.
+          </p>
+          <input type="range" min="0" max="100" value="50" id="vector-range" class="slider-control" />
+        </div>
+        <div class="compare-stage">
+          <div class="layer raster-layer">
+            <div class="pixel-box">NANS DEV</div>
+            <small>LOW-RES RASTER (BLUR / PECAH)</small>
+          </div>
+          <div class="layer vector-layer" id="vector-layer">
+            <div class="sharp-box">NANS DEV</div>
+            <small>100% VECTOR GEOMETRY (TAJAM)</small>
+          </div>
+          <div class="slider-line" id="slider-line"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="portfolio">
+      <div class="section-header">
+        <div class="kicker">Deployed Systems</div>
+        <h2>Portofolio & Live Demo</h2>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">Semua Proyek</button>
+        <button class="filter-btn" data-filter="web">Website & Toko</button>
+        <button class="filter-btn" data-filter="system">Sistem & Direktori</button>
+        <button class="filter-btn" data-filter="design">Vector & Brand</button>
+      </div>
+      <div class="projects-grid" id="projects-grid"></div>
+    </section>
+
+    <section id="estimator">
+      <div class="section-header">
+        <div class="kicker">Project Configurator</div>
+        <h2>Rakit Kebutuhan Proyek Anda</h2>
+      </div>
+      <div class="estimator-box">
+        <div class="est-grid">
+          <div class="est-options">
+            <label>
+              <span><input type="checkbox" class="est-check" value="Custom Company Profile / Landing Page" data-days="3" checked> Company Profile / Landing Page</span>
+              <span class="days">+3 Hari</span>
+            </label>
+            <label>
+              <span><input type="checkbox" class="est-check" value="E-Commerce / Katalog / Sistem LMS" data-days="5"> E-Commerce / Katalog / LMS</span>
+              <span class="days">+5 Hari</span>
+            </label>
+            <label>
+              <span><input type="checkbox" class="est-check" value="Raster-to-Vector Logo Conversion" data-days="1"> Raster-to-Vector Logo HD</span>
+              <span class="days">+1 Hari</span>
+            </label>
+            <label>
+              <span><input type="checkbox" class="est-check" value="Paket Banner & Aset Media Sosial" data-days="2"> Banner & Aset Visual Sosmed</span>
+              <span class="days">+2 Hari</span>
+            </label>
+          </div>
+          <div class="est-summary">
+            <div class="est-label">Estimasi Waktu Rilis</div>
+            <div class="est-time" id="est-days">3 Hari Kerja</div>
+            <p class="est-note">Spesifikasi modul otomatis terlampir saat Anda klik tombol di bawah.</p>
+            <button type="button" id="est-wa-btn" class="btn-primary" style="width:100%;">Kirim Brief via WhatsApp</button>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
   <footer>
-    &copy; 2026 Nans Dev. Ditenagai oleh Python, TypeScript, SCSS & GitHub Actions.
+    <div class="container">
+      &copy; 2026 Nans Dev Architecture. Ditenagai oleh Python, TypeScript, SCSS & GitHub Actions.
+    </div>
   </footer>
 
   <script src="./main.js" defer></script>
 </body>
 </html>
-  
