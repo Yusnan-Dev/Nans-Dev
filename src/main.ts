@@ -54,7 +54,7 @@ async function bootApp(): Promise<void> {
   }
 }
 
-/* Photorealistic 3D Earth with Flick-Spin Momentum + Flying 3D Laser Arcs */
+/* Photorealistic 3D Earth with High-Inertia Flick Spin + Flying Laser Arcs */
 function initPhotorealisticEarth(): void {
   const container = document.getElementById('earth-3d-container');
   if (!container || typeof THREE === 'undefined') return;
@@ -75,7 +75,6 @@ function initPhotorealisticEarth(): void {
   const earthGroup = new THREE.Group();
   scene.add(earthGroup);
 
-  // Initial orientation facing Indonesia & Asia-Pacific
   earthGroup.rotation.y = -2.25;
   earthGroup.rotation.x = 0.22;
 
@@ -92,7 +91,6 @@ function initPhotorealisticEarth(): void {
     'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-water.png'
   );
 
-  // 1. Real Earth Sphere
   const earthGeo = new THREE.SphereGeometry(1, 64, 64);
   const earthMat = new THREE.MeshPhongMaterial({
     map: earthMap,
@@ -102,10 +100,8 @@ function initPhotorealisticEarth(): void {
     specular: new THREE.Color('#38bdf8'),
     shininess: 18,
   });
-  const earthMesh = new THREE.Mesh(earthGeo, earthMat);
-  earthGroup.add(earthMesh);
+  earthGroup.add(new THREE.Mesh(earthGeo, earthMat));
 
-  // 2. Atmospheric Blue Halo Rim
   const atmoGeo = new THREE.SphereGeometry(1.06, 64, 64);
   const atmoMat = new THREE.MeshBasicMaterial({
     color: new THREE.Color('#38bdf8'),
@@ -113,13 +109,9 @@ function initPhotorealisticEarth(): void {
     opacity: 0.14,
     side: THREE.BackSide,
   });
-  const atmoMesh = new THREE.Mesh(atmoGeo, atmoMat);
-  earthGroup.add(atmoMesh);
+  earthGroup.add(new THREE.Mesh(atmoGeo, atmoMat));
 
-  // 3. Studio Lighting
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
-  scene.add(ambientLight);
-
+  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
   const sunLight = new THREE.DirectionalLight(0xffffff, 1.6);
   sunLight.position.set(4, 2.5, 4);
   scene.add(sunLight);
@@ -139,15 +131,15 @@ function initPhotorealisticEarth(): void {
   }
 
   const hubs = [
-    { lat: -7.25, lon: 112.75 }, // Surabaya / Jatim
-    { lat: -6.2, lon: 106.8 },   // Jakarta
-    { lat: 1.35, lon: 103.8 },   // Singapore
-    { lat: 35.68, lon: 139.69 }, // Tokyo
-    { lat: 25.2, lon: 55.27 },   // Dubai
-    { lat: 51.5, lon: -0.12 },   // London
-    { lat: 40.71, lon: -74.0 },  // New York
-    { lat: -33.86, lon: 151.2 }, // Sydney
-    { lat: -23.55, lon: -46.63 } // Sao Paulo
+    { lat: -7.25, lon: 112.75 },
+    { lat: -6.2, lon: 106.8 },
+    { lat: 1.35, lon: 103.8 },
+    { lat: 35.68, lon: 139.69 },
+    { lat: 25.2, lon: 55.27 },
+    { lat: 51.5, lon: -0.12 },
+    { lat: 40.71, lon: -74.0 },
+    { lat: -33.86, lon: 151.2 },
+    { lat: -23.55, lon: -46.63 }
   ];
 
   const beaconGeo = new THREE.SphereGeometry(0.016, 12, 12);
@@ -161,7 +153,6 @@ function initPhotorealisticEarth(): void {
     earthGroup.add(dot);
   });
 
-  // 4. Flying 3D Laser Arcs
   interface LaserArc {
     line: any;
     head: any;
@@ -219,37 +210,37 @@ function initPhotorealisticEarth(): void {
     laserArcs.push(createLaserArc(i));
   }
 
-  // Flick-Spin Physics (Momentum Impulse on Swipe)
-  let isPointerDown = false;
+  // Free-Spin Flick Physics (Swipe launches independent fast rotation)
   let prevX = 0;
   let prevY = 0;
+  let isTouching = false;
   let velY = 0.004;
   let velX = 0;
-  const baseCruiseSpeed = 0.004;
+  const cruiseSpeed = 0.004;
 
   const domElem = renderer.domElement;
   domElem.style.touchAction = 'none';
 
   domElem.addEventListener('pointerdown', (e: PointerEvent) => {
-    isPointerDown = true;
+    isTouching = true;
     prevX = e.clientX;
     prevY = e.clientY;
   });
 
   window.addEventListener('pointerup', () => {
-    isPointerDown = false;
+    isTouching = false;
   });
 
   domElem.addEventListener('pointermove', (e: PointerEvent) => {
-    if (!isPointerDown) return;
+    if (!isTouching) return;
     const dx = e.clientX - prevX;
     const dy = e.clientY - prevY;
     prevX = e.clientX;
     prevY = e.clientY;
 
-    // Inject immediate rotational impulse so a quick swipe launches a smooth spin
-    velY = THREE.MathUtils.clamp(velY + dx * 0.0045, -0.28, 0.28);
-    velX = THREE.MathUtils.clamp(velX + dy * 0.0025, -0.12, 0.12);
+    // Launch spin velocity directly from swipe gesture without locking position to finger
+    velY = THREE.MathUtils.clamp(dx * 0.014, -0.35, 0.35);
+    velX = THREE.MathUtils.clamp(dy * 0.006, -0.15, 0.15);
   });
 
   window.addEventListener('resize', () => {
@@ -264,7 +255,6 @@ function initPhotorealisticEarth(): void {
   function animate(): void {
     requestAnimationFrame(animate);
 
-    // Apply continuous angular velocity + smooth friction decay
     earthGroup.rotation.y += velY;
     earthGroup.rotation.x = THREE.MathUtils.clamp(
       earthGroup.rotation.x + velX,
@@ -272,21 +262,18 @@ function initPhotorealisticEarth(): void {
       0.65
     );
 
-    velY *= 0.965;
-    velX *= 0.92;
+    // Long smooth inertia decay (0.985 keeps it spinning freely after flick)
+    velY *= 0.985;
+    velX *= 0.94;
 
-    // Gently return to steady cruise rotation after flick slows down
-    if (Math.abs(velY) < baseCruiseSpeed) {
-      const targetDir = velY >= 0 ? baseCruiseSpeed : -baseCruiseSpeed;
-      velY += (targetDir - velY) * 0.05;
+    if (Math.abs(velY) < cruiseSpeed) {
+      const dir = velY >= 0 ? cruiseSpeed : -cruiseSpeed;
+      velY += (dir - velY) * 0.04;
     }
 
-    // Animate Flying Laser Beams
     laserArcs.forEach((arc) => {
       arc.progress += arc.speed;
-      if (arc.progress > 1.45) {
-        arc.progress = -0.15;
-      }
+      if (arc.progress > 1.45) arc.progress = -0.15;
 
       const totalPts = arc.curvePoints.length;
       if (arc.progress <= 0) {
@@ -461,4 +448,3 @@ function setupEstimator(): void {
 }
 
 document.addEventListener('DOMContentLoaded', bootApp);
-    
