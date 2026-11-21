@@ -32,7 +32,6 @@ body {
   background-size: 42px 42px;
 }
 
-/* Ambient Animated Glow Orbs */
 .ambient-orb {
   position: fixed;
   border-radius: 50%;
@@ -327,35 +326,110 @@ body {
   }
 }
 
-/* Metrics Strip */
+/* Animated Telemetry Metrics Strip */
 .metrics-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   background: $border-subtle;
   border: 1px solid $border-subtle;
-  border-radius: 16px;
+  border-radius: 18px;
   overflow: hidden;
   margin-bottom: 5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
 
   .metric-box {
     background: $bg-surface;
-    padding: 1.5rem;
+    padding: 1.65rem 1.5rem;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+
+    &:hover {
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba($cyan, 0.07),
+        transparent
+      );
+      animation: metricShimmer 4.5s infinite;
+    }
+
+    &:nth-child(2)::after { animation-delay: 1.5s; }
+    &:nth-child(3)::after { animation-delay: 3s; }
+
+    .metric-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: monospace;
+      font-size: 0.65rem;
+      color: $emerald;
+      letter-spacing: 1px;
+      margin-bottom: 0.4rem;
+      opacity: 0.85;
+
+      .live-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: $emerald;
+        box-shadow: 0 0 8px $emerald;
+        animation: pulse 1.8s infinite;
+      }
+    }
 
     .val {
-      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-size: clamp(1.65rem, 3.4vw, 2.3rem);
       font-weight: 800;
-      background: linear-gradient(90deg, #fff, $cyan);
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(90deg, #ffffff 20%, $cyan 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
     .lbl {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: $text-secondary;
       margin-top: 4px;
+      margin-bottom: 12px;
+    }
+
+    .metric-bar-track {
+      width: 72%;
+      max-width: 180px;
+      height: 4px;
+      margin: 0 auto;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+
+      .metric-bar-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, $indigo, $cyan, $emerald);
+        box-shadow: 0 0 10px rgba($cyan, 0.65);
+        transition: width 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
     }
   }
+}
+
+@keyframes metricShimmer {
+  0% { left: -120%; }
+  45%, 100% { left: 160%; }
 }
 
 @media (max-width: 600px) {
