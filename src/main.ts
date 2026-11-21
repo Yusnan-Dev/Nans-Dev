@@ -29,7 +29,7 @@ interface EnterpriseData {
   services: ServiceItem[];
 }
 
-const WHATSAPP_NUMBER = '6283187521130'; // Ganti nomor WA lu (diawali 62)
+const WHATSAPP_NUMBER = '6281234567890'; // Ganti nomor WA lu (diawali 62)
 
 async function bootApp(): Promise<void> {
   setupMobileNav();
@@ -54,7 +54,7 @@ async function bootApp(): Promise<void> {
   }
 }
 
-/* Photorealistic 3D Earth with High-Inertia Flick Spin + Flying Laser Arcs */
+/* Photorealistic 3D Earth + Full-Viewport 3D Rocket Launch Overlay */
 function initPhotorealisticEarth(): void {
   const container = document.getElementById('earth-3d-container');
   if (!container || typeof THREE === 'undefined') return;
@@ -131,7 +131,7 @@ function initPhotorealisticEarth(): void {
   }
 
   const hubs = [
-    { lat: -7.25, lon: 112.75 },
+    { lat: -7.25, lon: 112.75 }, // Index 0: Indonesia Launchpad
     { lat: -6.2, lon: 106.8 },
     { lat: 1.35, lon: 103.8 },
     { lat: 35.68, lon: 139.69 },
@@ -143,6 +143,8 @@ function initPhotorealisticEarth(): void {
   ];
 
   const beaconGeo = new THREE.SphereGeometry(0.016, 12, 12);
+  let indonesiaBeacon: any = null;
+
   hubs.forEach((h, i) => {
     const pos = latLonToVector3(h.lat, h.lon, 1.008);
     const beaconMat = new THREE.MeshBasicMaterial({
@@ -151,7 +153,25 @@ function initPhotorealisticEarth(): void {
     const dot = new THREE.Mesh(beaconGeo, beaconMat);
     dot.position.copy(pos);
     earthGroup.add(dot);
+    if (i === 0) indonesiaBeacon = dot;
   });
+
+  // Launchpad Shockwave Ring on Earth Surface
+  const shockGeo = new THREE.RingGeometry(0.015, 0.032, 32);
+  const shockMat = new THREE.MeshBasicMaterial({
+    color: 0x38bdf8,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0,
+  });
+  const shockRing = new THREE.Mesh(shockGeo, shockMat);
+  if (indonesiaBeacon) {
+    shockRing.position.copy(indonesiaBeacon.position).multiplyScalar(1.01);
+    shockRing.lookAt(
+      indonesiaBeacon.position.clone().multiplyScalar(2)
+    );
+  }
+  earthGroup.add(shockRing);
 
   interface LaserArc {
     line: any;
@@ -210,6 +230,212 @@ function initPhotorealisticEarth(): void {
     laserArcs.push(createLaserArc(i));
   }
 
+  /* =====================================================================
+     FULL-VIEWPORT 3D ROCKET OVERLAY (Launches out of Earth past top of phone)
+     ===================================================================== */
+  const overlayCanvas = document.createElement('canvas');
+  overlayCanvas.style.position = 'fixed';
+  overlayCanvas.style.inset = '0';
+  overlayCanvas.style.width = '100vw';
+  overlayCanvas.style.height = '100vh';
+  overlayCanvas.style.pointerEvents = 'none';
+  overlayCanvas.style.zIndex = '9999';
+  document.body.appendChild(overlayCanvas);
+
+  const ovScene = new THREE.Scene();
+  const ovCamera = new THREE.PerspectiveCamera(
+    45,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
+  );
+  ovCamera.position.set(0, 0, 10);
+
+  const ovRenderer = new THREE.WebGLRenderer({
+    canvas: overlayCanvas,
+    antialias: true,
+    alpha: true,
+  });
+  ovRenderer.setSize(window.innerWidth, window.innerHeight);
+  ovRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  ovScene.add(new THREE.AmbientLight(0xffffff, 1.1));
+  const ovKeyLight = new THREE.DirectionalLight(0x38bdf8, 2.2);
+  ovKeyLight.position.set(5, 8, 8);
+  ovScene.add(ovKeyLight);
+
+  const ovWarmLight = new THREE.DirectionalLight(0xffedd5, 1.5);
+  ovWarmLight.position.set(-4, -3, 6);
+  ovScene.add(ovWarmLight);
+
+  // Build Detailed 3D Spacecraft / Rocket Mesh
+  const rocketGroup = new THREE.Group();
+  rocketGroup.visible = false;
+  ovScene.add(rocketGroup);
+
+  // Main Fuselage Body
+  const bodyGeo = new THREE.CylinderGeometry(0.14, 0.17, 0.95, 24);
+  const bodyMat = new THREE.MeshStandardMaterial({
+    color: 0xf8fafc,
+    metalness: 0.65,
+    roughness: 0.2,
+  });
+  const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+  rocketGroup.add(bodyMesh);
+
+  // Sleek Nose Cone
+  const noseGeo = new THREE.ConeGeometry(0.14, 0.42, 24);
+  const noseMat = new THREE.MeshStandardMaterial({
+    color: 0x38bdf8,
+    metalness: 0.5,
+    roughness: 0.25,
+    emissive: 0x0284c7,
+    emissiveIntensity: 0.35,
+  });
+  const noseMesh = new THREE.Mesh(noseGeo, noseMat);
+  noseMesh.position.y = 0.685;
+  rocketGroup.add(noseMesh);
+
+  // Cockpit Viewport Ring
+  const glassGeo = new THREE.SphereGeometry(0.065, 16, 16);
+  const glassMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee });
+  const glassMesh = new THREE.Mesh(glassGeo, glassMat);
+  glassMesh.position.set(0, 0.22, 0.12);
+  rocketGroup.add(glassMesh);
+
+  // 4 Aerodynamic Delta Fins
+  const finGeo = new THREE.BoxGeometry(0.03, 0.34, 0.22);
+  const finMat = new THREE.MeshStandardMaterial({
+    color: 0x818cf8,
+    metalness: 0.6,
+    roughness: 0.3,
+  });
+  for (let i = 0; i < 4; i++) {
+    const fin = new THREE.Mesh(finGeo, finMat);
+    const angle = (i * Math.PI) / 2;
+    fin.position.set(Math.sin(angle) * 0.18, -0.32, Math.cos(angle) * 0.18);
+    fin.rotation.y = angle;
+    rocketGroup.add(fin);
+  }
+
+  // Thruster Exhaust Plume (Outer Cyan + Inner White-Orange Core)
+  const flameOuterGeo = new THREE.ConeGeometry(0.15, 0.85, 20);
+  const flameOuterMat = new THREE.MeshBasicMaterial({
+    color: 0x38bdf8,
+    transparent: true,
+    opacity: 0.85,
+  });
+  const flameOuter = new THREE.Mesh(flameOuterGeo, flameOuterMat);
+  flameOuter.rotation.x = Math.PI;
+  flameOuter.position.y = -0.88;
+  rocketGroup.add(flameOuter);
+
+  const flameCoreGeo = new THREE.ConeGeometry(0.08, 0.52, 16);
+  const flameCoreMat = new THREE.MeshBasicMaterial({
+    color: 0xfef08a,
+  });
+  const flameCore = new THREE.Mesh(flameCoreGeo, flameCoreMat);
+  flameCore.rotation.x = Math.PI;
+  flameCore.position.y = -0.72;
+  rocketGroup.add(flameCore);
+
+  // Exhaust Smoke / Spark Particle Pool
+  interface ExhaustParticle {
+    mesh: any;
+    vel: any;
+    life: number;
+  }
+  const particles: ExhaustParticle[] = [];
+  const pGeo = new THREE.SphereGeometry(0.055, 8, 8);
+
+  function spawnExhaustParticle(origin: any): void {
+    const pMat = new THREE.MeshBasicMaterial({
+      color: Math.random() > 0.35 ? 0x38bdf8 : 0xfb923c,
+      transparent: true,
+      opacity: 0.9,
+    });
+    const mesh = new THREE.Mesh(pGeo, pMat);
+    mesh.position.copy(origin);
+    mesh.position.x += (Math.random() - 0.5) * 0.12;
+    mesh.position.y += (Math.random() - 0.5) * 0.12;
+    ovScene.add(mesh);
+
+    particles.push({
+      mesh,
+      vel: new THREE.Vector3(
+        (Math.random() - 0.5) * 0.03,
+        -0.06 - Math.random() * 0.04,
+        -0.05
+      ),
+      life: 1.0,
+    });
+  }
+
+  // Rocket Launch State Machine
+  let rocketActive = false;
+  let launchProgress = 0;
+  let startWorldPos = new THREE.Vector3(0, -1, 0);
+  let midControlPos = new THREE.Vector3(0.4, 2.2, 4.5);
+  let endWorldPos = new THREE.Vector3(-0.3, 6.8, 7.6);
+  const stageBox = container.closest('.hero-3d-stage') as HTMLElement | null;
+
+  function screenToOverlayWorld(screenX: number, screenY: number, targetZ: number) {
+    const ndcX = (screenX / window.innerWidth) * 2 - 1;
+    const ndcY = -(screenY / window.innerHeight) * 2 + 1;
+    const vec = new THREE.Vector3(ndcX, ndcY, 0.5);
+    vec.unproject(ovCamera);
+    const dir = vec.sub(ovCamera.position).normalize();
+    const distance = (targetZ - ovCamera.position.z) / dir.z;
+    return ovCamera.position.clone().add(dir.multiplyScalar(distance));
+  }
+
+  function triggerRocketLaunch(): void {
+    if (rocketActive) return;
+
+    // Project Indonesia hub position on Earth canvas onto screen coordinates
+    const rect = renderer.domElement.getBoundingClientRect();
+    let launchScreenX = rect.left + rect.width * 0.52;
+    let launchScreenY = rect.top + rect.height * 0.54;
+
+    if (indonesiaBeacon) {
+      earthGroup.updateMatrixWorld(true);
+      const worldPos = new THREE.Vector3();
+      indonesiaBeacon.getWorldPosition(worldPos);
+      // Only use exact beacon screen coords if facing front of globe
+      if (worldPos.z > -0.2) {
+        const projected = worldPos.clone().project(camera);
+        launchScreenX = rect.left + ((projected.x + 1) * 0.5) * rect.width;
+        launchScreenY = rect.top + ((-projected.y + 1) * 0.5) * rect.height;
+      }
+    }
+
+    // Start small & distant at Earth surface (z = 1.5), sweep up & close past top of phone (z = 7.8)
+    startWorldPos = screenToOverlayWorld(launchScreenX, launchScreenY, 1.5);
+    const topTargetX = window.innerWidth * (0.35 + Math.random() * 0.3);
+    endWorldPos = screenToOverlayWorld(topTargetX, -140, 7.8);
+
+    midControlPos = new THREE.Vector3(
+      (startWorldPos.x + endWorldPos.x) * 0.5 + (Math.random() - 0.5) * 1.4,
+      (startWorldPos.y + endWorldPos.y) * 0.48,
+      5.2
+    );
+
+    rocketActive = true;
+    launchProgress = 0;
+    rocketGroup.visible = true;
+    rocketGroup.position.copy(startWorldPos);
+    rocketGroup.scale.setScalar(0.16);
+
+    // Trigger launchpad shockwave on Earth
+    shockMat.opacity = 0.95;
+    shockRing.scale.setScalar(1);
+  }
+
+  // First launch 2.5s after page load, then automatically every 12 seconds
+  setTimeout(triggerRocketLaunch, 2500);
+  setInterval(triggerRocketLaunch, 12000);
+
+  // Free-Spin Flick Physics
   let prevX = 0;
   let prevY = 0;
   let isTouching = false;
@@ -242,12 +468,16 @@ function initPhotorealisticEarth(): void {
   });
 
   window.addEventListener('resize', () => {
-    if (!container) return;
-    const w = container.offsetWidth || 320;
-    const h = container.offsetHeight || 340;
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h);
+    if (container) {
+      const w = container.offsetWidth || 320;
+      const h = container.offsetHeight || 340;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+    ovCamera.aspect = window.innerWidth / window.innerHeight;
+    ovCamera.updateProjectionMatrix();
+    ovRenderer.setSize(window.innerWidth, window.innerHeight);
   });
 
   function animate(): void {
@@ -268,6 +498,13 @@ function initPhotorealisticEarth(): void {
       velY += (dir - velY) * 0.04;
     }
 
+    // Animate Shockwave Ring on Earth
+    if (shockMat.opacity > 0.01) {
+      shockRing.scale.addScalar(0.18);
+      shockMat.opacity *= 0.92;
+    }
+
+    // Animate Flying Laser Beams
     laserArcs.forEach((arc) => {
       arc.progress += arc.speed;
       if (arc.progress > 1.45) arc.progress = -0.15;
@@ -293,7 +530,85 @@ function initPhotorealisticEarth(): void {
       }
     });
 
+    // Animate 3D Rocket Trajectory (Small/Distant at Earth -> Close/Fast past Top of Phone)
+    if (rocketActive) {
+      // Accelerating ease-in curve so it lifts off smoothly then blasts past top edge
+      launchProgress += 0.0145;
+      const t = Math.min(1, launchProgress);
+      const ease = t * t * (2.2 - 1.2 * t);
+
+      // Quadratic Bezier interpolation
+      const invT = 1 - ease;
+      const pos = new THREE.Vector3()
+        .addScaledVector(startWorldPos, invT * invT)
+        .addScaledVector(midControlPos, 2 * invT * ease)
+        .addScaledVector(endWorldPos, ease * ease);
+
+      // Compute forward tangent so nose points along flight arc
+      const nextEase = Math.min(1, ease + 0.02);
+      const invNext = 1 - nextEase;
+      const nextPos = new THREE.Vector3()
+        .addScaledVector(startWorldPos, invNext * invNext)
+        .addScaledVector(midControlPos, 2 * invNext * nextEase)
+        .addScaledVector(endWorldPos, nextEase * nextEase);
+
+      const tangent = nextPos.sub(pos).normalize();
+      if (tangent.lengthSq() > 0.0001) {
+        const upAxis = new THREE.Vector3(0, 1, 0);
+        rocketGroup.quaternion.setFromUnitVectors(upAxis, tangent);
+      }
+
+      rocketGroup.position.copy(pos);
+      rocketGroup.rotateY(t * 6); // Subtle aerodynamic roll
+
+      // Scale grows from distant 0.16 at Earth to close-up 1.15 near top of phone
+      const currentScale = 0.16 + ease * 0.98;
+      rocketGroup.scale.setScalar(currentScale);
+
+      // Flickering thruster flame
+      const flicker = 0.85 + Math.random() * 0.45;
+      flameOuter.scale.set(1, flicker, 1);
+      flameCore.scale.set(1, flicker * 1.1, 1);
+
+      // Micro camera-shake on Earth stage during early ignition
+      if (stageBox && t < 0.35) {
+        const shake = (0.35 - t) * 7;
+        stageBox.style.transform = `translate(${(Math.random() - 0.5) * shake}px, ${(Math.random() - 0.5) * shake}px)`;
+      } else if (stageBox && stageBox.style.transform) {
+        stageBox.style.transform = '';
+      }
+
+      // Spawn glowing exhaust trail particles
+      if (Math.random() > 0.25) {
+        const nozzlePos = pos.clone().addScaledVector(tangent, -0.45 * currentScale);
+        spawnExhaustParticle(nozzlePos);
+      }
+
+      if (launchProgress >= 1.05) {
+        rocketActive = false;
+        rocketGroup.visible = false;
+        if (stageBox) stageBox.style.transform = '';
+      }
+    }
+
+    // Update & fade exhaust particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.mesh.position.add(p.vel);
+      p.life -= 0.032;
+      p.mesh.scale.setScalar(Math.max(0.01, p.life));
+      p.mesh.material.opacity = Math.max(0, p.life * 0.85);
+
+      if (p.life <= 0) {
+        ovScene.remove(p.mesh);
+        p.mesh.geometry.dispose();
+        p.mesh.material.dispose();
+        particles.splice(i, 1);
+      }
+    }
+
     renderer.render(scene, camera);
+    ovRenderer.render(ovScene, ovCamera);
   }
 
   animate();
@@ -364,7 +679,6 @@ function renderMetrics(metrics: MetricItem[]): void {
 
       const step = (now: number) => {
         const elapsed = Math.min(1, (now - startTime) / duration);
-        // Ease-out quartic curve
         const ease = 1 - Math.pow(1 - elapsed, 4);
         const current = startNum + (targetNum - startNum) * ease;
         el.textContent = `${prefix}${current.toFixed(decimals)}${suffix}`;
