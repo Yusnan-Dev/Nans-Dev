@@ -1,3 +1,5 @@
+declare const THREE: any;
+
 interface MetricItem {
   value: string;
   label: string;
@@ -31,7 +33,7 @@ const WHATSAPP_NUMBER = '6283187521130'; // Ganti nomor WA lu (diawali 62)
 
 async function bootApp(): Promise<void> {
   setupMobileNav();
-  initReal3DEarth();
+  initPhotorealisticEarth();
   setupVectorSlider();
   setupEstimator();
 
@@ -52,183 +54,92 @@ async function bootApp(): Promise<void> {
   }
 }
 
-/* Real World Coastlines + High-Density Dot Globe + Bright Flying Laser Arcs */
-function initReal3DEarth(): void {
-  const canvas = document.getElementById('canvas-3d') as HTMLCanvasElement | null;
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
+/* Photorealistic 3D Earth with Satellite Textures + Flying 3D Laser Arcs */
+function initPhotorealisticEarth(): void {
+  const container = document.getElementById('earth-3d-container');
+  if (!container || typeof THREE === 'undefined') return;
 
-  let width = (canvas.width = canvas.offsetWidth * 2);
-  let height = (canvas.height = canvas.offsetHeight * 2);
+  const width = container.offsetWidth || 320;
+  const height = container.offsetHeight || 340;
 
-  window.addEventListener('resize', () => {
-    if (!canvas) return;
-    width = canvas.width = canvas.offsetWidth * 2;
-    height = canvas.height = canvas.offsetHeight * 2;
-  });
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 1000);
+  camera.position.z = 3.15;
 
-  // Real continental & archipelago coastline polygons [lon, lat]
-  const WORLD_POLYGONS: number[][][] = [
-    // North America
-    [
-      [-168, 66], [-162, 60], [-152, 58], [-140, 60], [-130, 54], [-124, 48],
-      [-122, 37], [-117, 32], [-110, 24], [-105, 20], [-92, 15], [-84, 9],
-      [-79, 9], [-83, 15], [-88, 21], [-97, 26], [-90, 29], [-82, 25],
-      [-80, 32], [-75, 39], [-70, 42], [-64, 45], [-55, 52], [-64, 60],
-      [-78, 63], [-85, 68], [-95, 72], [-115, 70], [-135, 69], [-156, 71]
-    ],
-    // Greenland
-    [
-      [-52, 60], [-44, 60], [-22, 70], [-18, 81], [-45, 83], [-68, 77], [-58, 68]
-    ],
-    // South America
-    [
-      [-78, 10], [-71, 12], [-60, 7], [-50, 1], [-35, -6], [-38, -14],
-      [-41, -22], [-52, -33], [-62, -40], [-67, -54], [-74, -52], [-73, -40],
-      [-71, -28], [-76, -14], [-81, -4]
-    ],
-    // Europe
-    [
-      [-9, 37], [-9, 43], [-2, 48], [2, 51], [8, 54], [10, 58], [5, 61],
-      [15, 68], [28, 71], [42, 67], [55, 68], [58, 52], [45, 45], [30, 41],
-      [24, 37], [16, 38], [12, 44], [5, 43], [-3, 36]
-    ],
-    // UK & Ireland
-    [
-      [-6, 50], [-5, 58], [-1, 58], [1, 52], [-4, 50]
-    ],
-    // Africa
-    [
-      [-17, 15], [-13, 28], [-6, 35], [10, 37], [25, 32], [33, 31],
-      [43, 12], [51, 11], [41, -2], [40, -15], [33, -26], [26, -34],
-      [18, -34], [14, -22], [12, -6], [9, 4], [2, 6], [-8, 5], [-16, 11]
-    ],
-    // Madagascar
-    [
-      [44, -25], [47, -13], [50, -16], [47, -25]
-    ],
-    // Asia Mainland
-    [
-      [33, 31], [36, 37], [48, 30], [56, 26], [58, 21], [45, 13], [55, 17],
-      [62, 25], [70, 21], [77, 8], [82, 16], [89, 22], [94, 16], [98, 16],
-      [103, 2], [105, 10], [109, 13], [108, 21], [116, 23], [121, 31],
-      [119, 39], [126, 35], [129, 42], [136, 45], [142, 54], [158, 53],
-      [172, 62], [178, 66], [155, 70], [125, 73], [102, 77], [75, 72],
-      [58, 68], [58, 52], [45, 45], [36, 41]
-    ],
-    // Japan
-    [
-      [130, 32], [136, 34], [141, 41], [144, 44], [140, 44], [136, 37], [131, 34]
-    ],
-    // Sumatera
-    [
-      [95, 5], [99, 3], [104, -1], [106, -6], [103, -5], [98, 0]
-    ],
-    // Jawa
-    [
-      [105, -6], [110, -6.5], [114.5, -7.8], [114, -8.6], [108, -7.7], [105.5, -6.8]
-    ],
-    // Kalimantan
-    [
-      [109, 1], [114, 4], [118, 6], [118, 1], [116, -4], [111, -3], [109, -1]
-    ],
-    // Sulawesi
-    [
-      [119, -5], [120, -1], [124, 1], [123, -1], [122, -4], [120, -5]
-    ],
-    // Papua
-    [
-      [131, -1], [136, -2], [141, -3], [148, -7], [147, -10], [140, -8], [135, -5], [132, -3]
-    ],
-    // Australia
-    [
-      [114, -22], [122, -16], [131, -12], [136, -13], [142, -11], [146, -19],
-      [153, -28], [150, -37], [140, -38], [131, -32], [116, -34], [113, -26]
-    ],
-    // New Zealand
-    [
-      [167, -46], [174, -41], [177, -37], [174, -35], [171, -42], [167, -46]
-    ]
-  ];
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.innerHTML = '';
+  container.appendChild(renderer.domElement);
 
-  // Rasterize real world map onto an offscreen mask canvas for crisp dot & coastline sampling
-  const maskCanvas = document.createElement('canvas');
-  maskCanvas.width = 360;
-  maskCanvas.height = 180;
-  const mCtx = maskCanvas.getContext('2d')!;
-  mCtx.fillStyle = '#000000';
-  mCtx.fillRect(0, 0, 360, 180);
+  const earthGroup = new THREE.Group();
+  scene.add(earthGroup);
 
-  mCtx.fillStyle = '#ffffff';
-  mCtx.strokeStyle = '#ffffff';
-  mCtx.lineWidth = 1.2;
+  // Rotate initial view to face Indonesia & Asia-Pacific
+  earthGroup.rotation.y = -2.25;
+  earthGroup.rotation.x = 0.22;
 
-  WORLD_POLYGONS.forEach((poly) => {
-    mCtx.beginPath();
-    poly.forEach(([lon, lat], idx) => {
-      const x = lon + 180;
-      const y = 90 - lat;
-      if (idx === 0) mCtx.moveTo(x, y);
-      else mCtx.lineTo(x, y);
-    });
-    mCtx.closePath();
-    mCtx.fill();
-    mCtx.stroke();
-  });
+  const textureLoader = new THREE.TextureLoader();
+  textureLoader.setCrossOrigin('anonymous');
 
-  const maskData = mCtx.getImageData(0, 0, 360, 180).data;
-
-  function isRealLand(lat: number, lon: number): boolean {
-    const x = Math.min(359, Math.max(0, Math.floor(lon + 180)));
-    const y = Math.min(179, Math.max(0, Math.floor(90 - lat)));
-    return maskData[(y * 360 + x) * 4] > 100;
-  }
-
-  function latLonToVec(lat: number, lon: number): { x: number; y: number; z: number } {
-    const phi = ((90 - lat) * Math.PI) / 180;
-    const theta = ((lon + 180) * Math.PI) / 180;
-    return {
-      x: -Math.sin(phi) * Math.cos(theta),
-      y: Math.cos(phi),
-      z: Math.sin(phi) * Math.sin(theta),
-    };
-  }
-
-  interface GlobePoint {
-    x: number;
-    y: number;
-    z: number;
-    land: boolean;
-  }
-
-  // High-density Fibonacci/grid dots for sharp recognizable continents
-  const baseDots: GlobePoint[] = [];
-  const latSteps = 76;
-  const lonSteps = 152;
-
-  for (let i = 1; i < latSteps; i++) {
-    const lat = -90 + (180 * i) / latSteps;
-    const phi = ((90 - lat) * Math.PI) / 180;
-    const ringCount = Math.max(12, Math.round(lonSteps * Math.sin(phi)));
-
-    for (let j = 0; j < ringCount; j++) {
-      const lon = -180 + (360 * j) / ringCount;
-      const land = isRealLand(lat, lon);
-      // Keep all land dots, and sparse ocean grid dots for spherical depth
-      if (!land && (i % 3 !== 0 || j % 3 !== 0)) continue;
-
-      const vec = latLonToVec(lat, lon);
-      baseDots.push({ ...vec, land });
-    }
-  }
-
-  // Convert coastline polygons to 3D lines so continent outlines glow sharply
-  const coastLines3D = WORLD_POLYGONS.map((poly) =>
-    poly.map(([lon, lat]) => latLonToVec(lat, lon))
+  const earthMap = textureLoader.load(
+    'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg'
+  );
+  const bumpMap = textureLoader.load(
+    'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png'
+  );
+  const specularMap = textureLoader.load(
+    'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-water.png'
   );
 
-  // Global Hub Cities (Indonesia centered + global connections)
+  // 1. Real Earth Sphere
+  const earthGeo = new THREE.SphereGeometry(1, 64, 64);
+  const earthMat = new THREE.MeshPhongMaterial({
+    map: earthMap,
+    bumpMap: bumpMap,
+    bumpScale: 0.035,
+    specularMap: specularMap,
+    specular: new THREE.Color('#38bdf8'),
+    shininess: 18,
+  });
+  const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+  earthGroup.add(earthMesh);
+
+  // 2. Atmospheric Blue Halo Rim
+  const atmoGeo = new THREE.SphereGeometry(1.06, 64, 64);
+  const atmoMat = new THREE.MeshBasicMaterial({
+    color: new THREE.Color('#38bdf8'),
+    transparent: true,
+    opacity: 0.14,
+    side: THREE.BackSide,
+  });
+  const atmoMesh = new THREE.Mesh(atmoGeo, atmoMat);
+  earthGroup.add(atmoMesh);
+
+  // 3. Studio Lighting (Sun + Rim Light)
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+  scene.add(ambientLight);
+
+  const sunLight = new THREE.DirectionalLight(0xffffff, 1.6);
+  sunLight.position.set(4, 2.5, 4);
+  scene.add(sunLight);
+
+  const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.8);
+  rimLight.position.set(-4, -2, -3);
+  scene.add(rimLight);
+
+  // Convert Lat/Lon to 3D Vector on Sphere
+  function latLonToVector3(lat: number, lon: number, radius = 1.005) {
+    const phi = (90 - lat) * (Math.PI / 180);
+    const theta = (lon + 180) * (Math.PI / 180);
+    return new THREE.Vector3(
+      -radius * Math.sin(phi) * Math.cos(theta),
+      radius * Math.cos(phi),
+      radius * Math.sin(phi) * Math.sin(theta)
+    );
+  }
+
+  // Global Hub Cities (Indonesia centered)
   const hubs = [
     { lat: -7.25, lon: 112.75 }, // Surabaya / Jatim
     { lat: -6.2, lon: 106.8 },   // Jakarta
@@ -241,238 +152,160 @@ function initReal3DEarth(): void {
     { lat: -23.55, lon: -46.63 } // Sao Paulo
   ];
 
-  interface FlyingArc {
-    from: { x: number; y: number; z: number };
-    to: { x: number; y: number; z: number };
+  // Add glowing city beacon dots
+  const beaconGeo = new THREE.SphereGeometry(0.016, 12, 12);
+  hubs.forEach((h, i) => {
+    const pos = latLonToVector3(h.lat, h.lon, 1.008);
+    const beaconMat = new THREE.MeshBasicMaterial({
+      color: i <= 1 ? 0x34d399 : 0x38bdf8,
+    });
+    const dot = new THREE.Mesh(beaconGeo, beaconMat);
+    dot.position.copy(pos);
+    earthGroup.add(dot);
+  });
+
+  // 4. Flying 3D Laser Arcs Across Continents
+  interface LaserArc {
+    line: any;
+    head: any;
+    curvePoints: any[];
     progress: number;
     speed: number;
-    altitude: number;
-    color: string;
   }
 
-  const arcs: FlyingArc[] = [];
-  const arcColors = ['#38bdf8', '#a855f7', '#34d399', '#22d3ee', '#f472b6'];
+  const laserArcs: LaserArc[] = [];
+  const arcPalette = [0x38bdf8, 0xa855f7, 0x34d399, 0x22d3ee, 0xf472b6];
 
-  function spawnArc(index: number): FlyingArc {
+  function createLaserArc(index: number): LaserArc {
     const startIdx = index % 2 === 0 ? 0 : Math.floor(Math.random() * hubs.length);
     let endIdx = Math.floor(Math.random() * hubs.length);
-    if (endIdx === startIdx) endIdx = (startIdx + 2) % hubs.length;
+    if (endIdx === startIdx) endIdx = (startIdx + 3) % hubs.length;
+
+    const vStart = latLonToVector3(hubs[startIdx].lat, hubs[startIdx].lon, 1.005);
+    const vEnd = latLonToVector3(hubs[endIdx].lat, hubs[endIdx].lon, 1.005);
+
+    const distance = vStart.distanceTo(vEnd);
+    const midPoint = vStart.clone().add(vEnd).multiplyScalar(0.5);
+    midPoint.normalize().multiplyScalar(1.05 + distance * 0.32);
+
+    const curve = new THREE.QuadraticBezierCurve3(vStart, midPoint, vEnd);
+    const curvePoints = curve.getPoints(64);
+
+    const geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    geometry.setDrawRange(0, 0);
+
+    const material = new THREE.LineBasicMaterial({
+      color: arcPalette[index % arcPalette.length],
+      transparent: true,
+      opacity: 0.9,
+    });
+
+    const line = new THREE.Line(geometry, material);
+    earthGroup.add(line);
+
+    const headGeo = new THREE.SphereGeometry(0.018, 10, 10);
+    const headMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const head = new THREE.Mesh(headGeo, headMat);
+    head.visible = false;
+    earthGroup.add(head);
 
     return {
-      from: latLonToVec(hubs[startIdx].lat, hubs[startIdx].lon),
-      to: latLonToVec(hubs[endIdx].lat, hubs[endIdx].lon),
-      progress: (index / 10) * -0.8,
-      speed: 0.0075 + Math.random() * 0.004,
-      altitude: 0.28 + Math.random() * 0.22,
-      color: arcColors[index % arcColors.length],
+      line,
+      head,
+      curvePoints,
+      progress: -index * 0.14,
+      speed: 0.008 + Math.random() * 0.004,
     };
   }
 
-  for (let i = 0; i < 10; i++) {
-    arcs.push(spawnArc(i));
+  for (let i = 0; i < 9; i++) {
+    laserArcs.push(createLaserArc(i));
   }
 
-  let rotY = -2.0; // Facing Indonesia & Asia-Pacific
-  let rotX = 0.2;
-  let velY = 0.0045;
+  // Interactive Touch & Mouse Drag Rotation
+  let isDragging = false;
+  let prevX = 0;
+  let prevY = 0;
+  let rotSpeedY = 0.0035;
 
-  canvas.addEventListener('pointermove', (e) => {
-    if (e.buttons === 1 || e.pointerType === 'touch') {
-      velY = e.movementX * 0.003;
-      rotX = Math.max(-0.75, Math.min(0.75, rotX + e.movementY * 0.003));
-    }
+  const domElem = renderer.domElement;
+  domElem.addEventListener('pointerdown', (e: PointerEvent) => {
+    isDragging = true;
+    prevX = e.clientX;
+    prevY = e.clientY;
   });
 
-  function rotatePoint(
-    p: { x: number; y: number; z: number },
-    cosY: number,
-    sinY: number,
-    cosX: number,
-    sinX: number
-  ) {
-    const x1 = p.x * cosY - p.z * sinY;
-    const z1 = p.z * cosY + p.x * sinY;
-    const y2 = p.y * cosX - z1 * sinX;
-    const z2 = z1 * cosX + p.y * sinX;
-    return { x: x1, y: y2, z: z2 };
-  }
+  window.addEventListener('pointerup', () => {
+    isDragging = false;
+  });
 
-  function renderGlobe(): void {
-    if (!ctx) return;
-    ctx.clearRect(0, 0, width, height);
+  domElem.addEventListener('pointermove', (e: PointerEvent) => {
+    if (!isDragging) return;
+    const dx = e.clientX - prevX;
+    const dy = e.clientY - prevY;
+    prevX = e.clientX;
+    prevY = e.clientY;
 
-    rotY += velY;
-    velY *= 0.96;
-    if (Math.abs(velY) < 0.004) {
-      velY = velY >= 0 ? 0.004 : -0.004;
-    }
-
-    const cx = width / 2;
-    const cy = height / 2;
-    const radius = Math.min(width, height) * 0.35;
-
-    const cosY = Math.cos(rotY);
-    const sinY = Math.sin(rotY);
-    const cosX = Math.cos(rotX);
-    const sinX = Math.sin(rotX);
-
-    // 1. Atmosphere Halo
-    const atmoGrad = ctx.createRadialGradient(cx, cy, radius * 0.88, cx, cy, radius * 1.32);
-    atmoGrad.addColorStop(0, 'rgba(56, 189, 248, 0.22)');
-    atmoGrad.addColorStop(0.55, 'rgba(129, 140, 248, 0.08)');
-    atmoGrad.addColorStop(1, 'rgba(4, 6, 11, 0)');
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius * 1.32, 0, Math.PI * 2);
-    ctx.fillStyle = atmoGrad;
-    ctx.fill();
-
-    // 2. Globe Sphere Body
-    const coreGrad = ctx.createRadialGradient(
-      cx - radius * 0.3,
-      cy - radius * 0.3,
-      radius * 0.1,
-      cx,
-      cy,
-      radius
+    earthGroup.rotation.y += dx * 0.007;
+    earthGroup.rotation.x = Math.max(
+      -0.65,
+      Math.min(0.65, earthGroup.rotation.x + dy * 0.007)
     );
-    coreGrad.addColorStop(0, '#0f172a');
-    coreGrad.addColorStop(1, '#03050a');
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.fillStyle = coreGrad;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    rotSpeedY = dx * 0.002;
+  });
 
-    // 3. Draw Glowing Continent Outlines
-    ctx.lineWidth = 1.4;
-    coastLines3D.forEach((poly) => {
-      ctx.beginPath();
-      let started = false;
-      poly.forEach((pt) => {
-        const r = rotatePoint(pt, cosY, sinY, cosX, sinX);
-        if (r.z <= 0.05) {
-          const px = cx + r.x * radius;
-          const py = cy + r.y * radius;
-          if (!started) {
-            ctx.moveTo(px, py);
-            started = true;
-          } else {
-            ctx.lineTo(px, py);
-          }
-        } else {
-          started = false;
-        }
-      });
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
-      ctx.stroke();
-    });
+  window.addEventListener('resize', () => {
+    if (!container) return;
+    const w = container.offsetWidth || 320;
+    const h = container.offsetHeight || 340;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
 
-    // 4. Draw High-Density Continent Dots
-    for (let i = 0; i < baseDots.length; i++) {
-      const dot = baseDots[i];
-      const r = rotatePoint(dot, cosY, sinY, cosX, sinX);
-      if (r.z > 0.08 && !dot.land) continue;
+  function animate(): void {
+    requestAnimationFrame(animate);
 
-      const isFront = r.z <= 0;
-      const px = cx + r.x * radius;
-      const py = cy + r.y * radius;
-
-      ctx.beginPath();
-      if (dot.land) {
-        ctx.arc(px, py, isFront ? 1.85 : 1.0, 0, Math.PI * 2);
-        ctx.fillStyle = isFront ? 'rgba(56, 189, 248, 0.92)' : 'rgba(56, 189, 248, 0.12)';
-      } else {
-        ctx.arc(px, py, 1.0, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.14)';
+    if (!isDragging) {
+      earthGroup.rotation.y += rotSpeedY;
+      rotSpeedY *= 0.96;
+      if (Math.abs(rotSpeedY) < 0.0032) {
+        rotSpeedY = rotSpeedY >= 0 ? 0.0032 : -0.0032;
       }
-      ctx.fill();
     }
 
-    // 5. Draw Bright High-Arc Flying Laser Beams
-    arcs.forEach((arc, idx) => {
+    // Animate Flying Laser Beams
+    laserArcs.forEach((arc) => {
       arc.progress += arc.speed;
-      if (arc.progress > 1.35) {
-        arcs[idx] = spawnArc(idx);
+      if (arc.progress > 1.45) {
+        arc.progress = -0.15;
+      }
+
+      const totalPts = arc.curvePoints.length;
+      if (arc.progress <= 0) {
+        arc.line.geometry.setDrawRange(0, 0);
+        arc.head.visible = false;
         return;
       }
 
-      const headT = Math.min(1, Math.max(0, arc.progress));
-      const tailT = Math.max(0, arc.progress - 0.45);
-      if (headT <= 0) return;
+      const headIdx = Math.min(totalPts - 1, Math.floor(arc.progress * totalPts));
+      const tailIdx = Math.max(0, Math.floor((arc.progress - 0.42) * totalPts));
+      const count = Math.max(0, headIdx - tailIdx);
 
-      const steps = 32;
-      const points: { x: number; y: number; z: number }[] = [];
+      arc.line.geometry.setDrawRange(tailIdx, count);
 
-      for (let s = 0; s <= steps; s++) {
-        const t = tailT + ((headT - tailT) * s) / steps;
-        const lx = arc.from.x + (arc.to.x - arc.from.x) * t;
-        const ly = arc.from.y + (arc.to.y - arc.from.y) * t;
-        const lz = arc.from.z + (arc.to.z - arc.from.z) * t;
-        const len = Math.sqrt(lx * lx + ly * ly + lz * lz) || 1;
-        const lift = 1 + Math.sin(t * Math.PI) * arc.altitude;
-
-        const r = rotatePoint(
-          { x: (lx / len) * lift, y: (ly / len) * lift, z: (lz / len) * lift },
-          cosY,
-          sinY,
-          cosX,
-          sinX
-        );
-        points.push(r);
+      if (arc.progress <= 1.0 && headIdx < totalPts) {
+        arc.head.visible = true;
+        arc.head.position.copy(arc.curvePoints[headIdx]);
+      } else {
+        arc.head.visible = false;
       }
-
-      // Outer glow + core beam
-      for (let s = 1; s < points.length; s++) {
-        const pPrev = points[s - 1];
-        const pCurr = points[s];
-        // Show arc whenever it's in front OR lifted above horizon
-        const distFromCenter = Math.hypot(pCurr.x, pCurr.y);
-        if (pCurr.z > 0.15 && distFromCenter < 1.0) continue;
-
-        const ratio = s / points.length;
-        ctx.beginPath();
-        ctx.moveTo(cx + pPrev.x * radius, cy + pPrev.y * radius);
-        ctx.lineTo(cx + pCurr.x * radius, cy + pCurr.y * radius);
-        ctx.strokeStyle = arc.color;
-        ctx.globalAlpha = ratio * 0.95;
-        ctx.lineWidth = 1.5 + ratio * 3.0;
-        ctx.stroke();
-      }
-
-      // Glowing Comet Head + Ripple
-      const tip = points[points.length - 1];
-      if (tip) {
-        const distTip = Math.hypot(tip.x, tip.y);
-        if (tip.z <= 0.15 || distTip >= 1.0) {
-          const tx = cx + tip.x * radius;
-          const ty = cy + tip.y * radius;
-
-          ctx.globalAlpha = 1;
-          ctx.beginPath();
-          ctx.arc(tx, ty, 4.5, 0, Math.PI * 2);
-          ctx.fillStyle = '#ffffff';
-          ctx.fill();
-
-          if (arc.progress > 0.92) {
-            const pulseR = (arc.progress - 0.92) * 55;
-            ctx.beginPath();
-            ctx.arc(tx, ty, pulseR, 0, Math.PI * 2);
-            ctx.strokeStyle = arc.color;
-            ctx.globalAlpha = Math.max(0, 1 - (arc.progress - 0.92) * 2.4);
-            ctx.lineWidth = 2.5;
-            ctx.stroke();
-          }
-        }
-      }
-      ctx.globalAlpha = 1;
     });
 
-    requestAnimationFrame(renderGlobe);
+    renderer.render(scene, camera);
   }
 
-  renderGlobe();
+  animate();
 }
 
 function setupMobileNav(): void {
@@ -621,4 +454,4 @@ function setupEstimator(): void {
 }
 
 document.addEventListener('DOMContentLoaded', bootApp);
-        
+                               
