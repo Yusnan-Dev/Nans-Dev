@@ -54,7 +54,7 @@ async function bootApp(): Promise<void> {
   }
 }
 
-/* Photorealistic 3D Earth with Satellite Textures + Flying 3D Laser Arcs */
+/* Photorealistic 3D Earth with Flick-Spin Momentum + Flying 3D Laser Arcs */
 function initPhotorealisticEarth(): void {
   const container = document.getElementById('earth-3d-container');
   if (!container || typeof THREE === 'undefined') return;
@@ -75,7 +75,7 @@ function initPhotorealisticEarth(): void {
   const earthGroup = new THREE.Group();
   scene.add(earthGroup);
 
-  // Rotate initial view to face Indonesia & Asia-Pacific
+  // Initial orientation facing Indonesia & Asia-Pacific
   earthGroup.rotation.y = -2.25;
   earthGroup.rotation.x = 0.22;
 
@@ -116,7 +116,7 @@ function initPhotorealisticEarth(): void {
   const atmoMesh = new THREE.Mesh(atmoGeo, atmoMat);
   earthGroup.add(atmoMesh);
 
-  // 3. Studio Lighting (Sun + Rim Light)
+  // 3. Studio Lighting
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
   scene.add(ambientLight);
 
@@ -128,7 +128,6 @@ function initPhotorealisticEarth(): void {
   rimLight.position.set(-4, -2, -3);
   scene.add(rimLight);
 
-  // Convert Lat/Lon to 3D Vector on Sphere
   function latLonToVector3(lat: number, lon: number, radius = 1.005) {
     const phi = (90 - lat) * (Math.PI / 180);
     const theta = (lon + 180) * (Math.PI / 180);
@@ -139,7 +138,6 @@ function initPhotorealisticEarth(): void {
     );
   }
 
-  // Global Hub Cities (Indonesia centered)
   const hubs = [
     { lat: -7.25, lon: 112.75 }, // Surabaya / Jatim
     { lat: -6.2, lon: 106.8 },   // Jakarta
@@ -152,7 +150,6 @@ function initPhotorealisticEarth(): void {
     { lat: -23.55, lon: -46.63 } // Sao Paulo
   ];
 
-  // Add glowing city beacon dots
   const beaconGeo = new THREE.SphereGeometry(0.016, 12, 12);
   hubs.forEach((h, i) => {
     const pos = latLonToVector3(h.lat, h.lon, 1.008);
@@ -164,7 +161,7 @@ function initPhotorealisticEarth(): void {
     earthGroup.add(dot);
   });
 
-  // 4. Flying 3D Laser Arcs Across Continents
+  // 4. Flying 3D Laser Arcs
   interface LaserArc {
     line: any;
     head: any;
@@ -222,36 +219,37 @@ function initPhotorealisticEarth(): void {
     laserArcs.push(createLaserArc(i));
   }
 
-  // Interactive Touch & Mouse Drag Rotation
-  let isDragging = false;
+  // Flick-Spin Physics (Momentum Impulse on Swipe)
+  let isPointerDown = false;
   let prevX = 0;
   let prevY = 0;
-  let rotSpeedY = 0.0035;
+  let velY = 0.004;
+  let velX = 0;
+  const baseCruiseSpeed = 0.004;
 
   const domElem = renderer.domElement;
+  domElem.style.touchAction = 'none';
+
   domElem.addEventListener('pointerdown', (e: PointerEvent) => {
-    isDragging = true;
+    isPointerDown = true;
     prevX = e.clientX;
     prevY = e.clientY;
   });
 
   window.addEventListener('pointerup', () => {
-    isDragging = false;
+    isPointerDown = false;
   });
 
   domElem.addEventListener('pointermove', (e: PointerEvent) => {
-    if (!isDragging) return;
+    if (!isPointerDown) return;
     const dx = e.clientX - prevX;
     const dy = e.clientY - prevY;
     prevX = e.clientX;
     prevY = e.clientY;
 
-    earthGroup.rotation.y += dx * 0.007;
-    earthGroup.rotation.x = Math.max(
-      -0.65,
-      Math.min(0.65, earthGroup.rotation.x + dy * 0.007)
-    );
-    rotSpeedY = dx * 0.002;
+    // Inject immediate rotational impulse so a quick swipe launches a smooth spin
+    velY = THREE.MathUtils.clamp(velY + dx * 0.0045, -0.28, 0.28);
+    velX = THREE.MathUtils.clamp(velX + dy * 0.0025, -0.12, 0.12);
   });
 
   window.addEventListener('resize', () => {
@@ -266,12 +264,21 @@ function initPhotorealisticEarth(): void {
   function animate(): void {
     requestAnimationFrame(animate);
 
-    if (!isDragging) {
-      earthGroup.rotation.y += rotSpeedY;
-      rotSpeedY *= 0.96;
-      if (Math.abs(rotSpeedY) < 0.0032) {
-        rotSpeedY = rotSpeedY >= 0 ? 0.0032 : -0.0032;
-      }
+    // Apply continuous angular velocity + smooth friction decay
+    earthGroup.rotation.y += velY;
+    earthGroup.rotation.x = THREE.MathUtils.clamp(
+      earthGroup.rotation.x + velX,
+      -0.65,
+      0.65
+    );
+
+    velY *= 0.965;
+    velX *= 0.92;
+
+    // Gently return to steady cruise rotation after flick slows down
+    if (Math.abs(velY) < baseCruiseSpeed) {
+      const targetDir = velY >= 0 ? baseCruiseSpeed : -baseCruiseSpeed;
+      velY += (targetDir - velY) * 0.05;
     }
 
     // Animate Flying Laser Beams
@@ -454,4 +461,4 @@ function setupEstimator(): void {
 }
 
 document.addEventListener('DOMContentLoaded', bootApp);
-                               
+    
