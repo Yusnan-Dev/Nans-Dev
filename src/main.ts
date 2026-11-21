@@ -27,7 +27,7 @@ interface EnterpriseData {
   services: ServiceItem[];
 }
 
-const WHATSAPP_NUMBER = '6281234567890'; // Ganti nomor WA lu (diawali 62)
+const WHATSAPP_NUMBER = '6283187521130'; // Ganti nomor WA lu (diawali 62)
 
 async function bootApp(): Promise<void> {
   setupMobileNav();
