@@ -3,24 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nans Dev — Enterprise Web Engineering & Visual Architecture</title>
+  <title>Nans Dev — Enterprise Web Engineering & 3D Visual Architecture</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+
   <header class="navbar">
     <div class="container nav-inner">
       <a href="#" class="brand">
-        <div class="logo-mark">N</div>
+        <div class="logo-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M4 19V5L12 13L20 5V19" stroke="#05070c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         NANS<span>DEV</span>
       </a>
 
       <nav class="nav-links" id="nav-links">
-        <a href="#services">Arsitektur Layanan</a>
-        <a href="#vector-lab">Vector Lab</a>
-        <a href="#portfolio">Portofolio Live</a>
-        <a href="#estimator">Estimasi Proyek</a>
+        <a href="#services">Arsitektur</a>
+        <a href="#vector-lab">Vector 3D Lab</a>
+        <a href="#portfolio">Portofolio</a>
+        <a href="#estimator">Estimasi</a>
       </nav>
 
       <div class="build-badge">
@@ -33,13 +40,27 @@
   </header>
 
   <main class="container">
-    <section class="hero">
-      <div class="pill-announcement">⚡ Multi-Language Web & Brand Architecture</div>
-      <h1>Membangun Sistem Web & Identitas Visual Standar Korporat.</h1>
-      <p>Dari pengembangan website custom berperforma tinggi hingga rekonstruksi aset vektor presisi—dirancang untuk meningkatkan kredibilitas dan konversi bisnis Anda.</p>
-      <div class="hero-actions">
-        <a href="#estimator" class="btn-primary">Hitung Estimasi Proyek</a>
-        <a href="#portfolio" class="btn-secondary">Eksplorasi Live Demo</a>
+    <section class="hero-enterprise">
+      <div class="hero-copy">
+        <div class="pill-announcement">
+          <span class="pulse-ring"></span> Next-Gen Web & Visual Architecture
+        </div>
+        <h1>Membangun Sistem Web & Identitas Visual Standar Korporat.</h1>
+        <p>Rekayasa website custom berperforma tinggi, desain antarmuka modern, dan rekonstruksi aset vektor presisi untuk akselerasi bisnis digital Anda.</p>
+        <div class="hero-actions">
+          <a href="#estimator" class="btn-primary">Rakit Proyek Anda</a>
+          <a href="#portfolio" class="btn-secondary">Eksplorasi Demo ↗</a>
+        </div>
+      </div>
+
+      <div class="hero-3d-stage">
+        <canvas id="canvas-3d"></canvas>
+        <div class="floating-hud hud-top">
+          <span class="hud-dot"></span> RENDER ENGINE: 120 FPS
+        </div>
+        <div class="floating-hud hud-bottom">
+          <span>SVG / TS / PYTHON CORE</span>
+        </div>
       </div>
     </section>
 
@@ -48,34 +69,57 @@
     <section id="services">
       <div class="section-header">
         <div class="kicker">Core Capabilities</div>
-        <h2>Solusi Digital Terintegrasi</h2>
+        <h2>Infrastruktur Layanan Digital</h2>
       </div>
       <div class="bento-grid" id="services-bento"></div>
     </section>
 
     <section id="vector-lab">
       <div class="section-header">
-        <div class="kicker">Interactive Comparison</div>
-        <h2>Raster-to-Vector Precision Lab</h2>
+        <div class="kicker">Interactive Precision Lab</div>
+        <h2>Raster-to-Vector & Emblem Reconstruction</h2>
       </div>
       <div class="vector-lab">
         <div>
-          <h3 style="margin-bottom:0.75rem; font-size:1.35rem;">Geser untuk Melihat Perbedaan Ketajaman</h3>
+          <h3 style="margin-bottom:0.75rem; font-size:1.35rem;">Geser untuk Menguji Ketajaman Geometri</h3>
           <p style="color:#94a3b8; font-size:0.92rem; margin-bottom:1.25rem;">
-            Logo pecah atau buram merusak citra bisnis. Kami menggambar ulang aset visual Anda secara manual menjadi geometri vektor murni yang tajam di segala ukuran.
+            Bandingkan langsung aset beresolusi rendah dengan hasil rekonstruksi vektor murni yang tetap tajam hingga skala baliho maupun layar Retina.
           </p>
-          <input type="range" min="0" max="100" value="50" id="vector-range" class="slider-control" />
+          <input type="range" min="5" max="95" value="50" id="vector-range" class="slider-control" />
+          <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:#64748b; margin-top:6px;">
+            <span>← RASTER BLUR</span>
+            <span>VECTOR SHARP →</span>
+          </div>
         </div>
+
         <div class="compare-stage">
           <div class="layer raster-layer">
-            <div class="pixel-box">NANS DEV</div>
-            <small>LOW-RES RASTER (BLUR / PECAH)</small>
+            <svg class="emblem-blur" width="120" height="120" viewBox="0 0 120 120">
+              <polygon points="60,10 105,35 105,85 60,110 15,85 15,35" fill="#334155" stroke="#64748b" stroke-width="4"/>
+              <polygon points="60,28 88,45 88,75 60,92 32,75 32,45" fill="#1e293b"/>
+              <path d="M45 72V48L60 62L75 48V72" stroke="#94a3b8" stroke-width="6" fill="none"/>
+            </svg>
+            <small>LOW-RES RASTER (PECAH)</small>
           </div>
+
           <div class="layer vector-layer" id="vector-layer">
-            <div class="sharp-box">NANS DEV</div>
-            <small>100% VECTOR GEOMETRY (TAJAM)</small>
+            <svg class="emblem-sharp" width="120" height="120" viewBox="0 0 120 120">
+              <defs>
+                <linearGradient id="hexGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#38bdf8"/>
+                  <stop offset="100%" stop-color="#818cf8"/>
+                </linearGradient>
+              </defs>
+              <polygon points="60,10 105,35 105,85 60,110 15,85 15,35" fill="rgba(56,189,248,0.12)" stroke="url(#hexGrad)" stroke-width="3"/>
+              <polygon points="60,26 90,43 90,77 60,94 30,77 30,43" fill="#090d16" stroke="#38bdf8" stroke-width="1.5"/>
+              <path d="M45 73V47L60 62L75 47V73" stroke="url(#hexGrad)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <small>100% VECTOR GEOMETRY (PRESISI)</small>
           </div>
-          <div class="slider-line" id="slider-line"></div>
+
+          <div class="slider-line" id="slider-line">
+            <div class="slider-knob">↔</div>
+          </div>
         </div>
       </div>
     </section>
@@ -83,12 +127,12 @@
     <section id="portfolio">
       <div class="section-header">
         <div class="kicker">Deployed Systems</div>
-        <h2>Portofolio & Live Demo</h2>
+        <h2>Portofolio & Arsitektur Live</h2>
       </div>
       <div class="filter-bar">
-        <button class="filter-btn active" data-filter="all">Semua Proyek</button>
-        <button class="filter-btn" data-filter="web">Website & Toko</button>
-        <button class="filter-btn" data-filter="system">Sistem & Direktori</button>
+        <button class="filter-btn active" data-filter="all">Semua Sistem</button>
+        <button class="filter-btn" data-filter="web">Website & E-Commerce</button>
+        <button class="filter-btn" data-filter="system">Platform Direktori</button>
         <button class="filter-btn" data-filter="design">Vector & Brand</button>
       </div>
       <div class="projects-grid" id="projects-grid"></div>
@@ -97,7 +141,7 @@
     <section id="estimator">
       <div class="section-header">
         <div class="kicker">Project Configurator</div>
-        <h2>Rakit Kebutuhan Proyek Anda</h2>
+        <h2>Simulasi & Estimasi Proyek</h2>
       </div>
       <div class="estimator-box">
         <div class="est-grid">
@@ -122,7 +166,7 @@
           <div class="est-summary">
             <div class="est-label">Estimasi Waktu Rilis</div>
             <div class="est-time" id="est-days">3 Hari Kerja</div>
-            <p class="est-note">Spesifikasi modul otomatis terlampir saat Anda klik tombol di bawah.</p>
+            <p class="est-note">Spesifikasi modul otomatis terlampir saat Anda melanjutkan ke WhatsApp.</p>
             <button type="button" id="est-wa-btn" class="btn-primary" style="width:100%;">Kirim Brief via WhatsApp</button>
           </div>
         </div>
@@ -132,10 +176,11 @@
 
   <footer>
     <div class="container">
-      &copy; 2026 Nans Dev Architecture. Ditenagai oleh Python, TypeScript, SCSS & GitHub Actions.
+      &copy; 2026 Nans Dev Architecture. Engineered with Python, TypeScript, SCSS & GitHub Actions.
     </div>
   </footer>
 
   <script src="./main.js" defer></script>
 </body>
-</html>
+  </html>
+  
