@@ -27,11 +27,11 @@ interface EnterpriseData {
   services: ServiceItem[];
 }
 
-const WHATSAPP_NUMBER = '6283187521130'; // Ganti dengan nomor WA aktif lu (diawali 62)
+const WHATSAPP_NUMBER = '6281234567890'; // Ganti nomor WA lu (diawali 62)
 
 async function bootApp(): Promise<void> {
   setupMobileNav();
-  init3DEarthGlobe();
+  initReal3DEarth();
   setupVectorSlider();
   setupEstimator();
 
@@ -52,8 +52,8 @@ async function bootApp(): Promise<void> {
   }
 }
 
-/* 3D Earth Globe with Continents & Flying Laser Arcs */
-function init3DEarthGlobe(): void {
+/* Real World Coastlines + High-Density Dot Globe + Bright Flying Laser Arcs */
+function initReal3DEarth(): void {
   const canvas = document.getElementById('canvas-3d') as HTMLCanvasElement | null;
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -68,65 +68,121 @@ function init3DEarthGlobe(): void {
     height = canvas.height = canvas.offsetHeight * 2;
   });
 
-  // Approximate continental landmass detection (lat in deg, lon in deg)
-  function isLand(lat: number, lon: number): boolean {
+  // Real continental & archipelago coastline polygons [lon, lat]
+  const WORLD_POLYGONS: number[][][] = [
     // North America
-    if (lat > 15 && lat < 70 && lon > -165 && lon < -55) {
-      if (lat < 30 && lon > -85) return false;
-      return true;
-    }
+    [
+      [-168, 66], [-162, 60], [-152, 58], [-140, 60], [-130, 54], [-124, 48],
+      [-122, 37], [-117, 32], [-110, 24], [-105, 20], [-92, 15], [-84, 9],
+      [-79, 9], [-83, 15], [-88, 21], [-97, 26], [-90, 29], [-82, 25],
+      [-80, 32], [-75, 39], [-70, 42], [-64, 45], [-55, 52], [-64, 60],
+      [-78, 63], [-85, 68], [-95, 72], [-115, 70], [-135, 69], [-156, 71]
+    ],
+    // Greenland
+    [
+      [-52, 60], [-44, 60], [-22, 70], [-18, 81], [-45, 83], [-68, 77], [-58, 68]
+    ],
     // South America
-    if (lat > -55 && lat < 13 && lon > -82 && lon < -34) {
-      if (lat < -20 && lon < -72) return false;
-      return true;
-    }
+    [
+      [-78, 10], [-71, 12], [-60, 7], [-50, 1], [-35, -6], [-38, -14],
+      [-41, -22], [-52, -33], [-62, -40], [-67, -54], [-74, -52], [-73, -40],
+      [-71, -28], [-76, -14], [-81, -4]
+    ],
     // Europe
-    if (lat > 36 && lat < 71 && lon > -10 && lon < 45) return true;
+    [
+      [-9, 37], [-9, 43], [-2, 48], [2, 51], [8, 54], [10, 58], [5, 61],
+      [15, 68], [28, 71], [42, 67], [55, 68], [58, 52], [45, 45], [30, 41],
+      [24, 37], [16, 38], [12, 44], [5, 43], [-3, 36]
+    ],
+    // UK & Ireland
+    [
+      [-6, 50], [-5, 58], [-1, 58], [1, 52], [-4, 50]
+    ],
     // Africa
-    if (lat > -35 && lat < 36 && lon > -18 && lon < 51) {
-      if (lat < 5 && lon < 8) return false;
-      return true;
-    }
-    // Asia
-    if (lat > 8 && lat < 75 && lon >= 45 && lon < 145) {
-      if (lat < 22 && lon > 118) return false;
-      return true;
-    }
-    // Indonesia & Southeast Asia Archipelago
-    if (lat > -10 && lat <= 8 && lon > 95 && lon < 141) {
-      return Math.sin(lat * 0.9) * Math.cos(lon * 0.7) > -0.25;
-    }
+    [
+      [-17, 15], [-13, 28], [-6, 35], [10, 37], [25, 32], [33, 31],
+      [43, 12], [51, 11], [41, -2], [40, -15], [33, -26], [26, -34],
+      [18, -34], [14, -22], [12, -6], [9, 4], [2, 6], [-8, 5], [-16, 11]
+    ],
+    // Madagascar
+    [
+      [44, -25], [47, -13], [50, -16], [47, -25]
+    ],
+    // Asia Mainland
+    [
+      [33, 31], [36, 37], [48, 30], [56, 26], [58, 21], [45, 13], [55, 17],
+      [62, 25], [70, 21], [77, 8], [82, 16], [89, 22], [94, 16], [98, 16],
+      [103, 2], [105, 10], [109, 13], [108, 21], [116, 23], [121, 31],
+      [119, 39], [126, 35], [129, 42], [136, 45], [142, 54], [158, 53],
+      [172, 62], [178, 66], [155, 70], [125, 73], [102, 77], [75, 72],
+      [58, 68], [58, 52], [45, 45], [36, 41]
+    ],
+    // Japan
+    [
+      [130, 32], [136, 34], [141, 41], [144, 44], [140, 44], [136, 37], [131, 34]
+    ],
+    // Sumatera
+    [
+      [95, 5], [99, 3], [104, -1], [106, -6], [103, -5], [98, 0]
+    ],
+    // Jawa
+    [
+      [105, -6], [110, -6.5], [114.5, -7.8], [114, -8.6], [108, -7.7], [105.5, -6.8]
+    ],
+    // Kalimantan
+    [
+      [109, 1], [114, 4], [118, 6], [118, 1], [116, -4], [111, -3], [109, -1]
+    ],
+    // Sulawesi
+    [
+      [119, -5], [120, -1], [124, 1], [123, -1], [122, -4], [120, -5]
+    ],
+    // Papua
+    [
+      [131, -1], [136, -2], [141, -3], [148, -7], [147, -10], [140, -8], [135, -5], [132, -3]
+    ],
     // Australia
-    if (lat > -40 && lat < -11 && lon > 113 && lon < 154) return true;
-    return false;
-  }
+    [
+      [114, -22], [122, -16], [131, -12], [136, -13], [142, -11], [146, -19],
+      [153, -28], [150, -37], [140, -38], [131, -32], [116, -34], [113, -26]
+    ],
+    // New Zealand
+    [
+      [167, -46], [174, -41], [177, -37], [174, -35], [171, -42], [167, -46]
+    ]
+  ];
 
-  interface GlobePoint {
-    x: number;
-    y: number;
-    z: number;
-    land: boolean;
-  }
+  // Rasterize real world map onto an offscreen mask canvas for crisp dot & coastline sampling
+  const maskCanvas = document.createElement('canvas');
+  maskCanvas.width = 360;
+  maskCanvas.height = 180;
+  const mCtx = maskCanvas.getContext('2d')!;
+  mCtx.fillStyle = '#000000';
+  mCtx.fillRect(0, 0, 360, 180);
 
-  const baseDots: GlobePoint[] = [];
-  const latSteps = 44;
-  const lonSteps = 88;
+  mCtx.fillStyle = '#ffffff';
+  mCtx.strokeStyle = '#ffffff';
+  mCtx.lineWidth = 1.2;
 
-  for (let i = 0; i <= latSteps; i++) {
-    const lat = -90 + (180 * i) / latSteps;
-    const phi = ((90 - lat) * Math.PI) / 180;
-    const ringCount = Math.max(8, Math.round(lonSteps * Math.sin(phi)));
+  WORLD_POLYGONS.forEach((poly) => {
+    mCtx.beginPath();
+    poly.forEach(([lon, lat], idx) => {
+      const x = lon + 180;
+      const y = 90 - lat;
+      if (idx === 0) mCtx.moveTo(x, y);
+      else mCtx.lineTo(x, y);
+    });
+    mCtx.closePath();
+    mCtx.fill();
+    mCtx.stroke();
+  });
 
-    for (let j = 0; j < ringCount; j++) {
-      const lon = -180 + (360 * j) / ringCount;
-      const theta = ((lon + 180) * Math.PI) / 180;
+  const maskData = mCtx.getImageData(0, 0, 360, 180).data;
 
-      const x = -Math.sin(phi) * Math.cos(theta);
-      const y = Math.cos(phi);
-      const z = Math.sin(phi) * Math.sin(theta);
-
-      baseDots.push({ x, y, z, land: isLand(lat, lon) });
-    }
+  function isRealLand(lat: number, lon: number): boolean {
+    const x = Math.min(359, Math.max(0, Math.floor(lon + 180)));
+    const y = Math.min(179, Math.max(0, Math.floor(90 - lat)));
+    return maskData[(y * 360 + x) * 4] > 100;
   }
 
   function latLonToVec(lat: number, lon: number): { x: number; y: number; z: number } {
@@ -139,16 +195,49 @@ function init3DEarthGlobe(): void {
     };
   }
 
-  // Global Hub Coordinates (Indonesia centered & international routes)
+  interface GlobePoint {
+    x: number;
+    y: number;
+    z: number;
+    land: boolean;
+  }
+
+  // High-density Fibonacci/grid dots for sharp recognizable continents
+  const baseDots: GlobePoint[] = [];
+  const latSteps = 76;
+  const lonSteps = 152;
+
+  for (let i = 1; i < latSteps; i++) {
+    const lat = -90 + (180 * i) / latSteps;
+    const phi = ((90 - lat) * Math.PI) / 180;
+    const ringCount = Math.max(12, Math.round(lonSteps * Math.sin(phi)));
+
+    for (let j = 0; j < ringCount; j++) {
+      const lon = -180 + (360 * j) / ringCount;
+      const land = isRealLand(lat, lon);
+      // Keep all land dots, and sparse ocean grid dots for spherical depth
+      if (!land && (i % 3 !== 0 || j % 3 !== 0)) continue;
+
+      const vec = latLonToVec(lat, lon);
+      baseDots.push({ ...vec, land });
+    }
+  }
+
+  // Convert coastline polygons to 3D lines so continent outlines glow sharply
+  const coastLines3D = WORLD_POLYGONS.map((poly) =>
+    poly.map(([lon, lat]) => latLonToVec(lat, lon))
+  );
+
+  // Global Hub Cities (Indonesia centered + global connections)
   const hubs = [
-    { lat: -7.25, lon: 112.75 }, // Surabaya / Jawa Timur
+    { lat: -7.25, lon: 112.75 }, // Surabaya / Jatim
     { lat: -6.2, lon: 106.8 },   // Jakarta
     { lat: 1.35, lon: 103.8 },   // Singapore
     { lat: 35.68, lon: 139.69 }, // Tokyo
+    { lat: 25.2, lon: 55.27 },   // Dubai
     { lat: 51.5, lon: -0.12 },   // London
     { lat: 40.71, lon: -74.0 },  // New York
     { lat: -33.86, lon: 151.2 }, // Sydney
-    { lat: 25.2, lon: 55.27 },   // Dubai
     { lat: -23.55, lon: -46.63 } // Sao Paulo
   ];
 
@@ -162,35 +251,35 @@ function init3DEarthGlobe(): void {
   }
 
   const arcs: FlyingArc[] = [];
-  const arcColors = ['#38bdf8', '#818cf8', '#34d399', '#22d3ee'];
+  const arcColors = ['#38bdf8', '#a855f7', '#34d399', '#22d3ee', '#f472b6'];
 
   function spawnArc(index: number): FlyingArc {
     const startIdx = index % 2 === 0 ? 0 : Math.floor(Math.random() * hubs.length);
     let endIdx = Math.floor(Math.random() * hubs.length);
-    if (endIdx === startIdx) endIdx = (startIdx + 3) % hubs.length;
+    if (endIdx === startIdx) endIdx = (startIdx + 2) % hubs.length;
 
     return {
       from: latLonToVec(hubs[startIdx].lat, hubs[startIdx].lon),
       to: latLonToVec(hubs[endIdx].lat, hubs[endIdx].lon),
-      progress: Math.random() * -0.5,
-      speed: 0.0065 + Math.random() * 0.004,
-      altitude: 0.25 + Math.random() * 0.18,
+      progress: (index / 10) * -0.8,
+      speed: 0.0075 + Math.random() * 0.004,
+      altitude: 0.28 + Math.random() * 0.22,
       color: arcColors[index % arcColors.length],
     };
   }
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 10; i++) {
     arcs.push(spawnArc(i));
   }
 
-  let rotY = -2.1; // Start facing Indonesia / Asia
-  let rotX = 0.22;
+  let rotY = -2.0; // Facing Indonesia & Asia-Pacific
+  let rotX = 0.2;
   let velY = 0.0045;
 
   canvas.addEventListener('pointermove', (e) => {
     if (e.buttons === 1 || e.pointerType === 'touch') {
       velY = e.movementX * 0.003;
-      rotX = Math.max(-0.8, Math.min(0.8, rotX + e.movementY * 0.003));
+      rotX = Math.max(-0.75, Math.min(0.75, rotX + e.movementY * 0.003));
     }
   });
 
@@ -220,24 +309,24 @@ function init3DEarthGlobe(): void {
 
     const cx = width / 2;
     const cy = height / 2;
-    const radius = Math.min(width, height) * 0.34;
+    const radius = Math.min(width, height) * 0.35;
 
     const cosY = Math.cos(rotY);
     const sinY = Math.sin(rotY);
     const cosX = Math.cos(rotX);
     const sinX = Math.sin(rotX);
 
-    // 1. Outer Atmosphere Glow
-    const atmoGrad = ctx.createRadialGradient(cx, cy, radius * 0.85, cx, cy, radius * 1.28);
-    atmoGrad.addColorStop(0, 'rgba(56, 189, 248, 0.16)');
-    atmoGrad.addColorStop(0.6, 'rgba(129, 140, 248, 0.06)');
-    atmoGrad.addColorStop(1, 'rgba(5, 7, 12, 0)');
+    // 1. Atmosphere Halo
+    const atmoGrad = ctx.createRadialGradient(cx, cy, radius * 0.88, cx, cy, radius * 1.32);
+    atmoGrad.addColorStop(0, 'rgba(56, 189, 248, 0.22)');
+    atmoGrad.addColorStop(0.55, 'rgba(129, 140, 248, 0.08)');
+    atmoGrad.addColorStop(1, 'rgba(4, 6, 11, 0)');
     ctx.beginPath();
-    ctx.arc(cx, cy, radius * 1.28, 0, Math.PI * 2);
+    ctx.arc(cx, cy, radius * 1.32, 0, Math.PI * 2);
     ctx.fillStyle = atmoGrad;
     ctx.fill();
 
-    // 2. Dark Globe Core Sphere
+    // 2. Globe Sphere Body
     const coreGrad = ctx.createRadialGradient(
       cx - radius * 0.3,
       cy - radius * 0.3,
@@ -247,22 +336,44 @@ function init3DEarthGlobe(): void {
       radius
     );
     coreGrad.addColorStop(0, '#0f172a');
-    coreGrad.addColorStop(1, '#04060b');
+    coreGrad.addColorStop(1, '#03050a');
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.fillStyle = coreGrad;
     ctx.fill();
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+    ctx.lineWidth = 2;
     ctx.stroke();
 
-    // 3. Render Continent & Ocean Dots
+    // 3. Draw Glowing Continent Outlines
+    ctx.lineWidth = 1.4;
+    coastLines3D.forEach((poly) => {
+      ctx.beginPath();
+      let started = false;
+      poly.forEach((pt) => {
+        const r = rotatePoint(pt, cosY, sinY, cosX, sinX);
+        if (r.z <= 0.05) {
+          const px = cx + r.x * radius;
+          const py = cy + r.y * radius;
+          if (!started) {
+            ctx.moveTo(px, py);
+            started = true;
+          } else {
+            ctx.lineTo(px, py);
+          }
+        } else {
+          started = false;
+        }
+      });
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+      ctx.stroke();
+    });
+
+    // 4. Draw High-Density Continent Dots
     for (let i = 0; i < baseDots.length; i++) {
       const dot = baseDots[i];
       const r = rotatePoint(dot, cosY, sinY, cosX, sinX);
-
-      // Hide back-side ocean dots, keep faint back-side land silhouette
-      if (r.z > 0.15 && !dot.land) continue;
+      if (r.z > 0.08 && !dot.land) continue;
 
       const isFront = r.z <= 0;
       const px = cx + r.x * radius;
@@ -270,16 +381,16 @@ function init3DEarthGlobe(): void {
 
       ctx.beginPath();
       if (dot.land) {
-        ctx.arc(px, py, isFront ? 2.4 : 1.3, 0, Math.PI * 2);
-        ctx.fillStyle = isFront ? 'rgba(56, 189, 248, 0.92)' : 'rgba(56, 189, 248, 0.14)';
+        ctx.arc(px, py, isFront ? 1.85 : 1.0, 0, Math.PI * 2);
+        ctx.fillStyle = isFront ? 'rgba(56, 189, 248, 0.92)' : 'rgba(56, 189, 248, 0.12)';
       } else {
-        ctx.arc(px, py, 1.1, 0, Math.PI * 2);
+        ctx.arc(px, py, 1.0, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(148, 163, 184, 0.14)';
       }
       ctx.fill();
     }
 
-    // 4. Render Flying Data Arcs Across Continents
+    // 5. Draw Bright High-Arc Flying Laser Beams
     arcs.forEach((arc, idx) => {
       arc.progress += arc.speed;
       if (arc.progress > 1.35) {
@@ -288,15 +399,14 @@ function init3DEarthGlobe(): void {
       }
 
       const headT = Math.min(1, Math.max(0, arc.progress));
-      const tailT = Math.max(0, arc.progress - 0.35);
+      const tailT = Math.max(0, arc.progress - 0.45);
       if (headT <= 0) return;
 
-      const steps = 26;
+      const steps = 32;
       const points: { x: number; y: number; z: number }[] = [];
 
       for (let s = 0; s <= steps; s++) {
         const t = tailT + ((headT - tailT) * s) / steps;
-        // Linear interpolation normalized to sphere + parabolic altitude arc
         const lx = arc.from.x + (arc.to.x - arc.from.x) * t;
         const ly = arc.from.y + (arc.to.y - arc.from.y) * t;
         const lz = arc.from.z + (arc.to.z - arc.from.z) * t;
@@ -313,43 +423,47 @@ function init3DEarthGlobe(): void {
         points.push(r);
       }
 
-      // Draw glowing arc trail
+      // Outer glow + core beam
       for (let s = 1; s < points.length; s++) {
         const pPrev = points[s - 1];
         const pCurr = points[s];
-        if (pCurr.z > 0.25) continue; // Occlude behind globe
+        // Show arc whenever it's in front OR lifted above horizon
+        const distFromCenter = Math.hypot(pCurr.x, pCurr.y);
+        if (pCurr.z > 0.15 && distFromCenter < 1.0) continue;
 
-        const alpha = (s / points.length) * (pCurr.z <= 0 ? 0.95 : 0.25);
+        const ratio = s / points.length;
         ctx.beginPath();
         ctx.moveTo(cx + pPrev.x * radius, cy + pPrev.y * radius);
         ctx.lineTo(cx + pCurr.x * radius, cy + pCurr.y * radius);
         ctx.strokeStyle = arc.color;
-        ctx.globalAlpha = alpha;
-        ctx.lineWidth = 2.6;
+        ctx.globalAlpha = ratio * 0.95;
+        ctx.lineWidth = 1.5 + ratio * 3.0;
         ctx.stroke();
       }
 
-      // Draw bright laser head & landing ripple
+      // Glowing Comet Head + Ripple
       const tip = points[points.length - 1];
-      if (tip && tip.z <= 0.1) {
-        const tx = cx + tip.x * radius;
-        const ty = cy + tip.y * radius;
+      if (tip) {
+        const distTip = Math.hypot(tip.x, tip.y);
+        if (tip.z <= 0.15 || distTip >= 1.0) {
+          const tx = cx + tip.x * radius;
+          const ty = cy + tip.y * radius;
 
-        ctx.globalAlpha = 1;
-        ctx.beginPath();
-        ctx.arc(tx, ty, 3.8, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
-        ctx.fill();
-
-        // Landing pulse ring
-        if (arc.progress > 0.95) {
-          const pulseRadius = (arc.progress - 0.95) * 45;
+          ctx.globalAlpha = 1;
           ctx.beginPath();
-          ctx.arc(tx, ty, pulseRadius, 0, Math.PI * 2);
-          ctx.strokeStyle = arc.color;
-          ctx.globalAlpha = Math.max(0, 1 - (arc.progress - 0.95) * 2.5);
-          ctx.lineWidth = 2;
-          ctx.stroke();
+          ctx.arc(tx, ty, 4.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+
+          if (arc.progress > 0.92) {
+            const pulseR = (arc.progress - 0.92) * 55;
+            ctx.beginPath();
+            ctx.arc(tx, ty, pulseR, 0, Math.PI * 2);
+            ctx.strokeStyle = arc.color;
+            ctx.globalAlpha = Math.max(0, 1 - (arc.progress - 0.92) * 2.4);
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+          }
         }
       }
       ctx.globalAlpha = 1;
@@ -507,4 +621,4 @@ function setupEstimator(): void {
 }
 
 document.addEventListener('DOMContentLoaded', bootApp);
-  
+        
