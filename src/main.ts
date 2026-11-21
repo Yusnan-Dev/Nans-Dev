@@ -210,7 +210,6 @@ function initPhotorealisticEarth(): void {
     laserArcs.push(createLaserArc(i));
   }
 
-  // Free-Spin Flick Physics (Swipe launches independent fast rotation)
   let prevX = 0;
   let prevY = 0;
   let isTouching = false;
@@ -238,7 +237,6 @@ function initPhotorealisticEarth(): void {
     prevX = e.clientX;
     prevY = e.clientY;
 
-    // Launch spin velocity directly from swipe gesture without locking position to finger
     velY = THREE.MathUtils.clamp(dx * 0.014, -0.35, 0.35);
     velX = THREE.MathUtils.clamp(dy * 0.006, -0.15, 0.15);
   });
@@ -262,7 +260,6 @@ function initPhotorealisticEarth(): void {
       0.65
     );
 
-    // Long smooth inertia decay (0.985 keeps it spinning freely after flick)
     velY *= 0.985;
     velX *= 0.94;
 
@@ -313,18 +310,90 @@ function setupMobileNav(): void {
   });
 }
 
+/* Animated Rolling Number Counter & Progress Gauge */
 function renderMetrics(metrics: MetricItem[]): void {
   const container = document.getElementById('metrics-strip');
   if (!container) return;
+
+  const statusLabels = ['TELEMETRY // OPTIMAL', 'LATENCY // VERIFIED', 'GEOMETRY // LOCKED'];
+  const fillTargets = ['99.9%', '92%', '100%'];
+
   container.innerHTML = metrics
     .map(
-      (m) => `
+      (m, idx) => `
       <div class="metric-box">
-        <div class="val">${m.value}</div>
+        <div class="metric-status">
+          <span class="live-dot"></span> ${statusLabels[idx % statusLabels.length]}
+        </div>
+        <div class="val" data-target="${m.value}">${m.value}</div>
         <div class="lbl">${m.label}</div>
+        <div class="metric-bar-track">
+          <div class="metric-bar-fill" data-fill="${fillTargets[idx % fillTargets.length]}"></div>
+        </div>
       </div>`
     )
     .join('');
+
+  let hasAnimated = false;
+
+  const triggerAnimation = () => {
+    if (hasAnimated) return;
+    hasAnimated = true;
+
+    const valEls = container.querySelectorAll<HTMLElement>('.val');
+    const barEls = container.querySelectorAll<HTMLElement>('.metric-bar-fill');
+
+    barEls.forEach((bar) => {
+      bar.style.width = bar.dataset.fill || '100%';
+    });
+
+    valEls.forEach((el) => {
+      const raw = el.dataset.target || '';
+      const match = raw.match(/^([^\d.-]*)([\d.]+)(.*)$/);
+      if (!match) return;
+
+      const prefix = match[1];
+      const targetNum = parseFloat(match[2]);
+      const suffix = match[3];
+      const decimals = (match[2].split('.')[1] || '').length;
+      const isCountdown = prefix.includes('<');
+      const startNum = isCountdown ? 3.8 : 0;
+
+      const duration = 1600;
+      const startTime = performance.now();
+
+      const step = (now: number) => {
+        const elapsed = Math.min(1, (now - startTime) / duration);
+        // Ease-out quartic curve
+        const ease = 1 - Math.pow(1 - elapsed, 4);
+        const current = startNum + (targetNum - startNum) * ease;
+        el.textContent = `${prefix}${current.toFixed(decimals)}${suffix}`;
+
+        if (elapsed < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = raw;
+        }
+      };
+
+      requestAnimationFrame(step);
+    });
+  };
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          triggerAnimation();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(container);
+  } else {
+    triggerAnimation();
+  }
 }
 
 function renderServices(services: ServiceItem[]): void {
