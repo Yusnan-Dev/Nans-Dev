@@ -1,36 +1,74 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
-company_services = [
-    {
-        "id": "web-dev",
-        "title": "Custom Website & Landing Page",
-        "tag": "WEB ENGINEERING",
-        "desc": "Pembuatan website company profile, toko online, hingga sistem interaktif modern dengan performa cepat dan responsif di semua perangkat.",
-        "metrics": "99% Performance Score"
-    },
-    {
-        "id": "vector-logo",
-        "title": "Raster to Vector & Brand Identity",
-        "tag": "GRAPHIC DESIGN",
-        "desc": "Ubah logo pecah menjadi vektor tajam resolusi tak terbatas, desain banner promosi, serta identitas visual profesional.",
-        "metrics": "100% Scalable Vector"
-    },
-    {
-        "id": "ui-ux",
-        "title": "UI/UX & Visual Asset Production",
-        "tag": "CREATIVE STUDIO",
-        "desc": "Perancangan tampilan antarmuka aplikasi, thumbnail media sosial, dan aset visual kreatif untuk kebutuhan branding bisnis.",
-        "metrics": "60-120 FPS Smooth UI"
-    }
-]
-
-output_payload = {
-    "last_built": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
-    "services": company_services
+payload = {
+    "last_built": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+    "metrics": [
+        {"value": "99.9%", "label": "Lighthouse Performance"},
+        {"value": "< 1.2s", "label": "Global Edge Load Time"},
+        {"value": "100%", "label": "Scalable Vector Precision"}
+    ],
+    "projects": [
+        {
+            "id": "klinpro",
+            "title": "KlinPro Express Laundry",
+            "category": "web",
+            "badge": "WEB APP & CALCULATOR",
+            "desc": "Sistem web layanan laundry ekspres dengan kalkulator estimasi biaya multi-item otomatis dan panel pengaturan interaktif.",
+            "stack": ["HTML5", "CSS3", "JavaScript", "Interactive UI"],
+            "url": "https://klinpro-express-laundry.github.io/"
+        },
+        {
+            "id": "tokobukyul",
+            "title": "TokoBukYul Digital Store",
+            "category": "web",
+            "badge": "E-COMMERCE CATALOG",
+            "desc": "Platform katalog toko modern yang dioptimalkan untuk konversi cepat melalui perangkat mobile dengan navigasi ringan.",
+            "stack": ["Frontend Architecture", "Responsive Grid", "WA Checkout"],
+            "url": "https://tokobukyul.github.io/TokoBukYul/"
+        },
+        {
+            "id": "bizsnap",
+            "title": "bizsnap Business Directory",
+            "category": "system",
+            "badge": "DIRECTORY PLATFORM",
+            "desc": "Direktori bisnis digital terstruktur yang memetakan kafe dan tempat usaha lokal di berbagai kota besar Jawa.",
+            "stack": ["Data Architecture", "Search & Filter", "UI System"],
+            "url": "#estimator"
+        },
+        {
+            "id": "vector-suite",
+            "title": "Enterprise Brand & Vector Identity",
+            "category": "design",
+            "badge": "RASTER TO VECTOR",
+            "desc": "Rekonstruksi logo resolusi rendah menjadi aset vektor murni (SVG/AI/EPS) siap cetak skala baliho maupun antarmuka digital.",
+            "stack": ["Vector Geometry", "Brand System", "3D/2D Assets"],
+            "url": "#vector-lab"
+        }
+    ],
+    "services": [
+        {
+            "code": "01",
+            "title": "Custom Web & System Engineering",
+            "desc": "Pengembangan Company Profile korporat, E-Commerce, hingga Learning Management System (LMS) dengan arsitektur bersih dan cepat.",
+            "specs": ["Custom UI/UX Architecture", "Mobile-First 120fps", "SEO & Speed Optimized"]
+        },
+        {
+            "code": "02",
+            "title": "Raster-to-Vector & Brand Identity",
+            "desc": "Konversi logo pecah menjadi vektor presisi tinggi, perancangan identitas visual perusahaan, banner, dan aset media sosial.",
+            "specs": ["100% Manual Pen-Tool Tracing", "Master File SVG, PDF, PNG HD", "Revisi Hingga Presisi"]
+        },
+        {
+            "code": "03",
+            "title": "UI/UX Prototyping & Visual Assets",
+            "desc": "Perancangan sistem desain antarmuka web maupun mobile beserta aset visual berkarakter untuk meningkatkan daya jual produk.",
+            "specs": ["Interactive Component System", "Dark & Light Theme Ready", "Conversion-Focused Layout"]
+        }
+    ]
 }
 
 with open("dist/services.json", "w", encoding="utf-8") as f:
-    json.dump(output_payload, f, indent=2)
+    json.dump(payload, f, indent=2)
 
-print("Python berhasil memproses data layanan ke dist/services.json")
+print("Enterprise JSON payload generated.")
