@@ -29,7 +29,7 @@ interface EnterpriseData {
   services: ServiceItem[];
 }
 
-const WHATSAPP_NUMBER = '6283187521130'; // Ganti nomor WA lu (diawali 62)
+const WHATSAPP_NUMBER = '6281234567890'; // Ganti nomor WA lu (diawali 62)
 
 async function bootApp(): Promise<void> {
   setupMobileNav();
@@ -61,7 +61,6 @@ function createRocketHullTexture(): any {
   canvas.height = 512;
   const ctx = canvas.getContext('2d')!;
 
-  // Base aerospace white-silver hull
   const hullGrad = ctx.createLinearGradient(0, 0, 512, 0);
   hullGrad.addColorStop(0, '#e2e8f0');
   hullGrad.addColorStop(0.5, '#ffffff');
@@ -69,23 +68,19 @@ function createRocketHullTexture(): any {
   ctx.fillStyle = hullGrad;
   ctx.fillRect(0, 0, 512, 512);
 
-  // Upper black carbon-fiber interstage band
   ctx.fillStyle = '#0f172a';
   ctx.fillRect(0, 48, 512, 54);
 
-  // Aerospace red & orange hazard/brand stripes
   ctx.fillStyle = '#dc2626';
   ctx.fillRect(0, 112, 512, 22);
   ctx.fillStyle = '#f97316';
   ctx.fillRect(0, 138, 512, 8);
 
-  // Lower engine bay dark heat-shield skirt
   ctx.fillStyle = '#1e293b';
   ctx.fillRect(0, 415, 512, 97);
   ctx.fillStyle = '#dc2626';
   ctx.fillRect(0, 405, 512, 10);
 
-  // Subtle metallic panel seam lines & rivets
   ctx.strokeStyle = 'rgba(15, 23, 42, 0.22)';
   ctx.lineWidth = 2;
   for (let y = 0; y < 512; y += 64) {
@@ -101,7 +96,6 @@ function createRocketHullTexture(): any {
     ctx.stroke();
   }
 
-  // Vertical dark stripe accent
   ctx.fillStyle = '#0f172a';
   ctx.fillRect(236, 160, 40, 220);
 
@@ -127,7 +121,7 @@ function createSmokeTexture(): any {
   return tex;
 }
 
-/* Photorealistic 3D Earth + Realistic 3D Rocket Launch Overlay */
+/* Photorealistic 3D Earth + Viewport-Aware 3D Rocket Launch Overlay */
 function initPhotorealisticEarth(): void {
   const container = document.getElementById('earth-3d-container');
   if (!container || typeof THREE === 'undefined') return;
@@ -229,7 +223,6 @@ function initPhotorealisticEarth(): void {
     if (i === 0) indonesiaBeacon = dot;
   });
 
-  // Warm Ignition Shockwave Ring on Earth Surface
   const shockGeo = new THREE.RingGeometry(0.015, 0.036, 32);
   const shockMat = new THREE.MeshBasicMaterial({
     color: 0xfb923c,
@@ -330,7 +323,6 @@ function initPhotorealisticEarth(): void {
   ovRenderer.setSize(window.innerWidth, window.innerHeight);
   ovRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  // Studio + Engine Exhaust Dynamic Lighting
   ovScene.add(new THREE.AmbientLight(0xffffff, 1.05));
   const ovSunLight = new THREE.DirectionalLight(0xffffff, 2.1);
   ovSunLight.position.set(6, 10, 9);
@@ -343,7 +335,6 @@ function initPhotorealisticEarth(): void {
   const engineGlowLight = new THREE.PointLight(0xff7b00, 4, 6);
   ovScene.add(engineGlowLight);
 
-  // Build Detailed Realistic 3D Rocket
   const rocketGroup = new THREE.Group();
   rocketGroup.visible = false;
   ovScene.add(rocketGroup);
@@ -351,17 +342,14 @@ function initPhotorealisticEarth(): void {
   const hullTexture = createRocketHullTexture();
   const smokeTexture = createSmokeTexture();
 
-  // 1. Main Textured White/Carbon/Red Fuselage
   const bodyGeo = new THREE.CylinderGeometry(0.145, 0.165, 1.05, 32);
   const bodyMat = new THREE.MeshStandardMaterial({
     map: hullTexture,
     metalness: 0.45,
     roughness: 0.28,
   });
-  const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-  rocketGroup.add(bodyMesh);
+  rocketGroup.add(new THREE.Mesh(bodyGeo, bodyMat));
 
-  // 2. Payload Fairing Shoulder + Crimson/White Heat-Shield Nose Cone
   const fairingGeo = new THREE.CylinderGeometry(0.125, 0.145, 0.18, 32);
   const fairingMat = new THREE.MeshStandardMaterial({
     color: 0xf8fafc,
@@ -374,7 +362,7 @@ function initPhotorealisticEarth(): void {
 
   const noseGeo = new THREE.ConeGeometry(0.125, 0.36, 32);
   const noseMat = new THREE.MeshStandardMaterial({
-    color: 0xdc2626, // Aerospace crimson red nose
+    color: 0xdc2626,
     metalness: 0.45,
     roughness: 0.25,
   });
@@ -382,7 +370,6 @@ function initPhotorealisticEarth(): void {
   noseMesh.position.y = 0.885;
   rocketGroup.add(noseMesh);
 
-  // Titanium Thermal Nose Tip
   const tipGeo = new THREE.ConeGeometry(0.032, 0.1, 20);
   const tipMat = new THREE.MeshStandardMaterial({
     color: 0x334155,
@@ -393,7 +380,6 @@ function initPhotorealisticEarth(): void {
   tipMesh.position.y = 1.06;
   rocketGroup.add(tipMesh);
 
-  // 3. Metallic Engine Bell Nozzle at Bottom
   const nozzleGeo = new THREE.CylinderGeometry(0.085, 0.135, 0.18, 24, 1, true);
   const nozzleMat = new THREE.MeshStandardMaterial({
     color: 0x1e293b,
@@ -405,7 +391,6 @@ function initPhotorealisticEarth(): void {
   nozzleMesh.position.y = -0.6;
   rocketGroup.add(nozzleMesh);
 
-  // 4. 4 Swept Carbon-Titanium Fins with Red Tips
   const finGeo = new THREE.BoxGeometry(0.025, 0.36, 0.22);
   const finMat = new THREE.MeshStandardMaterial({
     color: 0x0f172a,
@@ -420,7 +405,6 @@ function initPhotorealisticEarth(): void {
     rocketGroup.add(fin);
   }
 
-  // 5. Realistic Multi-Layer Thruster Fire Plume (White Core -> Yellow -> Red-Orange Outer)
   const flameRedGeo = new THREE.ConeGeometry(0.16, 1.15, 24);
   const flameRedMat = new THREE.MeshBasicMaterial({
     color: 0xea580c,
@@ -452,7 +436,6 @@ function initPhotorealisticEarth(): void {
   flameCore.position.y = -0.92;
   rocketGroup.add(flameCore);
 
-  // Volumetric-Style Billowing Smoke & Ember Particle System
   interface ExhaustParticle {
     sprite: any;
     vel: any;
@@ -464,7 +447,6 @@ function initPhotorealisticEarth(): void {
   const particles: ExhaustParticle[] = [];
 
   function spawnSmokeAndEmbers(origin: any, tangent: any, rocketScale: number): void {
-    // 1. Billowing White/Grey Rocket Exhaust Smoke Cloud
     const isWarmSmoke = Math.random() > 0.65;
     const smokeMat = new THREE.SpriteMaterial({
       map: smokeTexture,
@@ -494,10 +476,9 @@ function initPhotorealisticEarth(): void {
       life: 1.0,
       decay: 0.018 + Math.random() * 0.01,
       baseScale: initialSize,
-      growRate: 0.045 * rocketScale, // Smoke expands as it billows out!
+      growRate: 0.045 * rocketScale,
     });
 
-    // 2. Bright Glowing Fire Sparks / Embers
     if (Math.random() > 0.3) {
       const sparkMat = new THREE.SpriteMaterial({
         map: smokeTexture,
@@ -529,7 +510,6 @@ function initPhotorealisticEarth(): void {
     }
   }
 
-  // Rocket Launch State Machine
   let rocketActive = false;
   let launchProgress = 0;
   let startWorldPos = new THREE.Vector3(0, -1, 0);
@@ -551,6 +531,9 @@ function initPhotorealisticEarth(): void {
     if (rocketActive) return;
 
     const rect = renderer.domElement.getBoundingClientRect();
+    // Skip launch if Earth container is scrolled out of the visible viewport
+    if (rect.bottom < 80 || rect.top > window.innerHeight) return;
+
     let launchScreenX = rect.left + rect.width * 0.52;
     let launchScreenY = rect.top + rect.height * 0.54;
 
@@ -585,11 +568,9 @@ function initPhotorealisticEarth(): void {
     shockRing.scale.setScalar(1);
   }
 
-  // First launch 2.5s after page load, then automatically every 12 seconds
   setTimeout(triggerRocketLaunch, 2500);
   setInterval(triggerRocketLaunch, 12000);
 
-  // Free-Spin Flick Physics
   let prevX = 0;
   let prevY = 0;
   let isTouching = false;
@@ -682,7 +663,6 @@ function initPhotorealisticEarth(): void {
       }
     });
 
-    // Animate Realistic 3D Rocket + Fire + Smoke Trail
     if (rocketActive) {
       launchProgress += 0.014;
       const t = Math.min(1, launchProgress);
@@ -708,12 +688,11 @@ function initPhotorealisticEarth(): void {
       }
 
       rocketGroup.position.copy(pos);
-      rocketGroup.rotateY(t * 7); // Aerodynamic roll showing hull stripes
+      rocketGroup.rotateY(t * 7);
 
       const currentScale = 0.16 + ease * 1.02;
       rocketGroup.scale.setScalar(currentScale);
 
-      // Realistic flickering multi-layer thruster flame
       const flickerRed = 0.85 + Math.random() * 0.5;
       const flickerOrange = 0.8 + Math.random() * 0.45;
       const flickerCore = 0.9 + Math.random() * 0.35;
@@ -725,7 +704,6 @@ function initPhotorealisticEarth(): void {
       engineGlowLight.position.copy(nozzleWorldPos);
       engineGlowLight.intensity = 3.5 + Math.random() * 2.5;
 
-      // Launchpad micro-shake
       if (stageBox && t < 0.35) {
         const shake = (0.35 - t) * 7;
         stageBox.style.transform = `translate(${(Math.random() - 0.5) * shake}px, ${(Math.random() - 0.5) * shake}px)`;
@@ -733,7 +711,6 @@ function initPhotorealisticEarth(): void {
         stageBox.style.transform = '';
       }
 
-      // Continuously emit billowing smoke & hot embers from nozzle
       spawnSmokeAndEmbers(nozzleWorldPos, tangent, currentScale);
       if (t > 0.25) {
         spawnSmokeAndEmbers(nozzleWorldPos, tangent, currentScale);
@@ -747,7 +724,6 @@ function initPhotorealisticEarth(): void {
       }
     }
 
-    // Update billowing smoke & embers
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
       p.sprite.position.add(p.vel);
