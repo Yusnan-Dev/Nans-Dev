@@ -27,10 +27,11 @@ interface EnterpriseData {
   services: ServiceItem[];
 }
 
-const WHATSAPP_NUMBER = '6283187521130'; // Ganti dengan nomor WA aktif lu (diawali 62)
+const WHATSAPP_NUMBER = '6281234567890'; // Ganti nomor WA lu (diawali 62)
 
 async function bootApp(): Promise<void> {
   setupMobileNav();
+  init3DWireframeGlobe();
   setupVectorSlider();
   setupEstimator();
 
@@ -51,15 +52,121 @@ async function bootApp(): Promise<void> {
   }
 }
 
+/* Interactive 3D Geodesic Sphere & Orbit Engine */
+function init3DWireframeGlobe(): void {
+  const canvas = document.getElementById('canvas-3d') as HTMLCanvasElement | null;
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  let width = (canvas.width = canvas.offsetWidth * 2);
+  let height = (canvas.height = canvas.offsetHeight * 2);
+
+  window.addEventListener('resize', () => {
+    if (!canvas) return;
+    width = canvas.width = canvas.offsetWidth * 2;
+    height = canvas.height = canvas.offsetHeight * 2;
+  });
+
+  interface Point3D {
+    x: number;
+    y: number;
+    z: number;
+  }
+
+  const nodes: Point3D[] = [];
+  const totalNodes = 42;
+  const radius = Math.min(width, height) * 0.31;
+
+  for (let i = 0; i < totalNodes; i++) {
+    const phi = Math.acos(-1 + (2 * i) / totalNodes);
+    const theta = Math.sqrt(totalNodes * Math.PI) * phi;
+    nodes.push({
+      x: radius * Math.cos(theta) * Math.sin(phi),
+      y: radius * Math.sin(theta) * Math.sin(phi),
+      z: radius * Math.cos(phi),
+    });
+  }
+
+  let angleY = 0;
+  let angleX = 0.25;
+  let dragVelocity = 0.006;
+
+  canvas.addEventListener('pointermove', (e) => {
+    if (e.buttons === 1 || e.pointerType === 'touch') {
+      dragVelocity = e.movementX * 0.0025;
+      angleX += e.movementY * 0.0025;
+    }
+  });
+
+  function renderFrame(): void {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, width, height);
+
+    angleY += dragVelocity;
+    dragVelocity *= 0.96;
+    if (Math.abs(dragVelocity) < 0.004) {
+      dragVelocity = dragVelocity >= 0 ? 0.004 : -0.004;
+    }
+
+    const cx = width / 2;
+    const cy = height / 2;
+    const cosY = Math.cos(angleY);
+    const sinY = Math.sin(angleY);
+    const cosX = Math.cos(angleX);
+    const sinX = Math.sin(angleX);
+
+    const projected = nodes.map((p) => {
+      const x1 = p.x * cosY - p.z * sinY;
+      const z1 = p.z * cosY + p.x * sinY;
+      const y2 = p.y * cosX - z1 * sinX;
+      const z2 = z1 * cosX + p.y * sinX;
+      const scale = 600 / (600 + z2);
+      return {
+        x: cx + x1 * scale,
+        y: cy + y2 * scale,
+        z: z2,
+        scale,
+      };
+    });
+
+    // Draw connecting mesh lines
+    for (let i = 0; i < projected.length; i++) {
+      for (let j = i + 1; j < projected.length; j++) {
+        const dx = projected[i].x - projected[j].x;
+        const dy = projected[i].y - projected[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < radius * 0.72) {
+          ctx.beginPath();
+          ctx.moveTo(projected[i].x, projected[i].y);
+          ctx.lineTo(projected[j].x, projected[j].y);
+          ctx.strokeStyle = `rgba(56, 189, 248, ${0.28 * (1 - dist / (radius * 0.72))})`;
+          ctx.lineWidth = 1.4;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw glowing vertices
+    projected.forEach((pt) => {
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, 3.2 * pt.scale, 0, Math.PI * 2);
+      ctx.fillStyle = pt.z < 0 ? '#38bdf8' : '#818cf8';
+      ctx.fill();
+    });
+
+    requestAnimationFrame(renderFrame);
+  }
+
+  renderFrame();
+}
+
 function setupMobileNav(): void {
   const toggle = document.getElementById('menu-toggle');
   const links = document.getElementById('nav-links');
   if (!toggle || !links) return;
 
-  toggle.addEventListener('click', () => {
-    links.classList.toggle('open');
-  });
-
+  toggle.addEventListener('click', () => links.classList.toggle('open'));
   links.querySelectorAll('a').forEach((a) => {
     a.addEventListener('click', () => links.classList.remove('open'));
   });
@@ -86,7 +193,12 @@ function renderServices(services: ServiceItem[]): void {
     .map(
       (s) => `
       <article class="bento-card">
-        <span class="code-num">// MODULE_${s.code}</span>
+        <div class="card-graphic">
+          <span class="code-num">// SYS_NODE_${s.code}</span>
+          <div class="eq-bars">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
         <h3>${s.title}</h3>
         <p>${s.desc}</p>
         <ul class="spec-list">
@@ -109,6 +221,14 @@ function renderProjects(projects: ProjectItem[], filter: string): void {
       (p) => `
       <article class="project-card">
         <div>
+          <div class="mockup-3d">
+            <div class="win-dots"><span></span><span></span><span></span></div>
+            <div class="win-bars">
+              <div class="bar-main"></div>
+              <div class="bar-sub"></div>
+              <div class="bar-grid"><div></div><div></div><div></div></div>
+            </div>
+          </div>
           <span class="p-badge">${p.badge}</span>
           <h3>${p.title}</h3>
           <p>${p.desc}</p>
@@ -118,7 +238,7 @@ function renderProjects(projects: ProjectItem[], filter: string): void {
             ${p.stack.map((t) => `<span>${t}</span>`).join('')}
           </div>
           <a href="${p.url}" ${p.url.startsWith('http') ? 'target="_blank"' : ''} class="p-link">
-            ${p.url.startsWith('http') ? 'Buka Live Demo ↗' : 'Lihat Detail ↓'}
+            ${p.url.startsWith('http') ? 'Buka Live Demo ↗' : 'Lihat Modul ↓'}
           </a>
         </div>
       </article>`
@@ -132,8 +252,7 @@ function setupProjectFilters(projects: ProjectItem[]): void {
     btn.addEventListener('click', () => {
       buttons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
-      const cat = btn.dataset.filter || 'all';
-      renderProjects(projects, cat);
+      renderProjects(projects, btn.dataset.filter || 'all');
     });
   });
 }
@@ -188,3 +307,4 @@ function setupEstimator(): void {
 }
 
 document.addEventListener('DOMContentLoaded', bootApp);
+  
