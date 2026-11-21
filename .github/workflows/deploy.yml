@@ -1,0 +1,44 @@
+name: Build Multi-Language & Deploy to Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Kode
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Compile Python, SCSS, & TypeScript
+        run: |
+          mkdir -p dist
+          cp index.html dist/index.html
+          python3 scripts/generate_data.py
+          npx --yes sass src/style.scss dist/style.css --no-source-map --style=compressed
+          npx --yes esbuild src/main.ts --bundle --minify --outfile=dist/main.js
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: Deploy ke GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
