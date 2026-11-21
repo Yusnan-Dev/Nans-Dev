@@ -27,11 +27,11 @@ interface EnterpriseData {
   services: ServiceItem[];
 }
 
-const WHATSAPP_NUMBER = '6283187521130'; // Ganti nomor WA lu (diawali 62)
+const WHATSAPP_NUMBER = '6283187521130'; // Ganti dengan nomor WA aktif lu (diawali 62)
 
 async function bootApp(): Promise<void> {
   setupMobileNav();
-  init3DWireframeGlobe();
+  init3DEarthGlobe();
   setupVectorSlider();
   setupEstimator();
 
@@ -52,8 +52,8 @@ async function bootApp(): Promise<void> {
   }
 }
 
-/* Interactive 3D Geodesic Sphere & Orbit Engine */
-function init3DWireframeGlobe(): void {
+/* 3D Earth Globe with Continents & Flying Laser Arcs */
+function init3DEarthGlobe(): void {
   const canvas = document.getElementById('canvas-3d') as HTMLCanvasElement | null;
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -68,97 +68,297 @@ function init3DWireframeGlobe(): void {
     height = canvas.height = canvas.offsetHeight * 2;
   });
 
-  interface Point3D {
+  // Approximate continental landmass detection (lat in deg, lon in deg)
+  function isLand(lat: number, lon: number): boolean {
+    // North America
+    if (lat > 15 && lat < 70 && lon > -165 && lon < -55) {
+      if (lat < 30 && lon > -85) return false;
+      return true;
+    }
+    // South America
+    if (lat > -55 && lat < 13 && lon > -82 && lon < -34) {
+      if (lat < -20 && lon < -72) return false;
+      return true;
+    }
+    // Europe
+    if (lat > 36 && lat < 71 && lon > -10 && lon < 45) return true;
+    // Africa
+    if (lat > -35 && lat < 36 && lon > -18 && lon < 51) {
+      if (lat < 5 && lon < 8) return false;
+      return true;
+    }
+    // Asia
+    if (lat > 8 && lat < 75 && lon >= 45 && lon < 145) {
+      if (lat < 22 && lon > 118) return false;
+      return true;
+    }
+    // Indonesia & Southeast Asia Archipelago
+    if (lat > -10 && lat <= 8 && lon > 95 && lon < 141) {
+      return Math.sin(lat * 0.9) * Math.cos(lon * 0.7) > -0.25;
+    }
+    // Australia
+    if (lat > -40 && lat < -11 && lon > 113 && lon < 154) return true;
+    return false;
+  }
+
+  interface GlobePoint {
     x: number;
     y: number;
     z: number;
+    land: boolean;
   }
 
-  const nodes: Point3D[] = [];
-  const totalNodes = 42;
-  const radius = Math.min(width, height) * 0.31;
+  const baseDots: GlobePoint[] = [];
+  const latSteps = 44;
+  const lonSteps = 88;
 
-  for (let i = 0; i < totalNodes; i++) {
-    const phi = Math.acos(-1 + (2 * i) / totalNodes);
-    const theta = Math.sqrt(totalNodes * Math.PI) * phi;
-    nodes.push({
-      x: radius * Math.cos(theta) * Math.sin(phi),
-      y: radius * Math.sin(theta) * Math.sin(phi),
-      z: radius * Math.cos(phi),
-    });
+  for (let i = 0; i <= latSteps; i++) {
+    const lat = -90 + (180 * i) / latSteps;
+    const phi = ((90 - lat) * Math.PI) / 180;
+    const ringCount = Math.max(8, Math.round(lonSteps * Math.sin(phi)));
+
+    for (let j = 0; j < ringCount; j++) {
+      const lon = -180 + (360 * j) / ringCount;
+      const theta = ((lon + 180) * Math.PI) / 180;
+
+      const x = -Math.sin(phi) * Math.cos(theta);
+      const y = Math.cos(phi);
+      const z = Math.sin(phi) * Math.sin(theta);
+
+      baseDots.push({ x, y, z, land: isLand(lat, lon) });
+    }
   }
 
-  let angleY = 0;
-  let angleX = 0.25;
-  let dragVelocity = 0.006;
+  function latLonToVec(lat: number, lon: number): { x: number; y: number; z: number } {
+    const phi = ((90 - lat) * Math.PI) / 180;
+    const theta = ((lon + 180) * Math.PI) / 180;
+    return {
+      x: -Math.sin(phi) * Math.cos(theta),
+      y: Math.cos(phi),
+      z: Math.sin(phi) * Math.sin(theta),
+    };
+  }
+
+  // Global Hub Coordinates (Indonesia centered & international routes)
+  const hubs = [
+    { lat: -7.25, lon: 112.75 }, // Surabaya / Jawa Timur
+    { lat: -6.2, lon: 106.8 },   // Jakarta
+    { lat: 1.35, lon: 103.8 },   // Singapore
+    { lat: 35.68, lon: 139.69 }, // Tokyo
+    { lat: 51.5, lon: -0.12 },   // London
+    { lat: 40.71, lon: -74.0 },  // New York
+    { lat: -33.86, lon: 151.2 }, // Sydney
+    { lat: 25.2, lon: 55.27 },   // Dubai
+    { lat: -23.55, lon: -46.63 } // Sao Paulo
+  ];
+
+  interface FlyingArc {
+    from: { x: number; y: number; z: number };
+    to: { x: number; y: number; z: number };
+    progress: number;
+    speed: number;
+    altitude: number;
+    color: string;
+  }
+
+  const arcs: FlyingArc[] = [];
+  const arcColors = ['#38bdf8', '#818cf8', '#34d399', '#22d3ee'];
+
+  function spawnArc(index: number): FlyingArc {
+    const startIdx = index % 2 === 0 ? 0 : Math.floor(Math.random() * hubs.length);
+    let endIdx = Math.floor(Math.random() * hubs.length);
+    if (endIdx === startIdx) endIdx = (startIdx + 3) % hubs.length;
+
+    return {
+      from: latLonToVec(hubs[startIdx].lat, hubs[startIdx].lon),
+      to: latLonToVec(hubs[endIdx].lat, hubs[endIdx].lon),
+      progress: Math.random() * -0.5,
+      speed: 0.0065 + Math.random() * 0.004,
+      altitude: 0.25 + Math.random() * 0.18,
+      color: arcColors[index % arcColors.length],
+    };
+  }
+
+  for (let i = 0; i < 8; i++) {
+    arcs.push(spawnArc(i));
+  }
+
+  let rotY = -2.1; // Start facing Indonesia / Asia
+  let rotX = 0.22;
+  let velY = 0.0045;
 
   canvas.addEventListener('pointermove', (e) => {
     if (e.buttons === 1 || e.pointerType === 'touch') {
-      dragVelocity = e.movementX * 0.0025;
-      angleX += e.movementY * 0.0025;
+      velY = e.movementX * 0.003;
+      rotX = Math.max(-0.8, Math.min(0.8, rotX + e.movementY * 0.003));
     }
   });
 
-  function renderFrame(): void {
+  function rotatePoint(
+    p: { x: number; y: number; z: number },
+    cosY: number,
+    sinY: number,
+    cosX: number,
+    sinX: number
+  ) {
+    const x1 = p.x * cosY - p.z * sinY;
+    const z1 = p.z * cosY + p.x * sinY;
+    const y2 = p.y * cosX - z1 * sinX;
+    const z2 = z1 * cosX + p.y * sinX;
+    return { x: x1, y: y2, z: z2 };
+  }
+
+  function renderGlobe(): void {
     if (!ctx) return;
     ctx.clearRect(0, 0, width, height);
 
-    angleY += dragVelocity;
-    dragVelocity *= 0.96;
-    if (Math.abs(dragVelocity) < 0.004) {
-      dragVelocity = dragVelocity >= 0 ? 0.004 : -0.004;
+    rotY += velY;
+    velY *= 0.96;
+    if (Math.abs(velY) < 0.004) {
+      velY = velY >= 0 ? 0.004 : -0.004;
     }
 
     const cx = width / 2;
     const cy = height / 2;
-    const cosY = Math.cos(angleY);
-    const sinY = Math.sin(angleY);
-    const cosX = Math.cos(angleX);
-    const sinX = Math.sin(angleX);
+    const radius = Math.min(width, height) * 0.34;
 
-    const projected = nodes.map((p) => {
-      const x1 = p.x * cosY - p.z * sinY;
-      const z1 = p.z * cosY + p.x * sinY;
-      const y2 = p.y * cosX - z1 * sinX;
-      const z2 = z1 * cosX + p.y * sinX;
-      const scale = 600 / (600 + z2);
-      return {
-        x: cx + x1 * scale,
-        y: cy + y2 * scale,
-        z: z2,
-        scale,
-      };
-    });
+    const cosY = Math.cos(rotY);
+    const sinY = Math.sin(rotY);
+    const cosX = Math.cos(rotX);
+    const sinX = Math.sin(rotX);
 
-    // Draw connecting mesh lines
-    for (let i = 0; i < projected.length; i++) {
-      for (let j = i + 1; j < projected.length; j++) {
-        const dx = projected[i].x - projected[j].x;
-        const dy = projected[i].y - projected[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < radius * 0.72) {
+    // 1. Outer Atmosphere Glow
+    const atmoGrad = ctx.createRadialGradient(cx, cy, radius * 0.85, cx, cy, radius * 1.28);
+    atmoGrad.addColorStop(0, 'rgba(56, 189, 248, 0.16)');
+    atmoGrad.addColorStop(0.6, 'rgba(129, 140, 248, 0.06)');
+    atmoGrad.addColorStop(1, 'rgba(5, 7, 12, 0)');
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius * 1.28, 0, Math.PI * 2);
+    ctx.fillStyle = atmoGrad;
+    ctx.fill();
+
+    // 2. Dark Globe Core Sphere
+    const coreGrad = ctx.createRadialGradient(
+      cx - radius * 0.3,
+      cy - radius * 0.3,
+      radius * 0.1,
+      cx,
+      cy,
+      radius
+    );
+    coreGrad.addColorStop(0, '#0f172a');
+    coreGrad.addColorStop(1, '#04060b');
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.fillStyle = coreGrad;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // 3. Render Continent & Ocean Dots
+    for (let i = 0; i < baseDots.length; i++) {
+      const dot = baseDots[i];
+      const r = rotatePoint(dot, cosY, sinY, cosX, sinX);
+
+      // Hide back-side ocean dots, keep faint back-side land silhouette
+      if (r.z > 0.15 && !dot.land) continue;
+
+      const isFront = r.z <= 0;
+      const px = cx + r.x * radius;
+      const py = cy + r.y * radius;
+
+      ctx.beginPath();
+      if (dot.land) {
+        ctx.arc(px, py, isFront ? 2.4 : 1.3, 0, Math.PI * 2);
+        ctx.fillStyle = isFront ? 'rgba(56, 189, 248, 0.92)' : 'rgba(56, 189, 248, 0.14)';
+      } else {
+        ctx.arc(px, py, 1.1, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.14)';
+      }
+      ctx.fill();
+    }
+
+    // 4. Render Flying Data Arcs Across Continents
+    arcs.forEach((arc, idx) => {
+      arc.progress += arc.speed;
+      if (arc.progress > 1.35) {
+        arcs[idx] = spawnArc(idx);
+        return;
+      }
+
+      const headT = Math.min(1, Math.max(0, arc.progress));
+      const tailT = Math.max(0, arc.progress - 0.35);
+      if (headT <= 0) return;
+
+      const steps = 26;
+      const points: { x: number; y: number; z: number }[] = [];
+
+      for (let s = 0; s <= steps; s++) {
+        const t = tailT + ((headT - tailT) * s) / steps;
+        // Linear interpolation normalized to sphere + parabolic altitude arc
+        const lx = arc.from.x + (arc.to.x - arc.from.x) * t;
+        const ly = arc.from.y + (arc.to.y - arc.from.y) * t;
+        const lz = arc.from.z + (arc.to.z - arc.from.z) * t;
+        const len = Math.sqrt(lx * lx + ly * ly + lz * lz) || 1;
+        const lift = 1 + Math.sin(t * Math.PI) * arc.altitude;
+
+        const r = rotatePoint(
+          { x: (lx / len) * lift, y: (ly / len) * lift, z: (lz / len) * lift },
+          cosY,
+          sinY,
+          cosX,
+          sinX
+        );
+        points.push(r);
+      }
+
+      // Draw glowing arc trail
+      for (let s = 1; s < points.length; s++) {
+        const pPrev = points[s - 1];
+        const pCurr = points[s];
+        if (pCurr.z > 0.25) continue; // Occlude behind globe
+
+        const alpha = (s / points.length) * (pCurr.z <= 0 ? 0.95 : 0.25);
+        ctx.beginPath();
+        ctx.moveTo(cx + pPrev.x * radius, cy + pPrev.y * radius);
+        ctx.lineTo(cx + pCurr.x * radius, cy + pCurr.y * radius);
+        ctx.strokeStyle = arc.color;
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = 2.6;
+        ctx.stroke();
+      }
+
+      // Draw bright laser head & landing ripple
+      const tip = points[points.length - 1];
+      if (tip && tip.z <= 0.1) {
+        const tx = cx + tip.x * radius;
+        const ty = cy + tip.y * radius;
+
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.arc(tx, ty, 3.8, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        // Landing pulse ring
+        if (arc.progress > 0.95) {
+          const pulseRadius = (arc.progress - 0.95) * 45;
           ctx.beginPath();
-          ctx.moveTo(projected[i].x, projected[i].y);
-          ctx.lineTo(projected[j].x, projected[j].y);
-          ctx.strokeStyle = `rgba(56, 189, 248, ${0.28 * (1 - dist / (radius * 0.72))})`;
-          ctx.lineWidth = 1.4;
+          ctx.arc(tx, ty, pulseRadius, 0, Math.PI * 2);
+          ctx.strokeStyle = arc.color;
+          ctx.globalAlpha = Math.max(0, 1 - (arc.progress - 0.95) * 2.5);
+          ctx.lineWidth = 2;
           ctx.stroke();
         }
       }
-    }
-
-    // Draw glowing vertices
-    projected.forEach((pt) => {
-      ctx.beginPath();
-      ctx.arc(pt.x, pt.y, 3.2 * pt.scale, 0, Math.PI * 2);
-      ctx.fillStyle = pt.z < 0 ? '#38bdf8' : '#818cf8';
-      ctx.fill();
+      ctx.globalAlpha = 1;
     });
 
-    requestAnimationFrame(renderFrame);
+    requestAnimationFrame(renderGlobe);
   }
 
-  renderFrame();
+  renderGlobe();
 }
 
 function setupMobileNav(): void {
