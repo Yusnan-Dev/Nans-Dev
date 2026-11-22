@@ -809,7 +809,7 @@ function setupEstimator(): void {
 }
 
 document.addEventListener('DOMContentLoaded', bootApp);
-                          
+
 window.addEventListener('load', () => {
   const preloader = document.getElementById('nans-preloader');
   if (!preloader) return;
@@ -818,3 +818,4 @@ window.addEventListener('load', () => {
     setTimeout(() => preloader.remove(), 600);
   }, 2200);
 });
+                      
