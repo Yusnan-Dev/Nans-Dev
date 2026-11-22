@@ -1,3 +1,4 @@
+import { renderPolyglotStrip } from './components/StackBadge';
 declare const THREE: any;
 
 interface MetricItem { value: string; label: string; }
@@ -754,22 +755,47 @@ function setupArchitectureBlueprint(): void {
   }));
 }
 
-function setupLighthouseAudit(): void {
+async function loadRustWasmEngine(): Promise<any> {
+  try {
+    const res = await fetch('./perf_engine.wasm');
+    if (!res.ok) return null;
+    const bytes = await res.arrayBuffer();
+    const { instance } = await WebAssembly.instantiate(bytes);
+    return instance.exports;
+  } catch {
+    return null;
+  }
+}
+
+async function setupLighthouseAudit(): Promise<void> {
   const btn = document.getElementById('run-audit-btn');
   const gauges = document.querySelectorAll<HTMLElement>('.g-val');
+  const auditPanel = document.querySelector<HTMLElement>('.audit-panel');
+  if (auditPanel && !auditPanel.querySelector('.polyglot-strip')) {
+    renderPolyglotStrip(auditPanel);
+  }
   if (!btn || !gauges.length) return;
+
+  const wasmExports = await loadRustWasmEngine();
 
   btn.addEventListener('click', () => {
     sfx.playUiClick(720);
-    btn.textContent = 'Auditing...';
+    btn.textContent = wasmExports ? 'WASM Auditing...' : 'Auditing...';
     gauges.forEach((g) => {
       const target = Number(g.dataset.score || 99);
       const start = performance.now();
       const tick = (now: number) => {
         const p = Math.min(1, (now - start) / 900);
-        g.textContent = String(Math.round(45 + (target - 45) * (1 - Math.pow(1 - p, 3))));
+        const pct = Math.round(p * 100);
+        const scoreVal = wasmExports?.compute_eased_score
+          ? wasmExports.compute_eased_score(pct, target)
+          : Math.round(45 + (target - 45) * (1 - Math.pow(1 - p, 3)));
+        g.textContent = String(scoreVal);
         if (p < 1) requestAnimationFrame(tick);
-        else { g.textContent = String(target); btn.textContent = 'Verified ✓'; }
+        else {
+          g.textContent = String(target);
+          btn.textContent = wasmExports ? 'WASM Verified ✓' : 'Verified ✓';
+        }
       };
       requestAnimationFrame(tick);
     });
