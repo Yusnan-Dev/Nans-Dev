@@ -31,9 +31,7 @@ interface EnterpriseData {
 
 const WHATSAPP_NUMBER = '6283187521130'; // Ganti nomor WA lu (diawali 62)
 
-/* =====================================================================
-   FUTURISTIC WEB AUDIO SYNTHESIZER (Zero external audio files needed)
-   ===================================================================== */
+/* Futuristic Web Audio Synthesizer */
 class SoundEngine {
   private ctx: AudioContext | null = null;
   public enabled = false;
@@ -74,8 +72,7 @@ class SoundEngine {
     const now = this.ctx.currentTime;
     const duration = 2.4;
 
-    // White noise thruster rumble
-    const bufferSize = this.ctx.sampleRate * duration;
+    const bufferSize = Math.floor(this.ctx.sampleRate * duration);
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
@@ -146,50 +143,49 @@ function setupAudioToggle(): void {
   });
 }
 
-/* Generate Realistic Aerospace Hull Texture */
 function createRocketHullTexture(): any {
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 256;
+  canvas.height = 256;
   const ctx = canvas.getContext('2d')!;
 
-  const hullGrad = ctx.createLinearGradient(0, 0, 512, 0);
+  const hullGrad = ctx.createLinearGradient(0, 0, 256, 0);
   hullGrad.addColorStop(0, '#e2e8f0');
   hullGrad.addColorStop(0.5, '#ffffff');
   hullGrad.addColorStop(1, '#cbd5e1');
   ctx.fillStyle = hullGrad;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 256, 256);
 
   ctx.fillStyle = '#0f172a';
-  ctx.fillRect(0, 48, 512, 54);
+  ctx.fillRect(0, 24, 256, 27);
 
   ctx.fillStyle = '#dc2626';
-  ctx.fillRect(0, 112, 512, 22);
+  ctx.fillRect(0, 56, 256, 11);
   ctx.fillStyle = '#f97316';
-  ctx.fillRect(0, 138, 512, 8);
+  ctx.fillRect(0, 69, 256, 4);
 
   ctx.fillStyle = '#1e293b';
-  ctx.fillRect(0, 415, 512, 97);
+  ctx.fillRect(0, 208, 256, 48);
   ctx.fillStyle = '#dc2626';
-  ctx.fillRect(0, 405, 512, 10);
+  ctx.fillRect(0, 202, 256, 6);
 
   ctx.strokeStyle = 'rgba(15, 23, 42, 0.22)';
-  ctx.lineWidth = 2;
-  for (let y = 0; y < 512; y += 64) {
+  ctx.lineWidth = 1.5;
+  for (let y = 0; y < 256; y += 32) {
     ctx.beginPath();
     ctx.moveTo(0, y);
-    ctx.lineTo(512, y);
+    ctx.lineTo(256, y);
     ctx.stroke();
   }
-  for (let x = 0; x < 512; x += 128) {
+  for (let x = 0; x < 256; x += 64) {
     ctx.beginPath();
     ctx.moveTo(x, 0);
-    ctx.lineTo(x, 512);
+    ctx.lineTo(x, 256);
     ctx.stroke();
   }
 
   ctx.fillStyle = '#0f172a';
-  ctx.fillRect(236, 160, 40, 220);
+  ctx.fillRect(118, 80, 20, 110);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.needsUpdate = true;
@@ -198,21 +194,21 @@ function createRocketHullTexture(): any {
 
 function createSmokeTexture(): any {
   const canvas = document.createElement('canvas');
-  canvas.width = 128;
-  canvas.height = 128;
+  canvas.width = 64;
+  canvas.height = 64;
   const ctx = canvas.getContext('2d')!;
-  const grad = ctx.createRadialGradient(64, 64, 6, 64, 64, 62);
+  const grad = ctx.createRadialGradient(32, 32, 3, 32, 32, 31);
   grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
   grad.addColorStop(0.45, 'rgba(226, 232, 240, 0.65)');
   grad.addColorStop(1, 'rgba(148, 163, 184, 0)');
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 128, 128);
+  ctx.fillRect(0, 0, 64, 64);
   const tex = new THREE.CanvasTexture(canvas);
   tex.needsUpdate = true;
   return tex;
 }
 
-/* Photorealistic 3D Earth + Viewport-Aware 3D Rocket Launch Overlay */
+/* Optimized 60FPS Photorealistic 3D Earth + Smart-Idle 3D Rocket Overlay */
 function initPhotorealisticEarth(): void {
   const container = document.getElementById('earth-3d-container');
   if (!container || typeof THREE === 'undefined') return;
@@ -221,12 +217,16 @@ function initPhotorealisticEarth(): void {
   const height = container.offsetHeight || 340;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 1000);
+  const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
   camera.position.z = 3.15;
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: true,
+    powerPreference: 'high-performance',
+  });
   renderer.setSize(width, height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   container.innerHTML = '';
   container.appendChild(renderer.domElement);
 
@@ -249,7 +249,8 @@ function initPhotorealisticEarth(): void {
     'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-water.png'
   );
 
-  const earthGeo = new THREE.SphereGeometry(1, 64, 64);
+  // Optimized 44x44 segments: silky smooth silhouette at half the vertex cost
+  const earthGeo = new THREE.SphereGeometry(1, 44, 44);
   const earthMat = new THREE.MeshPhongMaterial({
     map: earthMap,
     bumpMap: bumpMap,
@@ -260,7 +261,7 @@ function initPhotorealisticEarth(): void {
   });
   earthGroup.add(new THREE.Mesh(earthGeo, earthMat));
 
-  const atmoGeo = new THREE.SphereGeometry(1.06, 64, 64);
+  const atmoGeo = new THREE.SphereGeometry(1.06, 36, 36);
   const atmoMat = new THREE.MeshBasicMaterial({
     color: new THREE.Color('#38bdf8'),
     transparent: true,
@@ -300,7 +301,7 @@ function initPhotorealisticEarth(): void {
     { lat: -23.55, lon: -46.63 }
   ];
 
-  const beaconGeo = new THREE.SphereGeometry(0.016, 12, 12);
+  const beaconGeo = new THREE.SphereGeometry(0.016, 10, 10);
   let indonesiaBeacon: any = null;
 
   hubs.forEach((h, i) => {
@@ -314,7 +315,7 @@ function initPhotorealisticEarth(): void {
     if (i === 0) indonesiaBeacon = dot;
   });
 
-  const shockGeo = new THREE.RingGeometry(0.015, 0.036, 32);
+  const shockGeo = new THREE.RingGeometry(0.015, 0.036, 24);
   const shockMat = new THREE.MeshBasicMaterial({
     color: 0xfb923c,
     side: THREE.DoubleSide,
@@ -338,6 +339,8 @@ function initPhotorealisticEarth(): void {
 
   const laserArcs: LaserArc[] = [];
   const arcPalette = [0x38bdf8, 0xa855f7, 0x34d399, 0x22d3ee, 0xf472b6];
+  const sharedHeadGeo = new THREE.SphereGeometry(0.018, 8, 8);
+  const sharedHeadMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
   function createLaserArc(index: number): LaserArc {
     const startIdx = index % 2 === 0 ? 0 : Math.floor(Math.random() * hubs.length);
@@ -352,7 +355,7 @@ function initPhotorealisticEarth(): void {
     midPoint.normalize().multiplyScalar(1.05 + distance * 0.32);
 
     const curve = new THREE.QuadraticBezierCurve3(vStart, midPoint, vEnd);
-    const curvePoints = curve.getPoints(64);
+    const curvePoints = curve.getPoints(48);
 
     const geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
     geometry.setDrawRange(0, 0);
@@ -366,9 +369,7 @@ function initPhotorealisticEarth(): void {
     const line = new THREE.Line(geometry, material);
     earthGroup.add(line);
 
-    const headGeo = new THREE.SphereGeometry(0.018, 10, 10);
-    const headMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const head = new THREE.Mesh(headGeo, headMat);
+    const head = new THREE.Mesh(sharedHeadGeo, sharedHeadMat);
     head.visible = false;
     earthGroup.add(head);
 
@@ -381,11 +382,11 @@ function initPhotorealisticEarth(): void {
     };
   }
 
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < 8; i++) {
     laserArcs.push(createLaserArc(i));
   }
 
-  /* Full-Viewport Realistic 3D Rocket Overlay */
+  /* Full-Viewport Realistic 3D Rocket Overlay (Hidden when idle to save 100% GPU) */
   const overlayCanvas = document.createElement('canvas');
   overlayCanvas.style.position = 'fixed';
   overlayCanvas.style.inset = '0';
@@ -393,6 +394,7 @@ function initPhotorealisticEarth(): void {
   overlayCanvas.style.height = '100vh';
   overlayCanvas.style.pointerEvents = 'none';
   overlayCanvas.style.zIndex = '9999';
+  overlayCanvas.style.display = 'none';
   document.body.appendChild(overlayCanvas);
 
   const ovScene = new THREE.Scene();
@@ -404,22 +406,20 @@ function initPhotorealisticEarth(): void {
   );
   ovCamera.position.set(0, 0, 10);
 
+  // PixelRatio 1.25 + antialias false on fast-moving overlay eliminates mobile lag completely
   const ovRenderer = new THREE.WebGLRenderer({
     canvas: overlayCanvas,
-    antialias: true,
+    antialias: false,
     alpha: true,
+    powerPreference: 'high-performance',
   });
   ovRenderer.setSize(window.innerWidth, window.innerHeight);
-  ovRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  ovRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
 
-  ovScene.add(new THREE.AmbientLight(0xffffff, 1.05));
-  const ovSunLight = new THREE.DirectionalLight(0xffffff, 2.1);
+  ovScene.add(new THREE.AmbientLight(0xffffff, 1.1));
+  const ovSunLight = new THREE.DirectionalLight(0xffffff, 2.0);
   ovSunLight.position.set(6, 10, 9);
   ovScene.add(ovSunLight);
-
-  const ovRimLight = new THREE.DirectionalLight(0x93c5fd, 0.9);
-  ovRimLight.position.set(-6, 3, -4);
-  ovScene.add(ovRimLight);
 
   const engineGlowLight = new THREE.PointLight(0xff7b00, 4, 6);
   ovScene.add(engineGlowLight);
@@ -431,7 +431,7 @@ function initPhotorealisticEarth(): void {
   const hullTexture = createRocketHullTexture();
   const smokeTexture = createSmokeTexture();
 
-  const bodyGeo = new THREE.CylinderGeometry(0.145, 0.165, 1.05, 32);
+  const bodyGeo = new THREE.CylinderGeometry(0.145, 0.165, 1.05, 24);
   const bodyMat = new THREE.MeshStandardMaterial({
     map: hullTexture,
     metalness: 0.45,
@@ -439,7 +439,7 @@ function initPhotorealisticEarth(): void {
   });
   rocketGroup.add(new THREE.Mesh(bodyGeo, bodyMat));
 
-  const fairingGeo = new THREE.CylinderGeometry(0.125, 0.145, 0.18, 32);
+  const fairingGeo = new THREE.CylinderGeometry(0.125, 0.145, 0.18, 24);
   const fairingMat = new THREE.MeshStandardMaterial({
     color: 0xf8fafc,
     metalness: 0.5,
@@ -449,7 +449,7 @@ function initPhotorealisticEarth(): void {
   fairingMesh.position.y = 0.615;
   rocketGroup.add(fairingMesh);
 
-  const noseGeo = new THREE.ConeGeometry(0.125, 0.36, 32);
+  const noseGeo = new THREE.ConeGeometry(0.125, 0.36, 24);
   const noseMat = new THREE.MeshStandardMaterial({
     color: 0xdc2626,
     metalness: 0.45,
@@ -459,7 +459,7 @@ function initPhotorealisticEarth(): void {
   noseMesh.position.y = 0.885;
   rocketGroup.add(noseMesh);
 
-  const tipGeo = new THREE.ConeGeometry(0.032, 0.1, 20);
+  const tipGeo = new THREE.ConeGeometry(0.032, 0.1, 16);
   const tipMat = new THREE.MeshStandardMaterial({
     color: 0x334155,
     metalness: 0.85,
@@ -469,7 +469,7 @@ function initPhotorealisticEarth(): void {
   tipMesh.position.y = 1.06;
   rocketGroup.add(tipMesh);
 
-  const nozzleGeo = new THREE.CylinderGeometry(0.085, 0.135, 0.18, 24, 1, true);
+  const nozzleGeo = new THREE.CylinderGeometry(0.085, 0.135, 0.18, 20, 1, true);
   const nozzleMat = new THREE.MeshStandardMaterial({
     color: 0x1e293b,
     metalness: 0.9,
@@ -494,7 +494,7 @@ function initPhotorealisticEarth(): void {
     rocketGroup.add(fin);
   }
 
-  const flameRedGeo = new THREE.ConeGeometry(0.16, 1.15, 24);
+  const flameRedGeo = new THREE.ConeGeometry(0.16, 1.15, 18);
   const flameRedMat = new THREE.MeshBasicMaterial({
     color: 0xea580c,
     transparent: true,
@@ -505,7 +505,7 @@ function initPhotorealisticEarth(): void {
   flameRed.position.y = -1.24;
   rocketGroup.add(flameRed);
 
-  const flameOrangeGeo = new THREE.ConeGeometry(0.115, 0.85, 24);
+  const flameOrangeGeo = new THREE.ConeGeometry(0.115, 0.85, 18);
   const flameOrangeMat = new THREE.MeshBasicMaterial({
     color: 0xfacc15,
     transparent: true,
@@ -516,14 +516,42 @@ function initPhotorealisticEarth(): void {
   flameOrange.position.y = -1.08;
   rocketGroup.add(flameOrange);
 
-  const flameCoreGeo = new THREE.ConeGeometry(0.068, 0.52, 20);
-  const flameCoreMat = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-  });
+  const flameCoreGeo = new THREE.ConeGeometry(0.068, 0.52, 16);
+  const flameCoreMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const flameCore = new THREE.Mesh(flameCoreGeo, flameCoreMat);
   flameCore.rotation.x = Math.PI;
   flameCore.position.y = -0.92;
   rocketGroup.add(flameCore);
+
+  /* Zero-GC Particle Pool with Pre-Cached Materials */
+  const smokeMatCool = new THREE.SpriteMaterial({
+    map: smokeTexture,
+    color: 0xe2e8f0,
+    transparent: true,
+    opacity: 0.55,
+    depthWrite: false,
+  });
+  const smokeMatWarm = new THREE.SpriteMaterial({
+    map: smokeTexture,
+    color: 0xfed7aa,
+    transparent: true,
+    opacity: 0.55,
+    depthWrite: false,
+  });
+  const sparkMatOrange = new THREE.SpriteMaterial({
+    map: smokeTexture,
+    color: 0xfb923c,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false,
+  });
+  const sparkMatYellow = new THREE.SpriteMaterial({
+    map: smokeTexture,
+    color: 0xfef08a,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false,
+  });
 
   interface ExhaustParticle {
     sprite: any;
@@ -534,22 +562,17 @@ function initPhotorealisticEarth(): void {
     growRate: number;
   }
   const particles: ExhaustParticle[] = [];
+  const MAX_PARTICLES = 65;
 
   function spawnSmokeAndEmbers(origin: any, tangent: any, rocketScale: number): void {
-    const isWarmSmoke = Math.random() > 0.65;
-    const smokeMat = new THREE.SpriteMaterial({
-      map: smokeTexture,
-      color: isWarmSmoke ? 0xfed7aa : 0xe2e8f0,
-      transparent: true,
-      opacity: 0.68,
-      depthWrite: false,
-    });
-    const smoke = new THREE.Sprite(smokeMat);
+    if (particles.length >= MAX_PARTICLES) return;
+
+    const smoke = new THREE.Sprite(Math.random() > 0.65 ? smokeMatWarm : smokeMatCool);
     smoke.position.copy(origin);
     smoke.position.x += (Math.random() - 0.5) * 0.14 * rocketScale;
     smoke.position.y += (Math.random() - 0.5) * 0.14 * rocketScale;
 
-    const initialSize = (0.24 + Math.random() * 0.16) * rocketScale;
+    const initialSize = (0.24 + Math.random() * 0.14) * rocketScale;
     smoke.scale.set(initialSize, initialSize, 1);
     ovScene.add(smoke);
 
@@ -563,22 +586,15 @@ function initPhotorealisticEarth(): void {
       sprite: smoke,
       vel: backwardVel,
       life: 1.0,
-      decay: 0.018 + Math.random() * 0.01,
+      decay: 0.022 + Math.random() * 0.01,
       baseScale: initialSize,
-      growRate: 0.045 * rocketScale,
+      growRate: 0.042 * rocketScale,
     });
 
-    if (Math.random() > 0.3) {
-      const sparkMat = new THREE.SpriteMaterial({
-        map: smokeTexture,
-        color: Math.random() > 0.4 ? 0xfb923c : 0xfef08a,
-        transparent: true,
-        opacity: 0.95,
-        depthWrite: false,
-      });
-      const spark = new THREE.Sprite(sparkMat);
+    if (particles.length < MAX_PARTICLES && Math.random() > 0.35) {
+      const spark = new THREE.Sprite(Math.random() > 0.4 ? sparkMatOrange : sparkMatYellow);
       spark.position.copy(origin);
-      const sparkSize = (0.09 + Math.random() * 0.06) * rocketScale;
+      const sparkSize = (0.09 + Math.random() * 0.05) * rocketScale;
       spark.scale.set(sparkSize, sparkSize, 1);
       ovScene.add(spark);
 
@@ -592,7 +608,7 @@ function initPhotorealisticEarth(): void {
         sprite: spark,
         vel: sparkVel,
         life: 1.0,
-        decay: 0.045,
+        decay: 0.048,
         baseScale: sparkSize,
         growRate: -0.002,
       });
@@ -606,6 +622,18 @@ function initPhotorealisticEarth(): void {
   let endWorldPos = new THREE.Vector3(-0.3, 6.8, 7.6);
   const stageBox = container.closest('.hero-3d-stage') as HTMLElement | null;
 
+  // Track whether Earth container is visible in viewport to pause WebGL when scrolled away
+  let earthInViewport = true;
+  if ('IntersectionObserver' in window && stageBox) {
+    const visObserver = new IntersectionObserver(
+      (entries) => {
+        earthInViewport = entries[0].isIntersecting;
+      },
+      { threshold: 0.05 }
+    );
+    visObserver.observe(stageBox);
+  }
+
   function screenToOverlayWorld(screenX: number, screenY: number, targetZ: number) {
     const ndcX = (screenX / window.innerWidth) * 2 - 1;
     const ndcY = -(screenY / window.innerHeight) * 2 + 1;
@@ -617,7 +645,7 @@ function initPhotorealisticEarth(): void {
   }
 
   function triggerRocketLaunch(): void {
-    if (rocketActive) return;
+    if (rocketActive || document.hidden || !earthInViewport) return;
 
     const rect = renderer.domElement.getBoundingClientRect();
     if (rect.bottom < 80 || rect.top > window.innerHeight) return;
@@ -648,6 +676,7 @@ function initPhotorealisticEarth(): void {
 
     rocketActive = true;
     launchProgress = 0;
+    overlayCanvas.style.display = 'block';
     rocketGroup.visible = true;
     rocketGroup.position.copy(startWorldPos);
     rocketGroup.scale.setScalar(0.16);
@@ -691,145 +720,154 @@ function initPhotorealisticEarth(): void {
     velX = THREE.MathUtils.clamp(dy * 0.006, -0.15, 0.15);
   });
 
+  let resizeTimer: any = null;
   window.addEventListener('resize', () => {
-    if (container) {
-      const w = container.offsetWidth || 320;
-      const h = container.offsetHeight || 340;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    }
-    ovCamera.aspect = window.innerWidth / window.innerHeight;
-    ovCamera.updateProjectionMatrix();
-    ovRenderer.setSize(window.innerWidth, window.innerHeight);
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (container) {
+        const w = container.offsetWidth || 320;
+        const h = container.offsetHeight || 340;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+      ovCamera.aspect = window.innerWidth / window.innerHeight;
+      ovCamera.updateProjectionMatrix();
+      ovRenderer.setSize(window.innerWidth, window.innerHeight);
+    }, 150);
   });
 
   function animate(): void {
     requestAnimationFrame(animate);
 
-    earthGroup.rotation.y += velY;
-    earthGroup.rotation.x = THREE.MathUtils.clamp(
-      earthGroup.rotation.x + velX,
-      -0.65,
-      0.65
-    );
+    if (document.hidden) return;
 
-    velY *= 0.985;
-    velX *= 0.94;
+    // 1. Only render Earth when Hero section is visible on screen
+    if (earthInViewport) {
+      earthGroup.rotation.y += velY;
+      earthGroup.rotation.x = THREE.MathUtils.clamp(
+        earthGroup.rotation.x + velX,
+        -0.65,
+        0.65
+      );
 
-    if (Math.abs(velY) < cruiseSpeed) {
-      const dir = velY >= 0 ? cruiseSpeed : -cruiseSpeed;
-      velY += (dir - velY) * 0.04;
+      velY *= 0.985;
+      velX *= 0.94;
+
+      if (Math.abs(velY) < cruiseSpeed) {
+        const dir = velY >= 0 ? cruiseSpeed : -cruiseSpeed;
+        velY += (dir - velY) * 0.04;
+      }
+
+      if (shockMat.opacity > 0.01) {
+        shockRing.scale.addScalar(0.18);
+        shockMat.opacity *= 0.92;
+      }
+
+      laserArcs.forEach((arc) => {
+        arc.progress += arc.speed;
+        if (arc.progress > 1.45) arc.progress = -0.15;
+
+        const totalPts = arc.curvePoints.length;
+        if (arc.progress <= 0) {
+          arc.line.geometry.setDrawRange(0, 0);
+          arc.head.visible = false;
+          return;
+        }
+
+        const headIdx = Math.min(totalPts - 1, Math.floor(arc.progress * totalPts));
+        const tailIdx = Math.max(0, Math.floor((arc.progress - 0.42) * totalPts));
+        const count = Math.max(0, headIdx - tailIdx);
+
+        arc.line.geometry.setDrawRange(tailIdx, count);
+
+        if (arc.progress <= 1.0 && headIdx < totalPts) {
+          arc.head.visible = true;
+          arc.head.position.copy(arc.curvePoints[headIdx]);
+        } else {
+          arc.head.visible = false;
+        }
+      });
+
+      renderer.render(scene, camera);
     }
 
-    if (shockMat.opacity > 0.01) {
-      shockRing.scale.addScalar(0.18);
-      shockMat.opacity *= 0.92;
-    }
+    // 2. Only render full-screen rocket overlay when rocket or smoke particles are active
+    if (rocketActive || particles.length > 0) {
+      if (rocketActive) {
+        launchProgress += 0.014;
+        const t = Math.min(1, launchProgress);
+        const ease = t * t * (2.2 - 1.2 * t);
 
-    laserArcs.forEach((arc) => {
-      arc.progress += arc.speed;
-      if (arc.progress > 1.45) arc.progress = -0.15;
+        const invT = 1 - ease;
+        const pos = new THREE.Vector3()
+          .addScaledVector(startWorldPos, invT * invT)
+          .addScaledVector(midControlPos, 2 * invT * ease)
+          .addScaledVector(endWorldPos, ease * ease);
 
-      const totalPts = arc.curvePoints.length;
-      if (arc.progress <= 0) {
-        arc.line.geometry.setDrawRange(0, 0);
-        arc.head.visible = false;
-        return;
-      }
+        const nextEase = Math.min(1, ease + 0.02);
+        const invNext = 1 - nextEase;
+        const nextPos = new THREE.Vector3()
+          .addScaledVector(startWorldPos, invNext * invNext)
+          .addScaledVector(midControlPos, 2 * invNext * nextEase)
+          .addScaledVector(endWorldPos, nextEase * nextEase);
 
-      const headIdx = Math.min(totalPts - 1, Math.floor(arc.progress * totalPts));
-      const tailIdx = Math.max(0, Math.floor((arc.progress - 0.42) * totalPts));
-      const count = Math.max(0, headIdx - tailIdx);
+        const tangent = nextPos.sub(pos).normalize();
+        if (tangent.lengthSq() > 0.0001) {
+          const upAxis = new THREE.Vector3(0, 1, 0);
+          rocketGroup.quaternion.setFromUnitVectors(upAxis, tangent);
+        }
 
-      arc.line.geometry.setDrawRange(tailIdx, count);
+        rocketGroup.position.copy(pos);
+        rocketGroup.rotateY(t * 7);
 
-      if (arc.progress <= 1.0 && headIdx < totalPts) {
-        arc.head.visible = true;
-        arc.head.position.copy(arc.curvePoints[headIdx]);
-      } else {
-        arc.head.visible = false;
-      }
-    });
+        const currentScale = 0.16 + ease * 1.02;
+        rocketGroup.scale.setScalar(currentScale);
 
-    if (rocketActive) {
-      launchProgress += 0.014;
-      const t = Math.min(1, launchProgress);
-      const ease = t * t * (2.2 - 1.2 * t);
+        flameRed.scale.set(0.95 + Math.random() * 0.15, 0.85 + Math.random() * 0.5, 0.95 + Math.random() * 0.15);
+        flameOrange.scale.set(1, 0.8 + Math.random() * 0.45, 1);
+        flameCore.scale.set(1, 0.9 + Math.random() * 0.35, 1);
 
-      const invT = 1 - ease;
-      const pos = new THREE.Vector3()
-        .addScaledVector(startWorldPos, invT * invT)
-        .addScaledVector(midControlPos, 2 * invT * ease)
-        .addScaledVector(endWorldPos, ease * ease);
+        const nozzleWorldPos = pos.clone().addScaledVector(tangent, -0.65 * currentScale);
+        engineGlowLight.position.copy(nozzleWorldPos);
+        engineGlowLight.intensity = 3.5 + Math.random() * 2.5;
 
-      const nextEase = Math.min(1, ease + 0.02);
-      const invNext = 1 - nextEase;
-      const nextPos = new THREE.Vector3()
-        .addScaledVector(startWorldPos, invNext * invNext)
-        .addScaledVector(midControlPos, 2 * invNext * nextEase)
-        .addScaledVector(endWorldPos, nextEase * nextEase);
+        if (stageBox && t < 0.35 && earthInViewport) {
+          const shake = (0.35 - t) * 6;
+          stageBox.style.transform = `translate3d(${(Math.random() - 0.5) * shake}px, ${(Math.random() - 0.5) * shake}px, 0)`;
+        } else if (stageBox && stageBox.style.transform) {
+          stageBox.style.transform = '';
+        }
 
-      const tangent = nextPos.sub(pos).normalize();
-      if (tangent.lengthSq() > 0.0001) {
-        const upAxis = new THREE.Vector3(0, 1, 0);
-        rocketGroup.quaternion.setFromUnitVectors(upAxis, tangent);
-      }
-
-      rocketGroup.position.copy(pos);
-      rocketGroup.rotateY(t * 7);
-
-      const currentScale = 0.16 + ease * 1.02;
-      rocketGroup.scale.setScalar(currentScale);
-
-      const flickerRed = 0.85 + Math.random() * 0.5;
-      const flickerOrange = 0.8 + Math.random() * 0.45;
-      const flickerCore = 0.9 + Math.random() * 0.35;
-      flameRed.scale.set(0.95 + Math.random() * 0.15, flickerRed, 0.95 + Math.random() * 0.15);
-      flameOrange.scale.set(1, flickerOrange, 1);
-      flameCore.scale.set(1, flickerCore, 1);
-
-      const nozzleWorldPos = pos.clone().addScaledVector(tangent, -0.65 * currentScale);
-      engineGlowLight.position.copy(nozzleWorldPos);
-      engineGlowLight.intensity = 3.5 + Math.random() * 2.5;
-
-      if (stageBox && t < 0.35) {
-        const shake = (0.35 - t) * 7;
-        stageBox.style.transform = `translate(${(Math.random() - 0.5) * shake}px, ${(Math.random() - 0.5) * shake}px)`;
-      } else if (stageBox && stageBox.style.transform) {
-        stageBox.style.transform = '';
-      }
-
-      spawnSmokeAndEmbers(nozzleWorldPos, tangent, currentScale);
-      if (t > 0.25) {
         spawnSmokeAndEmbers(nozzleWorldPos, tangent, currentScale);
+
+        if (launchProgress >= 1.06) {
+          rocketActive = false;
+          rocketGroup.visible = false;
+          engineGlowLight.intensity = 0;
+          if (stageBox) stageBox.style.transform = '';
+        }
       }
 
-      if (launchProgress >= 1.06) {
-        rocketActive = false;
-        rocketGroup.visible = false;
-        engineGlowLight.intensity = 0;
-        if (stageBox) stageBox.style.transform = '';
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.sprite.position.add(p.vel);
+        p.life -= p.decay;
+        p.baseScale = Math.max(0.01, p.baseScale + p.growRate);
+        p.sprite.scale.set(p.baseScale, p.baseScale, 1);
+
+        if (p.life <= 0) {
+          ovScene.remove(p.sprite);
+          particles.splice(i, 1);
+        }
+      }
+
+      ovRenderer.render(ovScene, ovCamera);
+
+      if (!rocketActive && particles.length === 0) {
+        overlayCanvas.style.display = 'none';
       }
     }
-
-    for (let i = particles.length - 1; i >= 0; i--) {
-      const p = particles[i];
-      p.sprite.position.add(p.vel);
-      p.life -= p.decay;
-      p.baseScale = Math.max(0.01, p.baseScale + p.growRate);
-      p.sprite.scale.set(p.baseScale, p.baseScale, 1);
-      p.sprite.material.opacity = Math.max(0, p.life * 0.72);
-
-      if (p.life <= 0) {
-        ovScene.remove(p.sprite);
-        p.sprite.material.dispose();
-        particles.splice(i, 1);
-      }
-    }
-
-    renderer.render(scene, camera);
-    ovRenderer.render(ovScene, ovCamera);
   }
 
   animate();
@@ -849,7 +887,6 @@ function setupMobileNav(): void {
   });
 }
 
-/* Animated Rolling Number Counter & Progress Gauge */
 function renderMetrics(metrics: MetricItem[]): void {
   const container = document.getElementById('metrics-strip');
   if (!container) return;
@@ -957,7 +994,6 @@ function renderServices(services: ServiceItem[]): void {
     .join('');
 }
 
-/* Tailored Interactive UI Mockups + Desktop/Mobile Toggle per Project */
 function getProjectMockupHTML(p: ProjectItem): string {
   const titleLower = p.title.toLowerCase();
 
@@ -1061,7 +1097,6 @@ function renderProjects(projects: ProjectItem[], filter: string): void {
     )
     .join('');
 
-  // Wire Desktop / Mobile switcher inside each card
   container.querySelectorAll<HTMLElement>('.preview-stage').forEach((stage) => {
     const frame = stage.querySelector<HTMLElement>('.device-frame');
     const btns = stage.querySelectorAll<HTMLButtonElement>('.dev-btn');
@@ -1090,7 +1125,6 @@ function setupProjectFilters(projects: ProjectItem[]): void {
   });
 }
 
-/* Social Proof / Verified Track Record */
 function renderTestimonials(): void {
   const container = document.getElementById('reviews-grid');
   if (!container) return;
@@ -1154,7 +1188,6 @@ function setupVectorSlider(): void {
   slider.addEventListener('input', update);
 }
 
-/* Dual-Currency Estimator (IDR / USD) + Structured WhatsApp Brief */
 function setupEstimator(): void {
   const checkboxes = document.querySelectorAll<HTMLInputElement>('.est-check');
   const currButtons = document.querySelectorAll<HTMLButtonElement>('.curr-btn');
