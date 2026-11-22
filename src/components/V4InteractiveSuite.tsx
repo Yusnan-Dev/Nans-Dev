@@ -71,7 +71,7 @@ export function mountGlobeInspectorAndTrigger(stageEl: HTMLElement): void {
     'div',
     {
       className: 'v4-globe-bar',
-      style: 'position:absolute;left:14px;bottom:14px;z-index:4;display:flex;align-items:center;gap:8px;max-width:calc(100% - 170px);',
+      style: 'position:absolute;left:10px;right:10px;bottom:10px;z-index:4;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;',
     },
     createDomNode(
       'button',
@@ -101,7 +101,7 @@ export function mountVectorLabModeSwitch(vectorLabEl: HTMLElement): void {
 
   const row = createDomNode(
     'div',
-    { className: 'v4-lab-mode-row', style: 'display:flex;gap:8px;margin-bottom:12px;' },
+    { className: 'v4-lab-mode-row', style: 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;' },
     createDomNode(
       'button',
       {
