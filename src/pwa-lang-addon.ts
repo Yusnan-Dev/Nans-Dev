@@ -204,17 +204,29 @@
     }
   };
 
-  window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', () => {
     mountInsideHamburger();
     const saved = localStorage.getItem('nans_selected_lang') || 'id';
-    if (saved !== 'id') setTimeout(() => applyLang(saved), 350);
+    if (saved !== 'id') setTimeout(() => applyLang(saved), 600);
 
-    // Pantau elemen dinamis dari main.ts agar ikut terjemah otomatis
+    // Pengaman anti-macet: paksa tutup preloader maksimal 2.2 detik
+    setTimeout(() => {
+      const pre = document.getElementById('nans-preloader');
+      if (pre) {
+        pre.style.opacity = '0';
+        pre.style.pointerEvents = 'none';
+        setTimeout(() => pre.remove(), 400);
+      }
+    }, 2200);
+
+    // Pantau perubahan konten tanpa mengganggu preloader
+    let timer: any = null;
     const observer = new MutationObserver(() => {
       const active = localStorage.getItem('nans_selected_lang') || 'id';
-      if (active !== 'id') applyLang(active);
+      if (active === 'id') return;
+      clearTimeout(timer);
+      timer = setTimeout(() => applyLang(active), 150);
     });
     observer.observe(document.body, { childList: true, subtree: true });
   });
 })();
-    
