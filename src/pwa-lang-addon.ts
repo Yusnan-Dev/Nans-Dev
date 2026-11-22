@@ -54,6 +54,18 @@
         display: none !important;
       }
     }
+    .nav-links {
+      gap: 12px !important;
+    }
+    .nav-links a {
+      font-size: 12px !important;
+      white-space: nowrap !important;
+    }
+    #nans-pwa-install-btn {
+      padding: 5px 10px !important;
+      font-size: 11.5px !important;
+    }
+    
   `;
   document.head.appendChild(fixStyle);
 
