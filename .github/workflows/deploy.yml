@@ -38,9 +38,9 @@ jobs:
 
       - name: Compile TypeScript & SCSS
         run: |
-          npm install -g typescript sass
-          tsc src/main.ts --target ES2020 --module none --outFile main.js
-          sass src/style.scss style.css --style compressed
+          npm install -g esbuild sass
+          esbuild src/main.ts --bundle --minify --outfile=main.js
+          sass src/style.scss style.css --style compressed --no-source-map
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
