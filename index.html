@@ -10,7 +10,7 @@
   <link rel="manifest" href="./manifest.json">
 </head>
 <body>
-        <!-- Cinematic Physics Bounce + AE Preloader -->
+  <!-- Cinematic Physics Bounce + AE Preloader -->
   <div id="nans-preloader" class="preloader-screen" aria-hidden="true">
     <div class="pre-inner">
       <div class="pre-ae-lockup">
@@ -31,9 +31,7 @@
       <div class="pre-status">SYSTEM BOOT // 60FPS READY</div>
     </div>
   </div>
-  
-  
-  
+
   <div class="ambient-orb orb-1"></div>
   <div class="ambient-orb orb-2"></div>
 
@@ -68,27 +66,29 @@
         NANS<span>DEV</span>
       </a>
 
-      <nav class="nav-links" id="nav-links">
-        <a href="#services">Arsitektur</a>
-        <a href="#blueprint">Pipeline</a>
-        <a href="#vector-lab">Vector Lab</a>
-        <a href="#portfolio">Portofolio</a>
-        <a href="#estimator">AI Scope & Estimasi</a>
-      </nav>
-
-      <div style="display:flex;align-items:center;gap:8px;">
+      <div class="nav-right-cluster">
         <button type="button" id="cmd-trigger" class="cmd-btn" title="Quick Command">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span>Menu Cepat</span>
           <kbd>⌘K</kbd>
         </button>
+
         <div class="build-badge">
           <span class="dot"></span>
           <span id="build-time">SYS.ONLINE</span>
         </div>
+
+        <!-- Theme Switcher (#v4-navbar-theme-switcher) di-mount otomatis sebelum tombol hamburger -->
+        <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Menu Navigasi" aria-expanded="false">☰</button>
       </div>
 
-      <button class="menu-toggle" id="menu-toggle" aria-label="Menu">☰</button>
+      <nav class="nav-links" id="nav-links" aria-label="Navigasi Utama">
+        <a href="#services">Arsitektur</a>
+        <a href="#blueprint">Pipeline</a>
+        <a href="#vector-lab">Vector Lab</a>
+        <a href="#portfolio">Portofolio</a>
+        <a href="#estimator">AI Scope &amp; Estimasi</a>
+      </nav>
     </div>
   </header>
 
@@ -97,14 +97,14 @@
       <div class="hero-copy">
         <div class="status-pills">
           <div class="pill-announcement">
-            <span class="pulse-ring"></span> Next-Gen Web & Visual Architecture
+            <span class="pulse-ring"></span> Next-Gen Web &amp; Visual Architecture
           </div>
           <div class="pill-slot">
             <span class="slot-dot"></span> 2 Slot Proyek Tersedia Minggu Ini
           </div>
         </div>
 
-        <h1>Membangun Sistem Web & Identitas Visual Standar Korporat.</h1>
+        <h1>Membangun Sistem Web &amp; Identitas Visual Standar Korporat.</h1>
         <p>Rekayasa website custom berperforma tinggi, desain antarmuka modern, dan rekonstruksi aset vektor presisi untuk akselerasi bisnis digital Anda.</p>
         <div class="hero-actions">
           <a href="#estimator" class="btn-primary">Rakit Proyek Anda</a>
@@ -134,14 +134,14 @@
     <section id="blueprint">
       <div class="section-header">
         <div class="kicker">Enterprise Engineering Workflow</div>
-        <h2>Arsitektur Pipeline & Audit Performa Live</h2>
+        <h2>Arsitektur Pipeline &amp; Audit Performa Live</h2>
       </div>
       <div class="enterprise-grid">
         <div class="blueprint-panel">
           <div class="bp-nodes" id="bp-nodes">
-            <button type="button" class="bp-node active" data-step="0">01. UI/UX & 3D</button>
+            <button type="button" class="bp-node active" data-step="0">01. UI/UX &amp; 3D</button>
             <button type="button" class="bp-node" data-step="1">02. Core Engine</button>
-            <button type="button" class="bp-node" data-step="2">03. WA & API</button>
+            <button type="button" class="bp-node" data-step="2">03. WA &amp; API</button>
             <button type="button" class="bp-node" data-step="3">04. Edge CDN</button>
           </div>
           <div id="bp-inspector" class="bp-inspector"></div>
@@ -168,7 +168,7 @@
     <section id="vector-lab">
       <div class="section-header">
         <div class="kicker">Interactive Precision Lab</div>
-        <h2>Raster-to-Vector & Emblem Reconstruction</h2>
+        <h2>Raster-to-Vector &amp; Emblem Reconstruction</h2>
       </div>
       <div class="vector-lab">
         <div>
@@ -214,13 +214,13 @@
     <section id="portfolio">
       <div class="section-header">
         <div class="kicker">Deployed Systems</div>
-        <h2>Portofolio & Arsitektur Live</h2>
+        <h2>Portofolio &amp; Arsitektur Live</h2>
       </div>
       <div class="filter-bar">
         <button class="filter-btn active" data-filter="all">Semua Sistem</button>
-        <button class="filter-btn" data-filter="web">Website & E-Commerce</button>
+        <button class="filter-btn" data-filter="web">Website &amp; E-Commerce</button>
         <button class="filter-btn" data-filter="system">Platform Direktori</button>
-        <button class="filter-btn" data-filter="design">Vector & Brand</button>
+        <button class="filter-btn" data-filter="design">Vector &amp; Brand</button>
       </div>
       <div class="projects-grid" id="projects-grid"></div>
     </section>
@@ -228,7 +228,7 @@
     <section id="reviews">
       <div class="section-header">
         <div class="kicker">Verified Track Record</div>
-        <h2>Kepercayaan Klien & Pengiriman Proyek</h2>
+        <h2>Kepercayaan Klien &amp; Pengiriman Proyek</h2>
       </div>
       <div class="reviews-grid" id="reviews-grid"></div>
     </section>
@@ -236,8 +236,8 @@
     <section id="estimator">
       <div class="section-header-row">
         <div class="section-header" style="margin-bottom:0;">
-          <div class="kicker">AI Scope & Configurator</div>
-          <h2>Rekomendasi Otomatis & Simulasi Biaya</h2>
+          <div class="kicker">AI Scope &amp; Configurator</div>
+          <h2>Rekomendasi Otomatis &amp; Simulasi Biaya</h2>
         </div>
         <div class="currency-switch" role="group" aria-label="Pilih Mata Uang">
           <button type="button" class="curr-btn active" data-curr="IDR">IDR (Rp)</button>
@@ -269,7 +269,7 @@
                 <span class="meta-tag" data-idr="Rp 150rb • +1 Hari" data-usd="$15 • +1 Day">Rp 150rb • +1 Hari</span>
               </label>
               <label>
-                <span><input type="checkbox" class="est-check" value="Paket Banner & Aset Media Sosial" data-days="2" data-idr="250000" data-usd="25"> Banner & Aset Visual Sosmed</span>
+                <span><input type="checkbox" class="est-check" value="Paket Banner & Aset Media Sosial" data-days="2" data-idr="250000" data-usd="25"> Banner &amp; Aset Visual Sosmed</span>
                 <span class="meta-tag" data-idr="Rp 250rb • +2 Hari" data-usd="$25 • +2 Days">Rp 250rb • +2 Hari</span>
               </label>
             </div>
@@ -280,7 +280,7 @@
           </div>
 
           <div class="est-summary">
-            <div class="est-label">Estimasi Investasi & Rilis</div>
+            <div class="est-label">Estimasi Investasi &amp; Rilis</div>
             <div class="est-price" id="est-price">Rp 750.000</div>
             <div class="est-time" id="est-days">ESTIMASI: 3 HARI KERJA</div>
             <p class="est-note">Detail modul, estimasi biaya, dan brief Anda otomatis terformat rapi saat dialihkan ke WhatsApp.</p>
@@ -292,7 +292,7 @@
   </main>
 
   <footer>
-    <div class="container">&copy; 2026 Nans Dev Architecture. Engineered with TypeScript/TSX, Rust (WebAssembly), Go, Python, SCSS & GitHub Actions.</div>
+    <div class="container">&copy; 2026 Nans Dev Architecture. Engineered with TypeScript/TSX, Rust (WebAssembly), Go, Python, SCSS &amp; GitHub Actions.</div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
@@ -300,4 +300,3 @@
   <script src="./pwa-lang-addon.js" defer></script>
 </body>
 </html>
-                
