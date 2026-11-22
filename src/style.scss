@@ -1527,12 +1527,3 @@ footer {
 @keyframes aeLetterReveal { to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); } }
 @keyframes aeSubReveal { to { opacity: 1; transform: translateY(0); } }
 @keyframes fillProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-
-/* Fix tombol Menu Cepat agar tidak gepeng 2 baris di layar HP */
-@media (max-width: 520px) {
-  .cmd-btn {
-    padding: 7px 9px;
-    span { display: none; }
-    kbd { font-size: 0.62rem; }
-  }
-}
