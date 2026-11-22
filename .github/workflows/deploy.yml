@@ -31,21 +31,31 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Prepare dist & Run Python Pipeline
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Setup Rust WASM Target
+        run: |
+          rustup target add wasm32-unknown-unknown
+
+      - name: Prepare dist & Run Python + Go Pipeline
         run: |
           mkdir -p dist
           cp index.html sw.js dist/
           python3 scripts/generate_data.py
           python3 scripts/enterprise_ops.py
+          go run scripts/edge_benchmark.go
           cp -f sitemap.xml robots.txt manifest.json schema.json _headers build-telemetry.json dist/ 2>/dev/null || true
 
-      - name: Compile TypeScript & SCSS into dist
+      - name: Compile Rust WebAssembly, TypeScript/TSX & SCSS into dist
         run: |
+          rustc --target wasm32-unknown-unknown -O --crate-type=cdylib src/wasm/perf_engine.rs -o dist/perf_engine.wasm
           npm install -g esbuild sass
-          esbuild src/main.ts --bundle --minify --outfile=dist/main.js
+          esbuild src/main.ts --bundle --minify --jsx-factory=createDomNode --outfile=dist/main.js
           esbuild src/pwa-lang-addon.ts --bundle --minify --outfile=dist/pwa-lang-addon.js
           sass src/style.scss dist/style.css --style compressed --no-source-map
-
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -65,4 +75,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        
