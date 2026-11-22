@@ -903,8 +903,7 @@ function setupV4Suite(): void {
     return `NANS DEV BRIEF
 Brand: ${brand}
 Modul:
-${mods.join('
-') || '• Konsultasi'}
+${mods.join('\n') || '• Konsultasi'}
 Estimasi: ${price} (${days})
 Palet: ${selectedPalette}
 Catatan: ${notes}`;
