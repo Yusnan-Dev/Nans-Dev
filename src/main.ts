@@ -1,5 +1,5 @@
 import { renderPolyglotStrip } from './components/StackBadge';
-import { mountWasmBenchmarkLab, mountV4EstimatorTools, applyV4ThemeColors, mountGlobeInspectorAndTrigger, mountVectorLabModeSwitch } from './components/V4InteractiveSuite';
+import { mountWasmBenchmarkLab, mountV4EstimatorTools, applyV4ThemeColors, applyV4ThemeMode, mountNavbarThemeSwitcher, mountGlobeInspectorAndTrigger, mountVectorLabModeSwitch, ThemeMode } from './components/V4InteractiveSuite';
 declare const THREE: any;
 
 interface MetricItem { value: string; label: string; }
@@ -761,88 +761,24 @@ function setupArchitectureBlueprint(): void {
   if (!nodes.length || !inspector) return;
 
   const steps = [
-    {
-      title: '01. High-Impact UI/UX & Interactive 3D',
-      sla: 'ESTIMASI: HARI 1',
-      desc: 'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.',
-      deliverables: [
-        'Wireframe & Layout Responsif Desktop + Mobile',
-        'Rekonstruksi Logo & Ikon Vektor Presisi (SVG)',
-        'Integrasi Elemen Interaktif & Micro-Animations',
-        'Kalibrasi Palet Warna Brand & Tipografi Korporat',
-      ],
-      code: 'renderTarget: "60FPS Mobile" | assets: ["SVG", "WebGL2", "SCSS"]',
-    },
-    {
-      title: '02. Modular TypeScript & Python Engine',
-      sla: 'ESTIMASI: HARI 2',
-      desc: 'Arsitektur kode terstruktur, bersih dari script berlebih, dan siap dikembangkan untuk katalog maupun kalkulator bisnis.',
-      deliverables: [
-        'Struktur Data Produk / Layanan Berbasis JSON',
-        'Kalkulator Harga & Simulasi Paket Otomatis',
-        'Filter Kategori Real-Time & Pencarian Cepat',
-        'Optimasi Bundle Script Ringan Tanpa Lag di HP',
-      ],
-      code: 'pipeline: "Python JSON Builder -> Strict TypeScript Bundle"',
-    },
-    {
-      title: '03. Automated WhatsApp & Payment Flow',
-      sla: 'ESTIMASI: HARI 2–3',
-      desc: 'Integrasi kalkulator pesanan otomatis yang mengubah pilihan pelanggan menjadi format invoice/brief langsung ke WhatsApp.',
-      deliverables: [
-        'Generator Format Pesan Order & Invoice WA Otomatis',
-        'Tombol CTA Multi-Titik & Floating Quick Contact',
-        'Validasi Input Klien & Ringkasan Estimasi Biaya',
-        'Dukungan Multi-Mata Uang (IDR / USD) Siap Ekspor',
-      ],
-      code: 'checkoutBridge: "Dynamic Cart -> Encoded WhatsApp API"',
-    },
-    {
-      title: '04. Global Edge CDN & Zero-Downtime CI/CD',
-      sla: 'ESTIMASI: RILIS LIVE',
-      desc: 'Otomatisasi build dan deployment dengan kompresi aset statis super cepat untuk akses instan dari berbagai wilayah.',
-      deliverables: [
-        'Deploy Otomatis via GitHub Actions & Edge CDN',
-        'Konfigurasi SEO Meta, Sitemap XML & Schema.org',
-        'Audit Skor Lighthouse & Kompresi Aset Produksi',
-        'Panduan Pengelolaan & Serah Terima Source Code',
-      ],
-      code: 'status: "DEPLOYED" | uptime: "99.9%" | ttfb: "<45ms"',
-    },
+    { title: '01. High-Impact UI/UX & Interactive 3D', desc: 'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.', code: 'renderTarget: "60FPS Mobile" | assets: ["SVG", "WebGL2", "SCSS"]' },
+    { title: '02. Modular TypeScript & Python Engine', desc: 'Arsitektur kode terstruktur, bersih dari script berlebih, dan siap dikembangkan untuk katalog maupun kalkulator bisnis.', code: 'pipeline: "Python JSON Builder -> Strict TypeScript Bundle"' },
+    { title: '03. Automated WhatsApp & Payment Flow', desc: 'Integrasi kalkulator pesanan otomatis yang mengubah pilihan pelanggan menjadi format invoice/brief langsung ke WhatsApp.', code: 'checkoutBridge: "Dynamic Cart -> Encoded WhatsApp API"' },
+    { title: '04. Global Edge CDN & Zero-Downtime CI/CD', desc: 'Otomatisasi build dan deployment dengan kompresi aset statis super cepat untuk akses instan dari berbagai wilayah.', code: 'status: "DEPLOYED" | uptime: "99.9%" | ttfb: "<45ms"' },
   ];
 
   const showStep = (i: number) => {
     const s = steps[i] || steps[0];
-    const listHtml = s.deliverables
-      .map(
-        (item, idx) =>
-          `<div class="bp-deliv-item" style="--i:${idx};"><span class="bp-check">✓</span><span>${item}</span></div>`
-      )
-      .join('');
-
-    inspector.innerHTML = `
-      <div class="bp-head-row">
-        <div class="bp-title">${s.title}</div>
-        <span class="bp-sla-pill">${s.sla}</span>
-      </div>
-      <p class="bp-desc">${s.desc}</p>
-      <div class="bp-deliv-label">OUTPUT & DELIVERABLES TAHAP INI:</div>
-      <div class="bp-deliverables">${listHtml}</div>
-      <div class="bp-code" style="--i:${s.deliverables.length};">${s.code}</div>
-    `;
+    inspector.innerHTML = `<div class="bp-title">${s.title}</div><p class="bp-desc">${s.desc}</p><div class="bp-code">${s.code}</div>`;
   };
-
   showStep(0);
-  nodes.forEach((n) =>
-    n.addEventListener('click', () => {
-      sfx.playUiClick(600);
-      nodes.forEach((b) => b.classList.remove('active'));
-      n.classList.add('active');
-      showStep(Number(n.dataset.step || 0));
-    })
-  );
+  nodes.forEach((n) => n.addEventListener('click', () => {
+    sfx.playUiClick(600);
+    nodes.forEach((b) => b.classList.remove('active'));
+    n.classList.add('active');
+    showStep(Number(n.dataset.step || 0));
+  }));
 }
-
 
 async function loadRustWasmEngine(): Promise<any> {
   try {
@@ -920,29 +856,57 @@ async function setupLighthouseAudit(): Promise<void> {
 }
 
 function setupV4Suite(): void {
-  const estBox = document.querySelector<HTMLElement>('.estimator-box');
-  if (estBox) {
-    mountV4EstimatorTools(estBox);
-  }
+  mountNavbarThemeSwitcher();
+
+  let currentMode: ThemeMode = 'dark';
+  try {
+    const savedMode = localStorage.getItem('nans_theme_mode');
+    if (savedMode === 'light' || savedMode === 'dark') currentMode = savedMode;
+  } catch {}
+  applyV4ThemeMode(currentMode);
 
   let selectedPalette = 'Cyber Cyan (#38bdf8, #818cf8)';
-  document.querySelectorAll<HTMLButtonElement>('.v4-palette-btn').forEach((btn) => {
+  try {
+    const savedAcc = localStorage.getItem('nans_theme_accent');
+    if (savedAcc) {
+      const parsed = JSON.parse(savedAcc);
+      if (Array.isArray(parsed) && parsed.length === 2) {
+        applyV4ThemeColors(parsed[0], parsed[1]);
+        const matchedBtn = document.querySelector<HTMLButtonElement>(`.v4-nav-swatch[data-accent="${parsed[0]}"]`);
+        if (matchedBtn?.dataset.palette) selectedPalette = matchedBtn.dataset.palette;
+      }
+    }
+  } catch {}
+
+  const modeBtn = document.getElementById('v4-theme-mode-btn');
+  modeBtn?.addEventListener('click', () => {
+    sfx.playUiClick(650);
+    currentMode = currentMode === 'dark' ? 'light' : 'dark';
+    applyV4ThemeMode(currentMode);
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.v4-nav-swatch').forEach((btn) => {
     btn.addEventListener('click', () => {
       sfx.playUiClick(620);
-      document.querySelectorAll<HTMLButtonElement>('.v4-palette-btn').forEach((b) => {
-        b.style.borderColor = 'rgba(255,255,255,0.1)';
-      });
-      btn.style.borderColor = '#38bdf8';
       selectedPalette = btn.dataset.palette || selectedPalette;
       const acc1 = btn.dataset.accent || '#38bdf8';
       const acc2 = btn.dataset.accent2 || '#818cf8';
       applyV4ThemeColors(acc1, acc2);
       const notes = document.getElementById('client-notes') as HTMLTextAreaElement | null;
-      if (notes && !notes.value.includes('Palet:')) {
-        notes.value = (notes.value ? notes.value + ' | ' : '') + `Palet: ${selectedPalette}`;
+      if (notes) {
+        if (notes.value.includes('Palet:')) {
+          notes.value = notes.value.replace(/Palet:[^|]+/, `Palet: ${selectedPalette} `).trim();
+        } else {
+          notes.value = (notes.value ? notes.value + ' | ' : '') + `Palet: ${selectedPalette}`;
+        }
       }
     });
   });
+
+  const estBox = document.querySelector<HTMLElement>('.estimator-box');
+  if (estBox) {
+    mountV4EstimatorTools(estBox);
+  }
 
   const roiRange = document.getElementById('roi-visitors-range') as HTMLInputElement | null;
   const roiVal = document.getElementById('roi-visitors-val');
