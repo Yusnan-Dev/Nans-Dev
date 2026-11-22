@@ -1386,8 +1386,9 @@ footer {
     transparent 75%
   );
 }
+
 /* =========================================================
-   CINEMATIC AFTER-EFFECTS PRELOADER LOCKUP
+   CINEMATIC PHYSICS BOUNCE + AE PRELOADER LOCKUP
    ========================================================= */
 .preloader-screen {
   position: fixed;
@@ -1408,7 +1409,7 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
   }
 
   .pre-ae-lockup {
@@ -1418,36 +1419,43 @@ footer {
   }
 
   .pre-logo-ring {
-    width: 58px;
-    height: 58px;
+    width: 60px;
+    height: 60px;
     flex-shrink: 0;
     border-radius: 16px;
-    background: rgba(56, 189, 248, 0.1);
-    border: 1.5px solid rgba(56, 189, 248, 0.55);
-    box-shadow: 0 0 32px rgba(56, 189, 248, 0.32);
+    background: rgba(56, 189, 248, 0.12);
+    border: 1.5px solid rgba(56, 189, 248, 0.6);
+    box-shadow: 0 0 34px rgba(56, 189, 248, 0.35);
     display: grid;
     place-items: center;
-    animation: aeLogoPop 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: aeDropBounce 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   .pre-stroke {
     stroke-dasharray: 64;
     stroke-dashoffset: 64;
-    animation: drawLogo 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: drawLogo 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.18s forwards;
+  }
+
+  .pre-text-stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: aeExpandTrack 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.74s forwards;
   }
 
   .pre-wordmark {
     display: flex;
     align-items: center;
     gap: 8px;
-    max-width: 0;
-    opacity: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    font-size: 1.55rem;
+    font-size: 1.52rem;
     font-weight: 800;
     letter-spacing: 0.12em;
-    animation: aeExpandTrack 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+    line-height: 1.1;
 
     i {
       font-style: normal;
@@ -1455,23 +1463,34 @@ footer {
       opacity: 0;
       transform: translateX(-12px) scale(0.92);
       filter: blur(4px);
-      animation: aeLetterReveal 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: aeLetterReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     .wm-nans { color: #f8fafc; }
     .wm-dev { color: #38bdf8; text-shadow: 0 0 18px rgba(56, 189, 248, 0.55); }
 
-    .wm-nans i:nth-child(1) { animation-delay: 0.62s; }
-    .wm-nans i:nth-child(2) { animation-delay: 0.69s; }
-    .wm-nans i:nth-child(3) { animation-delay: 0.76s; }
-    .wm-nans i:nth-child(4) { animation-delay: 0.83s; }
-    .wm-dev  i:nth-child(1) { animation-delay: 0.92s; }
-    .wm-dev  i:nth-child(2) { animation-delay: 0.99s; }
-    .wm-dev  i:nth-child(3) { animation-delay: 1.06s; }
+    .wm-nans i:nth-child(1) { animation-delay: 0.82s; }
+    .wm-nans i:nth-child(2) { animation-delay: 0.89s; }
+    .wm-nans i:nth-child(3) { animation-delay: 0.96s; }
+    .wm-nans i:nth-child(4) { animation-delay: 1.03s; }
+    .wm-dev  i:nth-child(1) { animation-delay: 1.12s; }
+    .wm-dev  i:nth-child(2) { animation-delay: 1.19s; }
+    .wm-dev  i:nth-child(3) { animation-delay: 1.26s; }
+  }
+
+  .pre-tagline {
+    font-family: monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    color: #94a3b8;
+    margin-top: 4px;
+    opacity: 0;
+    transform: translateY(6px);
+    animation: aeSubReveal 0.45s ease-out 1.32s forwards;
   }
 
   .pre-bar {
-    width: 190px;
+    width: 195px;
     height: 3px;
     border-radius: 99px;
     background: rgba(255, 255, 255, 0.08);
@@ -1482,20 +1501,29 @@ footer {
       height: 100%;
       background: linear-gradient(90deg, #38bdf8, #818cf8);
       transform-origin: left;
-      animation: fillProgress 1.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation: fillProgress 2.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
   }
 
   .pre-status {
     font-family: monospace;
-    font-size: 0.66rem;
+    font-size: 0.65rem;
     letter-spacing: 0.12em;
     color: #64748b;
   }
 }
 
+@keyframes aeDropBounce {
+  0%   { opacity: 0; transform: translateY(-130px) scale(0.85, 1.15); }
+  45%  { opacity: 1; transform: translateY(0) scale(1.14, 0.86); }
+  65%  { transform: translateY(-28px) scale(0.95, 1.05); }
+  82%  { transform: translateY(0) scale(1.05, 0.95); }
+  92%  { transform: translateY(-8px) scale(0.99, 1.01); }
+  100% { opacity: 1; transform: translateY(0) scale(1, 1); }
+}
+
 @keyframes drawLogo { to { stroke-dashoffset: 0; } }
-@keyframes aeLogoPop { from { transform: scale(0.78); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@keyframes aeExpandTrack { to { max-width: 240px; opacity: 1; padding-left: 14px; } }
+@keyframes aeExpandTrack { to { max-width: 260px; opacity: 1; padding-left: 14px; } }
 @keyframes aeLetterReveal { to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); } }
+@keyframes aeSubReveal { to { opacity: 1; transform: translateY(0); } }
 @keyframes fillProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
