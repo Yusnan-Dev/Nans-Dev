@@ -5,43 +5,49 @@
     });
   }
 
-  // CSS Responsif Navbar Desktop agar Sejajar & Tidak Bertumpuk
+  // CSS Responsif Navbar Desktop agar Sejajar & Tidak Terpotong di Tepi Kanan
   const fixStyle = document.createElement('style');
   fixStyle.textContent = `
     @media (min-width: 769px) {
+      header, .navbar, .nav-container {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+      }
       header nav, .nav-links {
         display: flex !important;
         align-items: center !important;
-        gap: 14px !important;
-        margin-left: 18px !important;
+        gap: 10px !important;
+        margin-left: 10px !important;
       }
       header nav a, .nav-links a {
         white-space: nowrap !important;
-        font-size: 13px !important;
+        font-size: 12px !important;
       }
       #nans-addon-controls {
         display: inline-flex !important;
         align-items: center !important;
-        gap: 8px !important;
+        gap: 6px !important;
         padding: 0 !important;
-        margin: 0 0 0 6px !important;
+        margin: 0 0 0 4px !important;
       }
       #nans-lang-switcher {
         width: auto !important;
-        max-width: 135px !important;
+        max-width: 115px !important;
         margin-top: 0 !important;
-        padding: 6px 10px !important;
-        font-size: 12px !important;
+        padding: 5px 8px !important;
+        font-size: 11.5px !important;
       }
       #nans-install-btn {
         width: auto !important;
         margin-top: 0 !important;
-        padding: 6px 11px !important;
-        font-size: 12px !important;
+        padding: 5px 9px !important;
+        font-size: 11.5px !important;
         white-space: nowrap !important;
       }
     }
-          html, body {
+    html, body {
       overflow-x: hidden !important;
       max-width: 100% !important;
     }
@@ -49,45 +55,36 @@
       white-space: nowrap !important;
       font-size: 11px !important;
     }
-    @media (max-width: 1100px) {
+    @media (max-width: 1180px) {
       #build-time {
         display: none !important;
       }
-    }
-    .nav-links {
-      gap: 12px !important;
-    }
-    .nav-links a {
-      font-size: 12px !important;
-      white-space: nowrap !important;
-    }
-    #nans-install-btn {
-      padding: 5px 10px !important;
-      font-size: 11.5px !important;
-      white-space: nowrap !important;
-    }
-    @media (max-width: 1180px) {
-      .nav-links {
-        gap: 8px !important;
+      header nav, .nav-links {
+        gap: 6px !important;
+        margin-left: 6px !important;
       }
-      .nav-links a {
-        font-size: 11px !important;
+      header nav a, .nav-links a {
+        font-size: 10.5px !important;
       }
       #cmd-trigger {
-        padding: 5px 8px !important;
-        font-size: 11px !important;
+        padding: 4px 7px !important;
+        font-size: 10.5px !important;
         white-space: nowrap !important;
       }
+      #cmd-trigger kbd, #cmd-trigger span:last-child {
+        display: none !important;
+      }
     }
-    
   `;
   document.head.appendChild(fixStyle);
+
+  const svgIcon = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;flex-shrink:0;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
 
   let deferredPrompt: any = null;
   const installItem = document.createElement('button');
   installItem.id = 'nans-install-btn';
   installItem.type = 'button';
-  installItem.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;flex-shrink:0;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Install App';
+  installItem.innerHTML = `${svgIcon}Install App`;
   Object.assign(installItem.style, {
     display: 'none', width: '100%', textAlign: 'left', padding: '10px 14px',
     marginTop: '8px', borderRadius: '10px', border: '1px solid #38bdf8',
@@ -222,8 +219,8 @@
       if (!parent || langBox.contains(parent) || installItem.contains(parent)) continue;
       if (['SCRIPT', 'STYLE', 'CODE', 'PRE', 'NOSCRIPT'].includes(parent.tagName)) continue;
       const clean = (current.nodeValue || '').replace(/\s+/g, ' ').trim();
-      if (!clean || clean.length < 3 || /^[\d\s.%+\-/•⌘K()]+$/.test(clean)) continue;    
-      if (/^(NANS|DEV|Install App|HTML5|CSS3|JavaScript|TypeScript|WebGL2|SCSS|SVG|PWA|SEO|99\.9%|100\/100)$/i.test(clean)) continue;  
+      if (!clean || clean.length < 3 || /^[\d\s.%+\-/•⌘K()]+$/.test(clean)) continue;
+      if (/^(NANS|DEV|Install App|HTML5|CSS3|JavaScript|TypeScript|WebGL2|SCSS|SVG|PWA|SEO|99\.9%|100\/100)$/i.test(clean)) continue;
       nodes.push({ node: current as Text, orig: clean });
     }
 
@@ -250,7 +247,7 @@
         })
       );
     }
-    installItem.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;flex-shrink:0;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Install App';
+    installItem.innerHTML = `${svgIcon}Install App`;
   };
 
   ['click', 'touchstart', 'mousedown'].forEach((evt) =>
@@ -301,3 +298,4 @@
     }, 2200);
   });
 })();
+      
