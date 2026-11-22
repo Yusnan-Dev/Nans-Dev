@@ -31,16 +31,19 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Run Python Data & Enterprise Ops Pipeline
+      - name: Prepare dist & Run Python Pipeline
         run: |
+          mkdir -p dist
+          cp index.html dist/
           python3 scripts/generate_data.py
           python3 scripts/enterprise_ops.py
+          cp -f sitemap.xml robots.txt manifest.json schema.json _headers build-telemetry.json dist/ 2>/dev/null || true
 
-      - name: Compile TypeScript & SCSS
+      - name: Compile TypeScript & SCSS into dist
         run: |
           npm install -g esbuild sass
-          esbuild src/main.ts --bundle --minify --outfile=main.js
-          sass src/style.scss style.css --style compressed --no-source-map
+          esbuild src/main.ts --bundle --minify --outfile=dist/main.js
+          sass src/style.scss dist/style.css --style compressed --no-source-map
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -48,7 +51,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: 'dist'
 
   deploy:
     environment:
