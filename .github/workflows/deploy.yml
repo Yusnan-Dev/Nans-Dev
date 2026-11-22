@@ -34,7 +34,7 @@ jobs:
       - name: Prepare dist & Run Python Pipeline
         run: |
           mkdir -p dist
-          cp index.html dist/
+          cp index.html sw.js dist/
           python3 scripts/generate_data.py
           python3 scripts/enterprise_ops.py
           cp -f sitemap.xml robots.txt manifest.json schema.json _headers build-telemetry.json dist/ 2>/dev/null || true
@@ -43,7 +43,9 @@ jobs:
         run: |
           npm install -g esbuild sass
           esbuild src/main.ts --bundle --minify --outfile=dist/main.js
+          esbuild src/pwa-lang-addon.ts --bundle --minify --outfile=dist/pwa-lang-addon.js
           sass src/style.scss dist/style.css --style compressed --no-source-map
+
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
