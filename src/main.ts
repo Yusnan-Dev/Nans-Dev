@@ -133,37 +133,48 @@ function setupAudioToggle(): void {
 
 function createRocketHullTexture(): any {
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
+  canvas.width = 512;
+  canvas.height = 512;
   const ctx = canvas.getContext('2d')!;
-  const hullGrad = ctx.createLinearGradient(0, 0, 256, 0);
-  hullGrad.addColorStop(0, '#e2e8f0');
+  const hullGrad = ctx.createLinearGradient(0, 0, 512, 0);
+  hullGrad.addColorStop(0, '#cbd5e1');
+  hullGrad.addColorStop(0.25, '#f8fafc');
   hullGrad.addColorStop(0.5, '#ffffff');
-  hullGrad.addColorStop(1, '#cbd5e1');
+  hullGrad.addColorStop(0.75, '#f1f5f9');
+  hullGrad.addColorStop(1, '#94a3b8');
   ctx.fillStyle = hullGrad;
-  ctx.fillRect(0, 0, 256, 256);
+  ctx.fillRect(0, 0, 512, 512);
 
+  // Strip interstage hitam & merah khas roket orbital (Falcon / Saturn style)
   ctx.fillStyle = '#0f172a';
-  ctx.fillRect(0, 24, 256, 27);
+  ctx.fillRect(0, 36, 512, 42);
   ctx.fillStyle = '#dc2626';
-  ctx.fillRect(0, 56, 256, 11);
+  ctx.fillRect(0, 86, 512, 18);
   ctx.fillStyle = '#f97316';
-  ctx.fillRect(0, 69, 256, 4);
-  ctx.fillStyle = '#1e293b';
-  ctx.fillRect(0, 208, 256, 48);
-  ctx.fillStyle = '#dc2626';
-  ctx.fillRect(0, 202, 256, 6);
+  ctx.fillRect(0, 108, 512, 8);
 
-  ctx.strokeStyle = 'rgba(15, 23, 42, 0.22)';
-  ctx.lineWidth = 1.5;
-  for (let y = 0; y < 256; y += 32) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(256, y); ctx.stroke();
+  // Tangki oksidator & seksi mesin bawah
+  ctx.fillStyle = '#1e293b';
+  ctx.fillRect(0, 415, 512, 97);
+  ctx.fillStyle = '#dc2626';
+  ctx.fillRect(0, 402, 512, 12);
+
+  // Garis panel & paku keling (rivet seams)
+  ctx.strokeStyle = 'rgba(15, 23, 42, 0.28)';
+  ctx.lineWidth = 2;
+  for (let y = 0; y < 512; y += 64) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
   }
-  for (let x = 0; x < 256; x += 64) {
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 256); ctx.stroke();
+  for (let x = 0; x < 512; x += 128) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke();
   }
+
+  // Jalur pipa LOX eksternal (raceway) & kode seri
+  ctx.fillStyle = '#334155';
+  ctx.fillRect(242, 130, 28, 260);
   ctx.fillStyle = '#0f172a';
-  ctx.fillRect(118, 80, 20, 110);
+  ctx.fillRect(110, 175, 16, 170);
+  ctx.fillRect(386, 175, 16, 170);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.needsUpdate = true;
@@ -175,9 +186,9 @@ function createSmokeTexture(): any {
   canvas.width = 64;
   canvas.height = 64;
   const ctx = canvas.getContext('2d')!;
-  const grad = ctx.createRadialGradient(32, 32, 3, 32, 32, 31);
+  const grad = ctx.createRadialGradient(32, 32, 2, 32, 32, 31);
   grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-  grad.addColorStop(0.45, 'rgba(226, 232, 240, 0.65)');
+  grad.addColorStop(0.5, 'rgba(226, 232, 240, 0.72)');
   grad.addColorStop(1, 'rgba(148, 163, 184, 0)');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 64, 64);
@@ -312,78 +323,149 @@ function initPhotorealisticEarth(): void {
 
   const hullTexture = createRocketHullTexture();
   const smokeTexture = createSmokeTexture();
-  rocketGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.145, 0.165, 1.05, 24), new THREE.MeshStandardMaterial({ map: hullTexture, metalness: 0.45, roughness: 0.28 })));
 
-  const fairingMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.125, 0.145, 0.18, 24), new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.5, roughness: 0.25 }));
-  fairingMesh.position.y = 0.615;
+  // Badan utama roket (Stage 1 & Stage 2)
+  rocketGroup.add(new THREE.Mesh(
+    new THREE.CylinderGeometry(0.145, 0.165, 1.08, 32),
+    new THREE.MeshStandardMaterial({ map: hullTexture, metalness: 0.5, roughness: 0.25 })
+  ));
+
+  // Cincin interstage & tangki samping (side boosters) biar tampak seperti roket berat asli
+  const interstageRing = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.152, 0.152, 0.06, 32),
+    new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.85, roughness: 0.2 })
+  );
+  interstageRing.position.y = 0.24;
+  rocketGroup.add(interstageRing);
+
+  const boosterGeo = new THREE.CylinderGeometry(0.055, 0.062, 0.68, 20);
+  const boosterNoseGeo = new THREE.ConeGeometry(0.055, 0.14, 20);
+  const boosterMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.45, roughness: 0.28 });
+  const boosterCapMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.5, roughness: 0.25 });
+  [-1, 1].forEach((side) => {
+    const b = new THREE.Mesh(boosterGeo, boosterMat);
+    b.position.set(side * 0.205, -0.18, 0);
+    rocketGroup.add(b);
+    const bn = new THREE.Mesh(boosterNoseGeo, boosterCapMat);
+    bn.position.set(side * 0.205, 0.23, 0);
+    rocketGroup.add(bn);
+  });
+
+  // Jendela kabin / sensor avionik berbingkai metalik
+  const portFrame = new THREE.Mesh(
+    new THREE.TorusGeometry(0.042, 0.01, 12, 24),
+    new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.9, roughness: 0.2 })
+  );
+  portFrame.position.set(0, 0.36, 0.148);
+  rocketGroup.add(portFrame);
+  const portGlass = new THREE.Mesh(
+    new THREE.CircleGeometry(0.038, 20),
+    new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.6, roughness: 0.1 })
+  );
+  portGlass.position.set(0, 0.36, 0.15);
+  rocketGroup.add(portGlass);
+
+  // Payload fairing & kerucut hidung aerodinamis + menara escape tower
+  const fairingMesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.128, 0.148, 0.19, 32),
+    new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.5, roughness: 0.22 })
+  );
+  fairingMesh.position.y = 0.635;
   rocketGroup.add(fairingMesh);
 
-  const noseMesh = new THREE.Mesh(new THREE.ConeGeometry(0.125, 0.36, 24), new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.45, roughness: 0.25 }));
-  noseMesh.position.y = 0.885;
+  const noseMesh = new THREE.Mesh(
+    new THREE.ConeGeometry(0.128, 0.38, 32),
+    new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.45, roughness: 0.25 })
+  );
+  noseMesh.position.y = 0.92;
   rocketGroup.add(noseMesh);
 
-  const tipMesh = new THREE.Mesh(new THREE.ConeGeometry(0.032, 0.1, 16), new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.85, roughness: 0.2 }));
-  tipMesh.position.y = 1.06;
+  const tipMesh = new THREE.Mesh(
+    new THREE.ConeGeometry(0.026, 0.14, 16),
+    new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.9, roughness: 0.18 })
+  );
+  tipMesh.position.y = 1.15;
   rocketGroup.add(tipMesh);
 
-  const nozzleMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.135, 0.18, 20, 1, true), new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.9, roughness: 0.25, side: THREE.DoubleSide }));
-  nozzleMesh.position.y = -0.6;
+  // Nozzle lonceng mesin utama (Bell Nozzle)
+  const nozzleMesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.082, 0.142, 0.22, 24, 1, true),
+    new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.92, roughness: 0.22, side: THREE.DoubleSide })
+  );
+  nozzleMesh.position.y = -0.63;
   rocketGroup.add(nozzleMesh);
 
-  const finGeo = new THREE.BoxGeometry(0.025, 0.36, 0.22);
-  const finMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.75, roughness: 0.3 });
+  // 4 Sirip Delta Aerodinamis dengan trim merah
+  const finGeo = new THREE.BoxGeometry(0.022, 0.38, 0.23);
+  const finMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.25 });
   for (let i = 0; i < 4; i++) {
     const fin = new THREE.Mesh(finGeo, finMat);
     const angle = (i * Math.PI) / 2;
-    fin.position.set(Math.sin(angle) * 0.185, -0.36, Math.cos(angle) * 0.185);
+    fin.position.set(Math.sin(angle) * 0.185, -0.38, Math.cos(angle) * 0.185);
     fin.rotation.y = angle;
     rocketGroup.add(fin);
   }
 
-  const flameRed = new THREE.Mesh(new THREE.ConeGeometry(0.16, 1.15, 18), new THREE.MeshBasicMaterial({ color: 0xea580c, transparent: true, opacity: 0.72 }));
-  flameRed.rotation.x = Math.PI; flameRed.position.y = -1.24; rocketGroup.add(flameRed);
+  // Lidah api roket proporsional
+  const flameRed = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.85, 18), new THREE.MeshBasicMaterial({ color: 0xea580c, transparent: true, opacity: 0.78 }));
+  flameRed.rotation.x = Math.PI; flameRed.position.y = -1.12; rocketGroup.add(flameRed);
 
-  const flameOrange = new THREE.Mesh(new THREE.ConeGeometry(0.115, 0.85, 18), new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.9 }));
-  flameOrange.rotation.x = Math.PI; flameOrange.position.y = -1.08; rocketGroup.add(flameOrange);
+  const flameOrange = new THREE.Mesh(new THREE.ConeGeometry(0.095, 0.62, 18), new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.92 }));
+  flameOrange.rotation.x = Math.PI; flameOrange.position.y = -0.98; rocketGroup.add(flameOrange);
 
-  const flameCore = new THREE.Mesh(new THREE.ConeGeometry(0.068, 0.52, 16), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-  flameCore.rotation.x = Math.PI; flameCore.position.y = -0.92; rocketGroup.add(flameCore);
+  const flameCore = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.38, 16), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+  flameCore.rotation.x = Math.PI; flameCore.position.y = -0.86; rocketGroup.add(flameCore);
 
-  const smokeMatCool = new THREE.SpriteMaterial({ map: smokeTexture, color: 0xe2e8f0, transparent: true, opacity: 0.28, depthWrite: false });
-  const smokeMatWarm = new THREE.SpriteMaterial({ map: smokeTexture, color: 0xfed7aa, transparent: true, opacity: 0.28, depthWrite: false });
-  const sparkMatOrange = new THREE.SpriteMaterial({ map: smokeTexture, color: 0xfb923c, transparent: true, opacity: 0.9, depthWrite: false });
-  const sparkMatYellow = new THREE.SpriteMaterial({ map: smokeTexture, color: 0xfef08a, transparent: true, opacity: 0.9, depthWrite: false });
+  // Jejak asap panjang seperti contrail pesawat terbang yang memudar perlahan
+  const trailPoints: any[] = [];
+  const MAX_TRAIL_POINTS = 95;
+  const trailPosArray = new Float32Array(MAX_TRAIL_POINTS * 3);
+  const trailGeo = new THREE.BufferGeometry();
+  trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPosArray, 3));
+  trailGeo.setDrawRange(0, 0);
+  const trailMat = new THREE.LineBasicMaterial({ color: 0xf1f5f9, transparent: true, opacity: 0.65 });
+  const contrailLine = new THREE.Line(trailGeo, trailMat);
+  contrailLine.frustumCulled = false;
+  ovScene.add(contrailLine);
 
-  interface ExhaustParticle { sprite: any; vel: any; life: number; decay: number; baseScale: number; growRate: number; }
+  // Sprite asap lembut sepanjang jalur lingkaran yang menghilang perlahan
+  interface ExhaustParticle { sprite: any; mat: any; vel: any; life: number; decay: number; baseScale: number; growRate: number; }
   const particles: ExhaustParticle[] = [];
 
-  function spawnSmokeAndEmbers(origin: any, tangent: any, rocketScale: number): void {
-    if (particles.length >= 65) return;
-    const smoke = new THREE.Sprite(Math.random() > 0.65 ? smokeMatWarm : smokeMatCool);
+  function spawnContrailPuff(origin: any, tangent: any, rocketScale: number): void {
+    if (particles.length >= 110) return;
+    const mat = new THREE.SpriteMaterial({
+      map: smokeTexture,
+      color: Math.random() > 0.3 ? 0xf8fafc : 0xe2e8f0,
+      transparent: true,
+      opacity: 0.48,
+      depthWrite: false
+    });
+    const smoke = new THREE.Sprite(mat);
     smoke.position.copy(origin);
-    smoke.position.x += (Math.random() - 0.5) * 0.14 * rocketScale;
-    smoke.position.y += (Math.random() - 0.5) * 0.14 * rocketScale;
-    const initialSize = (0.09 + Math.random() * 0.05) * rocketScale;
+    smoke.position.x += (Math.random() - 0.5) * 0.03 * rocketScale;
+    smoke.position.y += (Math.random() - 0.5) * 0.03 * rocketScale;
+    const initialSize = (0.11 + Math.random() * 0.04) * rocketScale;
     smoke.scale.set(initialSize, initialSize, 1);
     ovScene.add(smoke);
-    const backwardVel = tangent.clone().multiplyScalar(-(0.035 + Math.random() * 0.03) * rocketScale);
-    backwardVel.x += (Math.random() - 0.5) * 0.025; backwardVel.y += (Math.random() - 0.5) * 0.025;
-    particles.push({ sprite: smoke, vel: backwardVel, life: 1.0, decay: 0.032 + Math.random() * 0.012, baseScale: initialSize, growRate: 0.012 * rocketScale });
 
-    if (particles.length < 65 && Math.random() > 0.35) {
-      const spark = new THREE.Sprite(Math.random() > 0.4 ? sparkMatOrange : sparkMatYellow);
-      spark.position.copy(origin);
-      const sparkSize = (0.09 + Math.random() * 0.05) * rocketScale;
-      spark.scale.set(sparkSize, sparkSize, 1);
-      ovScene.add(spark);
-      const sparkVel = tangent.clone().multiplyScalar(-(0.08 + Math.random() * 0.05) * rocketScale);
-      sparkVel.x += (Math.random() - 0.5) * 0.045; sparkVel.y += (Math.random() - 0.5) * 0.045;
-      particles.push({ sprite: spark, vel: sparkVel, life: 1.0, decay: 0.048, baseScale: sparkSize, growRate: -0.002 });
-    }
+    // Asap diam mengambang seperti jejak pesawat terbang & memudar perlahan
+    const driftVel = tangent.clone().multiplyScalar(-0.004 * rocketScale);
+    driftVel.x += (Math.random() - 0.5) * 0.004;
+    driftVel.y += (Math.random() - 0.5) * 0.004;
+    particles.push({
+      sprite: smoke,
+      mat,
+      vel: driftVel,
+      life: 1.0,
+      decay: 0.011,
+      baseScale: initialSize,
+      growRate: 0.0045 * rocketScale
+    });
   }
 
   let rocketActive = false, launchProgress = 0;
-  let startWorldPos = new THREE.Vector3(), midControlPos = new THREE.Vector3(), endWorldPos = new THREE.Vector3();
+  let launchOrigin = new THREE.Vector3();
   const stageBox = container.closest('.hero-3d-stage') as HTMLElement | null;
   let earthInViewport = true;
 
@@ -397,12 +479,58 @@ function initPhotorealisticEarth(): void {
     return ovCamera.position.clone().add(dir.multiplyScalar((targetZ - ovCamera.position.z) / dir.z));
   }
 
+  // Kurva parametrik 100% kontinu: terbang dari Bumi ke atas -> berputar melingkar 360 derajat -> lurus menembus atas layar
+  function evalFlightPoint(u: number, origin: any): any {
+    const isMobile = window.innerWidth < 769;
+    const loopRadiusX = isMobile ? 0.95 : 1.45;
+    const loopRadiusY = isMobile ? 0.85 : 1.15;
+    const climbBeforeLoop = isMobile ? 0.95 : 1.15;
+    const climbDuringLoop = isMobile ? 0.55 : 0.75;
+    const straightClimb = isMobile ? 5.2 : 6.0;
+
+    let x = origin.x;
+    let y = origin.y;
+    let z = origin.z;
+
+    if (u <= 0.24) {
+      // Fase 1: Meluncur naik dari Bumi ke titik masuk lingkaran
+      const p = u / 0.24;
+      const easeIn = p * p * (2 - p);
+      x = origin.x + Math.sin(p * Math.PI * 0.5) * (loopRadiusX * 0.15);
+      y = origin.y + easeIn * climbBeforeLoop;
+      z = origin.z + easeIn * 0.8;
+    } else if (u <= 0.74) {
+      // Fase 2: Berputar melingkar 1 putaran penuh (0 -> 2*PI) di langit atas Bumi
+      const p = (u - 0.24) / 0.50;
+      const theta = p * Math.PI * 2;
+      const entryX = origin.x + loopRadiusX * 0.15;
+      const entryY = origin.y + climbBeforeLoop;
+      // Mulai tangen mengarah ke atas, memutar melingkar mulus lalu kembali mengarah lurus ke atas
+      x = entryX - loopRadiusX * (1 - Math.cos(theta));
+      y = entryY + loopRadiusY * Math.sin(theta) + p * climbDuringLoop;
+      z = origin.z + 0.8 + Math.sin(p * Math.PI) * 0.65 + p * 0.5;
+    } else {
+      // Fase 3: Sehabis melingkar, langsung melesat lurus ke atas keluar layar tanpa patah arah
+      const p = (u - 0.74) / 0.26;
+      const exitX = origin.x + loopRadiusX * 0.15;
+      const exitY = origin.y + climbBeforeLoop + climbDuringLoop;
+      const exitZ = origin.z + 1.3;
+      // Kecepatan tangen keluar lingkaran: dx/du = 0, dy/du = (loopRadiusY * 2*PI + climbDuringLoop) / 0.50
+      const exitVelY = (loopRadiusY * Math.PI * 2 + climbDuringLoop) / 0.50;
+      const du = u - 0.74;
+      x = exitX;
+      y = exitY + exitVelY * du * 0.55 + p * p * straightClimb;
+      z = exitZ + p * 0.6;
+    }
+    return new THREE.Vector3(x, y, z);
+  }
+
   function triggerRocketLaunch(): void {
     if (rocketActive || document.hidden || !earthInViewport) return;
     const rect = renderer.domElement.getBoundingClientRect();
     if (rect.bottom < 80 || rect.top > window.innerHeight) return;
 
-    let lx = rect.left + rect.width * 0.52, ly = rect.top + rect.height * 0.54;
+    let lx = rect.left + rect.width * 0.52, ly = rect.top + rect.height * 0.52;
     if (indonesiaBeacon) {
       earthGroup.updateMatrixWorld(true);
       const wp = new THREE.Vector3();
@@ -414,20 +542,24 @@ function initPhotorealisticEarth(): void {
       }
     }
 
-    startWorldPos = screenToOverlayWorld(lx, ly, 1.5);
-    endWorldPos = screenToOverlayWorld(window.innerWidth * (0.35 + Math.random() * 0.3), -150, 4.4);
-    midControlPos = new THREE.Vector3((startWorldPos.x + endWorldPos.x) * 0.5 + (Math.random() - 0.5) * 1.2, (startWorldPos.y + endWorldPos.y) * 0.48, 3.1);
+    launchOrigin = screenToOverlayWorld(lx, ly, 1.5);
+    trailPoints.length = 0;
+    trailGeo.setDrawRange(0, 0);
+    trailMat.opacity = 0.65;
 
-    rocketActive = true; launchProgress = 0;
+    rocketActive = true;
+    launchProgress = 0;
     overlayCanvas.style.display = 'block';
-    rocketGroup.visible = true; rocketGroup.position.copy(startWorldPos); rocketGroup.scale.setScalar(0.16);
-    shockMat.opacity = 0.95; shockRing.scale.setScalar(1);
+    rocketGroup.visible = true;
+    rocketGroup.position.copy(launchOrigin);
+    rocketGroup.scale.setScalar(0.18);
+    shockMat.opacity = 0.95;
+    shockRing.scale.setScalar(1);
     sfx.playRocketLaunch();
   }
 
-  setTimeout(triggerRocketLaunch, 2500);
-  setInterval(triggerRocketLaunch, 12000);
-
+  setTimeout(triggerRocketLaunch, 2200);
+  setInterval(triggerRocketLaunch, 13500);
   let prevX = 0, prevY = 0, isTouching = false, velY = 0.004, velX = 0;
   const domElem = renderer.domElement;
   domElem.style.touchAction = 'none';
@@ -465,42 +597,88 @@ function initPhotorealisticEarth(): void {
       renderer.render(scene, camera);
     }
 
-    if (rocketActive || particles.length > 0) {
+    if (rocketActive || particles.length > 0 || trailPoints.length > 0) {
       if (rocketActive) {
-        launchProgress += 0.014;
-        const t = Math.min(1, launchProgress), ease = t * t * (2.2 - 1.2 * t), invT = 1 - ease;
-        const pos = new THREE.Vector3().addScaledVector(startWorldPos, invT * invT).addScaledVector(midControlPos, 2 * invT * ease).addScaledVector(endWorldPos, ease * ease);
-        const ne = Math.min(1, ease + 0.02), ine = 1 - ne;
-        const nextPos = new THREE.Vector3().addScaledVector(startWorldPos, ine * ine).addScaledVector(midControlPos, 2 * ine * ne).addScaledVector(endWorldPos, ne * ne);
+        launchProgress += 0.0085;
+        const u = Math.min(1, launchProgress);
+        const pos = evalFlightPoint(u, launchOrigin);
+        const nextPos = evalFlightPoint(u + 0.006, launchOrigin);
         const tangent = nextPos.sub(pos).normalize();
-        if (tangent.lengthSq() > 0.0001) rocketGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
 
-        rocketGroup.position.copy(pos); rocketGroup.rotateY(t * 7);
-        const currentScale = 0.14 + ease * 0.32;
+        if (tangent.lengthSq() > 0.0001) {
+          rocketGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
+        }
+
+        rocketGroup.position.copy(pos);
+        rocketGroup.rotateY(u * 8);
+
+        // Skala roket tetap mungil proporsional dari awal meluncur sampai lurus ke atas
+        const currentScale = 0.18 + Math.min(u, 0.85) * 0.22;
         rocketGroup.scale.setScalar(currentScale);
-        flameRed.scale.set(0.95 + Math.random() * 0.15, 0.85 + Math.random() * 0.5, 0.95 + Math.random() * 0.15);
-        flameOrange.scale.set(1, 0.8 + Math.random() * 0.45, 1);
-        flameCore.scale.set(1, 0.9 + Math.random() * 0.35, 1);
 
-        const nozzleWorldPos = pos.clone().addScaledVector(tangent, -0.65 * currentScale);
-        engineGlowLight.position.copy(nozzleWorldPos); engineGlowLight.intensity = 3.5 + Math.random() * 2.5;
-        if (stageBox && t < 0.35 && earthInViewport) {
-          const shake = (0.35 - t) * 6;
+        flameRed.scale.set(0.95 + Math.random() * 0.12, 0.85 + Math.random() * 0.35, 0.95 + Math.random() * 0.12);
+        flameOrange.scale.set(1, 0.82 + Math.random() * 0.3, 1);
+        flameCore.scale.set(1, 0.9 + Math.random() * 0.25, 1);
+
+        const nozzleWorldPos = pos.clone().addScaledVector(tangent, -0.68 * currentScale);
+        engineGlowLight.position.copy(nozzleWorldPos);
+        engineGlowLight.intensity = 2.8 + Math.random() * 1.6;
+
+        if (stageBox && u < 0.18 && earthInViewport) {
+          const shake = (0.18 - u) * 7;
           stageBox.style.transform = `translate3d(${(Math.random() - 0.5) * shake}px, ${(Math.random() - 0.5) * shake}px, 0)`;
-        } else if (stageBox && stageBox.style.transform) stageBox.style.transform = '';
+        } else if (stageBox && stageBox.style.transform) {
+          stageBox.style.transform = '';
+        }
 
-        spawnSmokeAndEmbers(nozzleWorldPos, tangent, currentScale);
-        if (launchProgress >= 1.06) { rocketActive = false; rocketGroup.visible = false; engineGlowLight.intensity = 0; if (stageBox) stageBox.style.transform = ''; }
+        // Rekam titik jejak garis contrail melingkar & lurus ke atas
+        trailPoints.push(nozzleWorldPos.clone());
+        if (trailPoints.length > MAX_TRAIL_POINTS) trailPoints.shift();
+        for (let k = 0; k < trailPoints.length; k++) {
+          trailPosArray[k * 3] = trailPoints[k].x;
+          trailPosArray[k * 3 + 1] = trailPoints[k].y;
+          trailPosArray[k * 3 + 2] = trailPoints[k].z;
+        }
+        trailGeo.attributes.position.needsUpdate = true;
+        trailGeo.setDrawRange(0, trailPoints.length);
+
+        // Munculkan puff asap halus di sepanjang lintasan melingkar & lurus
+        spawnContrailPuff(nozzleWorldPos, tangent, currentScale);
+
+        if (launchProgress >= 1.02) {
+          rocketActive = false;
+          rocketGroup.visible = false;
+          engineGlowLight.intensity = 0;
+          if (stageBox) stageBox.style.transform = '';
+        }
+      } else if (trailPoints.length > 0) {
+        // Setelah roket keluar ke atas, garis jejak contrail ikut memudar perlahan hingga hilang
+        trailMat.opacity = Math.max(0, trailMat.opacity - 0.012);
+        if (trailMat.opacity <= 0.01) {
+          trailPoints.length = 0;
+          trailGeo.setDrawRange(0, 0);
+        }
       }
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
-        p.sprite.position.add(p.vel); p.life -= p.decay; p.baseScale = Math.max(0.01, p.baseScale + p.growRate);
+        p.sprite.position.add(p.vel);
+        p.life -= p.decay;
+        p.baseScale += p.growRate;
         p.sprite.scale.set(p.baseScale, p.baseScale, 1);
-        if (p.life <= 0) { ovScene.remove(p.sprite); particles.splice(i, 1); }
+        // Opasitas asap menghilang perlahan seiring life mendekati 0
+        p.mat.opacity = Math.max(0, p.life * 0.48);
+        if (p.life <= 0) {
+          ovScene.remove(p.sprite);
+          p.mat.dispose();
+          particles.splice(i, 1);
+        }
       }
+
       ovRenderer.render(ovScene, ovCamera);
-      if (!rocketActive && particles.length === 0) overlayCanvas.style.display = 'none';
+      if (!rocketActive && particles.length === 0 && trailPoints.length === 0) {
+        overlayCanvas.style.display = 'none';
+      }
     }
   }
   animate();
