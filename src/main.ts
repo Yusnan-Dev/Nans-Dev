@@ -31,7 +31,18 @@ interface EnterpriseData {
 
 const WHATSAPP_NUMBER = '6283187521130'; // Ganti nomor WA lu (diawali 62)
 
-/* Futuristic Web Audio Synthesizer */
+const SVG_ICONS = {
+  volOn: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`,
+  volOff: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`,
+  desktop: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+  mobile: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`,
+  calc: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align:-2px;margin-right:5px;"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/></svg>`,
+  bag: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align:-2px;margin-right:5px;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>`,
+  pin: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align:-2px;margin-right:5px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
+  pen: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align:-2px;margin-right:5px;"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>`,
+  clock: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align:-2px;margin-right:5px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+};
+
 class SoundEngine {
   private ctx: AudioContext | null = null;
   public enabled = false;
@@ -138,7 +149,7 @@ function setupAudioToggle(): void {
   btn.addEventListener('click', () => {
     const isOn = sfx.toggle();
     btn.classList.toggle('active', isOn);
-    icon.textContent = isOn ? '🔊' : '🔇';
+    icon.innerHTML = isOn ? SVG_ICONS.volOn : SVG_ICONS.volOff;
     label.textContent = isOn ? 'SFX ON' : 'SFX OFF';
   });
 }
@@ -208,7 +219,6 @@ function createSmokeTexture(): any {
   return tex;
 }
 
-/* Optimized 60FPS Photorealistic 3D Earth + Smart-Idle 3D Rocket Overlay */
 function initPhotorealisticEarth(): void {
   const container = document.getElementById('earth-3d-container');
   if (!container || typeof THREE === 'undefined') return;
@@ -249,7 +259,6 @@ function initPhotorealisticEarth(): void {
     'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-water.png'
   );
 
-  // Optimized 44x44 segments: silky smooth silhouette at half the vertex cost
   const earthGeo = new THREE.SphereGeometry(1, 44, 44);
   const earthMat = new THREE.MeshPhongMaterial({
     map: earthMap,
@@ -328,8 +337,7 @@ function initPhotorealisticEarth(): void {
     shockRing.lookAt(indonesiaBeacon.position.clone().multiplyScalar(2));
   }
   earthGroup.add(shockRing);
-
-  interface LaserArc {
+    interface LaserArc {
     line: any;
     head: any;
     curvePoints: any[];
@@ -386,7 +394,6 @@ function initPhotorealisticEarth(): void {
     laserArcs.push(createLaserArc(i));
   }
 
-  /* Full-Viewport Realistic 3D Rocket Overlay (Hidden when idle to save 100% GPU) */
   const overlayCanvas = document.createElement('canvas');
   overlayCanvas.style.position = 'fixed';
   overlayCanvas.style.inset = '0';
@@ -406,7 +413,6 @@ function initPhotorealisticEarth(): void {
   );
   ovCamera.position.set(0, 0, 10);
 
-  // PixelRatio 1.25 + antialias false on fast-moving overlay eliminates mobile lag completely
   const ovRenderer = new THREE.WebGLRenderer({
     canvas: overlayCanvas,
     antialias: false,
@@ -523,7 +529,6 @@ function initPhotorealisticEarth(): void {
   flameCore.position.y = -0.92;
   rocketGroup.add(flameCore);
 
-  /* Zero-GC Particle Pool with Pre-Cached Materials */
   const smokeMatCool = new THREE.SpriteMaterial({
     map: smokeTexture,
     color: 0xe2e8f0,
@@ -622,7 +627,6 @@ function initPhotorealisticEarth(): void {
   let endWorldPos = new THREE.Vector3(-0.3, 6.8, 7.6);
   const stageBox = container.closest('.hero-3d-stage') as HTMLElement | null;
 
-  // Track whether Earth container is visible in viewport to pause WebGL when scrolled away
   let earthInViewport = true;
   if ('IntersectionObserver' in window && stageBox) {
     const visObserver = new IntersectionObserver(
@@ -742,7 +746,6 @@ function initPhotorealisticEarth(): void {
 
     if (document.hidden) return;
 
-    // 1. Only render Earth when Hero section is visible on screen
     if (earthInViewport) {
       earthGroup.rotation.y += velY;
       earthGroup.rotation.x = THREE.MathUtils.clamp(
@@ -792,7 +795,6 @@ function initPhotorealisticEarth(): void {
       renderer.render(scene, camera);
     }
 
-    // 2. Only render full-screen rocket overlay when rocket or smoke particles are active
     if (rocketActive || particles.length > 0) {
       if (rocketActive) {
         launchProgress += 0.014;
@@ -1004,7 +1006,7 @@ function getProjectMockupHTML(p: ProjectItem): string {
         <span class="frame-url">klinpro-express.io</span>
       </div>
       <div class="ui-mock-body">
-        <div class="ui-banner">🧺 Kalkulator Kiloan & Express</div>
+        <div class="ui-banner">${SVG_ICONS.calc}Kalkulator Kiloan & Express</div>
         <div class="ui-grid">
           <div class="ui-widget">Cuci Kering</div>
           <div class="ui-widget">Setrika Uap</div>
@@ -1020,7 +1022,7 @@ function getProjectMockupHTML(p: ProjectItem): string {
         <span class="frame-url">tokobukyul.store</span>
       </div>
       <div class="ui-mock-body">
-        <div class="ui-banner">📚 Katalog Buku & Checkout</div>
+        <div class="ui-banner">${SVG_ICONS.bag}Katalog Buku & Checkout</div>
         <div class="ui-grid">
           <div class="ui-widget">Best Seller</div>
           <div class="ui-widget">Keranjang</div>
@@ -1036,7 +1038,7 @@ function getProjectMockupHTML(p: ProjectItem): string {
         <span class="frame-url">bizsnap.id/directory</span>
       </div>
       <div class="ui-mock-body">
-        <div class="ui-banner">📍 Direktori Cafe & Bisnis Lokal</div>
+        <div class="ui-banner">${SVG_ICONS.pin}Direktori Cafe & Bisnis Lokal</div>
         <div class="ui-grid">
           <div class="ui-widget">Malang</div>
           <div class="ui-widget">Batu</div>
@@ -1051,7 +1053,7 @@ function getProjectMockupHTML(p: ProjectItem): string {
       <span class="frame-url">vector-hd.svg</span>
     </div>
     <div class="ui-mock-body">
-      <div class="ui-banner">✒️ Kurva Bezier & Print-Ready</div>
+      <div class="ui-banner">${SVG_ICONS.pen}Kurva Bezier & Print-Ready</div>
       <div class="ui-grid">
         <div class="ui-widget">SVG / EPS</div>
         <div class="ui-widget">CMYK / RGB</div>
@@ -1074,8 +1076,8 @@ function renderProjects(projects: ProjectItem[], filter: string): void {
         <div>
           <div class="preview-stage">
             <div class="device-toggle">
-              <button type="button" class="dev-btn active" data-mode="desktop">🖥 Desktop</button>
-              <button type="button" class="dev-btn" data-mode="mobile">📱 HP</button>
+              <button type="button" class="dev-btn active" data-mode="desktop">${SVG_ICONS.desktop}Desktop</button>
+              <button type="button" class="dev-btn" data-mode="mobile">${SVG_ICONS.mobile}HP</button>
             </div>
             <div class="device-frame">
               ${getProjectMockupHTML(p)}
@@ -1230,11 +1232,11 @@ function setupEstimator(): void {
         ? 'Rp 0'
         : '$0 USD';
 
-    timeDisplay.textContent =
+    timeDisplay.innerHTML =
       totalDays > 0
         ? activeCurrency === 'IDR'
-          ? `⏱ Estimasi: ${totalDays} Hari Kerja`
-          : `⏱ Est. Delivery: ${totalDays} Business Days`
+          ? `${SVG_ICONS.clock}Estimasi: ${totalDays} Hari Kerja`
+          : `${SVG_ICONS.clock}Est. Delivery: ${totalDays} Business Days`
         : 'Pilih minimal 1 modul';
 
     return { selected, totalDays, totalCost };
