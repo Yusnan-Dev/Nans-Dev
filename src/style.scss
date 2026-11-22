@@ -1254,23 +1254,93 @@ footer {
   }
 }
 
+.blueprint-panel {
+  display: flex;
+  flex-direction: column;
+}
+
 .bp-inspector {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   background: #05070c;
   border: 1px solid $border-subtle;
   border-radius: 14px;
-  padding: 1.15rem;
+  padding: 1.25rem;
+  overflow: hidden;
+
+  .bp-head-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 0.45rem;
+    animation: bpCascadeDown 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 
   .bp-title {
     font-size: 1rem;
     font-weight: 800;
     color: $cyan;
-    margin-bottom: 0.4rem;
+  }
+
+  .bp-sla-pill {
+    font-family: monospace;
+    font-size: 0.66rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba($cyan, 0.12);
+    border: 1px solid rgba($cyan, 0.3);
+    color: $cyan;
+    white-space: nowrap;
   }
 
   .bp-desc {
     font-size: 0.84rem;
     color: $text-secondary;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.9rem;
+    animation: bpCascadeDown 0.36s cubic-bezier(0.16, 1, 0.3, 1) 40ms both;
+  }
+
+  .bp-deliv-label {
+    font-family: monospace;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+    animation: bpCascadeDown 0.36s cubic-bezier(0.16, 1, 0.3, 1) 70ms both;
+  }
+
+  .bp-deliverables {
+    display: grid;
+    gap: 7px;
+    margin-bottom: 1rem;
+  }
+
+  .bp-deliv-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.8rem;
+    color: #e2e8f0;
+    opacity: 0;
+    animation: bpCascadeDown 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(95ms + var(--i, 0) * 75ms);
+
+    .bp-check {
+      color: $emerald;
+      font-weight: 800;
+      font-size: 0.82rem;
+      flex-shrink: 0;
+    }
   }
 
   .bp-code {
@@ -1282,8 +1352,23 @@ footer {
     padding: 8px 10px;
     border-radius: 8px;
     overflow-x: auto;
+    opacity: 0;
+    animation: bpCascadeDown 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(95ms + var(--i, 4) * 75ms);
   }
 }
+
+@keyframes bpCascadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 .audit-head {
   display: flex;
