@@ -1,11 +1,12 @@
 $bg-base: #04060b;
 $bg-surface: #0a0f1c;
-$bg-glass: rgba(13, 19, 34, 0.72);
+$bg-glass: rgba(13, 19, 34, 0.75);
 $border-subtle: rgba(255, 255, 255, 0.08);
 $border-glow: rgba(56, 189, 248, 0.5);
 $cyan: #38bdf8;
 $indigo: #818cf8;
 $emerald: #34d399;
+$amber: #fbbf24;
 $text-primary: #f8fafc;
 $text-secondary: #94a3b8;
 
@@ -63,6 +64,35 @@ body {
   100% { transform: translate(35px, 45px) scale(1.12); }
 }
 
+/* Floating Audio Control Button */
+.audio-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9998;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 99px;
+  background: rgba(10, 15, 28, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid $border-subtle;
+  color: $text-secondary;
+  font-family: monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  transition: all 0.25s ease;
+
+  &.active {
+    border-color: $cyan;
+    color: $cyan;
+    box-shadow: 0 0 18px rgba($cyan, 0.35);
+  }
+}
+
 .container {
   max-width: 1160px;
   margin: 0 auto;
@@ -110,7 +140,7 @@ body {
 
   .nav-links {
     display: flex;
-    gap: 1.75rem;
+    gap: 1.6rem;
     align-items: center;
 
     a {
@@ -183,39 +213,66 @@ body {
   grid-template-columns: 1.15fr 0.85fr;
   gap: 2.5rem;
   align-items: center;
-  padding: 4.5rem 0 3.5rem;
+  padding: 4.2rem 0 3.5rem;
 
   @media (max-width: 860px) {
     grid-template-columns: 1fr;
-    padding: 3rem 0 2.5rem;
+    padding: 2.75rem 0 2.5rem;
     text-align: center;
+  }
+
+  .status-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    @media (max-width: 860px) { justify-content: center; }
   }
 
   .pill-announcement {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 6px 14px;
+    gap: 8px;
+    padding: 6px 13px;
     border-radius: 99px;
     background: rgba(56, 189, 248, 0.08);
     border: 1px solid rgba(56, 189, 248, 0.25);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     color: $cyan;
     font-weight: 700;
-    margin-bottom: 1.25rem;
 
     .pulse-ring {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: $cyan;
-      box-shadow: 0 0 0 0 rgba($cyan, 0.7);
       animation: pulse 2s infinite;
     }
   }
 
+  .pill-slot {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 13px;
+    border-radius: 99px;
+    background: rgba($emerald, 0.1);
+    border: 1px solid rgba($emerald, 0.3);
+    font-size: 0.75rem;
+    color: $emerald;
+    font-weight: 700;
+
+    .slot-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: $emerald;
+      box-shadow: 0 0 8px $emerald;
+    }
+  }
+
   h1 {
-    font-size: clamp(2rem, 4.8vw, 3.6rem);
+    font-size: clamp(2rem, 4.8vw, 3.55rem);
     font-weight: 800;
     line-height: 1.12;
     letter-spacing: -0.03em;
@@ -346,9 +403,7 @@ body {
     overflow: hidden;
     transition: background 0.3s;
 
-    &:hover {
-      background: rgba(15, 23, 42, 0.95);
-    }
+    &:hover { background: rgba(15, 23, 42, 0.95); }
 
     &::after {
       content: '';
@@ -357,12 +412,7 @@ body {
       left: -120%;
       width: 60%;
       height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba($cyan, 0.07),
-        transparent
-      );
+      background: linear-gradient(90deg, transparent, rgba($cyan, 0.07), transparent);
       animation: metricShimmer 4.5s infinite;
     }
 
@@ -454,7 +504,16 @@ body {
   }
 }
 
-/* Bento Services with Animated Telemetry Graphics */
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Bento Services */
 .bento-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -619,7 +678,7 @@ body {
   }
 }
 
-/* Portfolio Section with 3D Perspective UI Mockups */
+/* Portfolio Section with Tailored Desktop/Mobile UI Switcher */
 .filter-bar {
   display: flex;
   gap: 0.6rem;
@@ -647,8 +706,8 @@ body {
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.35rem;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1.4rem;
   margin-bottom: 5.5rem;
 
   .project-card {
@@ -660,70 +719,140 @@ body {
     flex-direction: column;
     justify-content: space-between;
     transition: border-color 0.3s, transform 0.3s;
-    perspective: 900px;
 
     &:hover {
       border-color: $border-glow;
       transform: translateY(-4px);
-
-      .mockup-3d {
-        transform: rotateX(0deg) rotateY(0deg) scale(1.02);
-      }
     }
 
-    .mockup-3d {
-      height: 115px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #0f172a, #1e1b4b);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    .preview-stage {
+      height: 155px;
+      border-radius: 14px;
+      background: radial-gradient(circle at top, #172038, #060911);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       padding: 10px;
-      margin-bottom: 1.25rem;
-      transform: rotateX(10deg) rotateY(-8deg);
-      transition: transform 0.4s ease;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+      margin-bottom: 1.15rem;
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: space-between;
+      position: relative;
+      overflow: hidden;
 
-      .win-dots {
-        display: flex;
-        gap: 5px;
-        span {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.25);
-          &:first-child { background: #ef4444; }
-          &:nth-child(2) { background: #f59e0b; }
-          &:nth-child(3) { background: #10b981; }
+      .device-toggle {
+        align-self: flex-end;
+        display: inline-flex;
+        background: rgba(4, 6, 11, 0.85);
+        border: 1px solid $border-subtle;
+        border-radius: 8px;
+        padding: 2px;
+        z-index: 2;
+
+        button {
+          background: none;
+          border: none;
+          color: $text-secondary;
+          font-size: 0.65rem;
+          font-weight: 700;
+          padding: 3px 7px;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &.active {
+            background: rgba($cyan, 0.2);
+            color: $cyan;
+          }
         }
       }
 
-      .win-bars {
-        display: grid;
-        gap: 6px;
-        .bar-main {
-          height: 10px;
-          width: 65%;
-          border-radius: 4px;
-          background: linear-gradient(90deg, $cyan, $indigo);
+      .device-frame {
+        width: 100%;
+        height: 104px;
+        background: #0b1120;
+        border: 1px solid rgba($cyan, 0.28);
+        border-radius: 9px;
+        padding: 8px 10px;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        &.mobile-mode {
+          width: 96px;
+          border-radius: 14px;
+          border-width: 2px;
+          border-color: rgba($indigo, 0.6);
+          padding: 6px 7px;
+
+          .ui-grid { grid-template-columns: 1fr; }
+          .ui-chip-hide { display: none; }
         }
-        .bar-sub {
-          height: 7px;
-          width: 90%;
-          border-radius: 4px;
-          background: rgba(255, 255, 255, 0.1);
+
+        .frame-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          padding-bottom: 4px;
+
+          .dots {
+            display: flex;
+            gap: 4px;
+            span {
+              width: 5px;
+              height: 5px;
+              border-radius: 50%;
+              background: rgba(255, 255, 255, 0.25);
+              &:first-child { background: #ef4444; }
+              &:nth-child(2) { background: #f59e0b; }
+              &:nth-child(3) { background: #10b981; }
+            }
+          }
+
+          .frame-url {
+            font-family: monospace;
+            font-size: 0.58rem;
+            color: $cyan;
+            opacity: 0.85;
+          }
         }
-        .bar-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 6px;
-          margin-top: 4px;
-          div {
-            height: 22px;
+
+        .ui-mock-body {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+
+          .ui-banner {
+            font-size: 0.62rem;
+            font-weight: 800;
+            color: #fff;
+            padding: 4px 7px;
             border-radius: 5px;
-            background: rgba(56, 189, 248, 0.14);
-            border: 1px solid rgba(56, 189, 248, 0.25);
+            background: linear-gradient(90deg, rgba($indigo, 0.45), rgba($cyan, 0.3));
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .ui-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+
+            .ui-widget {
+              background: rgba(255, 255, 255, 0.04);
+              border: 1px solid rgba(255, 255, 255, 0.07);
+              border-radius: 5px;
+              padding: 4px 5px;
+              font-size: 0.56rem;
+              color: #cbd5e1;
+              text-align: center;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
           }
         }
       }
@@ -763,7 +892,96 @@ body {
   }
 }
 
-/* Interactive Estimator */
+/* Social Proof / Client Reviews */
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 5.5rem;
+
+  .review-card {
+    background: $bg-glass;
+    border: 1px solid $border-subtle;
+    border-radius: 18px;
+    padding: 1.65rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: border-color 0.3s;
+
+    &:hover { border-color: rgba($emerald, 0.45); }
+
+    .stars {
+      color: $amber;
+      font-size: 0.88rem;
+      letter-spacing: 2px;
+      margin-bottom: 0.75rem;
+    }
+
+    blockquote {
+      color: #e2e8f0;
+      font-size: 0.88rem;
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+    }
+
+    .reviewer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid $border-subtle;
+      padding-top: 0.85rem;
+
+      .rev-name {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: $text-primary;
+      }
+      .rev-role {
+        font-size: 0.72rem;
+        color: $text-secondary;
+      }
+      .rev-platform {
+        font-family: monospace;
+        font-size: 0.66rem;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background: rgba($emerald, 0.12);
+        color: $emerald;
+        border: 1px solid rgba($emerald, 0.25);
+      }
+    }
+  }
+}
+
+/* Currency Switcher & Interactive Estimator */
+.currency-switch {
+  display: inline-flex;
+  background: $bg-surface;
+  border: 1px solid $border-subtle;
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+
+  .curr-btn {
+    background: none;
+    border: none;
+    color: $text-secondary;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &.active {
+      background: linear-gradient(135deg, rgba($indigo, 0.3), rgba($cyan, 0.25));
+      color: $text-primary;
+      border: 1px solid rgba($cyan, 0.4);
+    }
+  }
+}
+
 .estimator-box {
   background: linear-gradient(180deg, $bg-surface, rgba(15, 23, 42, 0.92));
   border: 1px solid $border-glow;
@@ -773,32 +991,59 @@ body {
 
   .est-grid {
     display: grid;
-    grid-template-columns: 1.4fr 1fr;
+    grid-template-columns: 1.45fr 1fr;
     gap: 2rem;
-    align-items: center;
+    align-items: start;
     @media (max-width: 768px) { grid-template-columns: 1fr; }
   }
 
   .est-options {
     display: grid;
     gap: 0.75rem;
+    margin-bottom: 1.15rem;
 
     label {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.9rem 1.1rem;
+      gap: 0.5rem;
+      padding: 0.85rem 1.1rem;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid $border-subtle;
       border-radius: 12px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
       transition: border-color 0.2s;
 
       &:hover { border-color: $cyan; }
-      input { accent-color: $cyan; width: 17px; height: 17px; margin-right: 10px; }
-      .days { font-size: 0.75rem; color: $cyan; font-family: monospace; }
+      input { accent-color: $cyan; width: 17px; height: 17px; margin-right: 9px; }
+      .meta-tag {
+        font-size: 0.72rem;
+        color: $cyan;
+        font-family: monospace;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .brief-inputs {
+    display: grid;
+    gap: 0.75rem;
+
+    input, textarea {
+      width: 100%;
+      background: rgba(4, 6, 11, 0.75);
+      border: 1px solid $border-subtle;
+      border-radius: 10px;
+      padding: 0.78rem 1rem;
+      color: $text-primary;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+
+      &::placeholder { color: #64748b; }
+      &:focus { border-color: $cyan; }
     }
   }
 
@@ -809,9 +1054,34 @@ body {
     padding: 1.75rem;
     text-align: center;
 
-    .est-label { font-size: 0.78rem; color: $text-secondary; text-transform: uppercase; letter-spacing: 1px; }
-    .est-time { font-size: 2rem; font-weight: 800; color: $cyan; margin: 0.5rem 0; }
-    .est-note { font-size: 0.8rem; color: $text-secondary; margin-bottom: 1.5rem; }
+    .est-label {
+      font-size: 0.75rem;
+      color: $text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .est-price {
+      font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+      font-weight: 800;
+      background: linear-gradient(90deg, #fff, $cyan);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-top: 0.45rem;
+    }
+
+    .est-time {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: $emerald;
+      margin: 0.35rem 0 1rem;
+    }
+
+    .est-note {
+      font-size: 0.78rem;
+      color: $text-secondary;
+      margin-bottom: 1.4rem;
+    }
   }
 }
 
