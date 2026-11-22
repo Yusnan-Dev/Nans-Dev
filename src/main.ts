@@ -1,4 +1,5 @@
 import { renderPolyglotStrip } from './components/StackBadge';
+import { mountWasmBenchmarkLab, mountV4EstimatorTools, applyV4ThemeColors, mountGlobeInspectorAndTrigger, mountVectorLabModeSwitch } from './components/V4InteractiveSuite';
 declare const THREE: any;
 
 interface MetricItem { value: string; label: string; }
@@ -99,6 +100,7 @@ async function bootApp(): Promise<void> {
   renderTestimonials();
   setupAiScopeGenerator();
   setupEstimator();
+  setupV4Suite();
   setupCardSpotlight();
 
   try {
@@ -570,6 +572,29 @@ function initPhotorealisticEarth(): void {
 
   setTimeout(triggerRocketLaunch, 2200);
   setInterval(triggerRocketLaunch, 13500);
+
+  if (stageBox) {
+    mountGlobeInspectorAndTrigger(stageBox);
+    const launchBtn = document.getElementById('v4-launch-rocket-btn');
+    launchBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sfx.playUiClick(760);
+      triggerRocketLaunch();
+    });
+  }
+
+  const hubNames = [
+    'Surabaya/ID (14ms)', 'Jakarta/ID (16ms)', 'Singapore (24ms)',
+    'Tokyo/JP (68ms)', 'Dubai/AE (92ms)', 'London/UK (148ms)',
+    'New York/US (195ms)', 'Sydney/AU (76ms)', 'Sao Paulo/BR (245ms)'
+  ];
+  let hubCycleIdx = 0;
+  const hubReadout = document.getElementById('v4-hub-readout');
+  renderer.domElement.addEventListener('click', () => {
+    hubCycleIdx = (hubCycleIdx + 1) % hubNames.length;
+    sfx.playUiClick(650);
+    if (hubReadout) hubReadout.textContent = `HUB: ${hubNames[hubCycleIdx]}`;
+  });
   let prevX = 0, prevY = 0, isTouching = false, velY = 0.004, velX = 0;
   const domElem = renderer.domElement;
   domElem.style.touchAction = 'none';
@@ -800,6 +825,114 @@ async function setupLighthouseAudit(): Promise<void> {
       requestAnimationFrame(tick);
     });
   });
+
+  if (auditPanel) {
+    mountWasmBenchmarkLab(auditPanel);
+    const rangeEl = document.getElementById('wasm-traffic-range') as HTMLInputElement | null;
+    const outEl = document.getElementById('wasm-latency-out');
+    const badgeEl = document.getElementById('wasm-node-badge');
+    const logEl = document.getElementById('go-telemetry-log');
+
+    const updateLatency = () => {
+      const nodes = Number(rangeEl?.value || 12);
+      if (badgeEl) badgeEl.textContent = `${nodes} EDGE NODES`;
+      const ms = wasmExports?.compute_edge_latency_ms
+        ? wasmExports.compute_edge_latency_ms(38, nodes)
+        : Math.round(38 / (1 + nodes * 0.18));
+      if (outEl) outEl.textContent = `${ms} ms`;
+    };
+
+    rangeEl?.addEventListener('input', updateLatency);
+    updateLatency();
+
+    try {
+      const gRes = await fetch('./go-telemetry.json');
+      if (gRes.ok && logEl) {
+        const gData = await gRes.json();
+        logEl.textContent = `Go Probe (${gData.go_version}) · Status: ${gData.status} · Edge Latency: ${gData.latency_ms}ms · ${gData.generated_utc}`;
+      }
+    } catch {}
+  }
+}
+
+function setupV4Suite(): void {
+  const estBox = document.querySelector<HTMLElement>('.estimator-box');
+  if (estBox) {
+    mountV4EstimatorTools(estBox);
+  }
+
+  let selectedPalette = 'Cyber Cyan (#38bdf8, #818cf8)';
+  document.querySelectorAll<HTMLButtonElement>('.v4-palette-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      sfx.playUiClick(620);
+      document.querySelectorAll<HTMLButtonElement>('.v4-palette-btn').forEach((b) => {
+        b.style.borderColor = 'rgba(255,255,255,0.1)';
+      });
+      btn.style.borderColor = '#38bdf8';
+      selectedPalette = btn.dataset.palette || selectedPalette;
+      const acc1 = btn.dataset.accent || '#38bdf8';
+      const acc2 = btn.dataset.accent2 || '#818cf8';
+      applyV4ThemeColors(acc1, acc2);
+      const notes = document.getElementById('client-notes') as HTMLTextAreaElement | null;
+      if (notes && !notes.value.includes('Palet:')) {
+        notes.value = (notes.value ? notes.value + ' | ' : '') + `Palet: ${selectedPalette}`;
+      }
+    });
+  });
+
+  const roiRange = document.getElementById('roi-visitors-range') as HTMLInputElement | null;
+  const roiVal = document.getElementById('roi-visitors-val');
+  const roiText = document.getElementById('roi-result-text');
+  const updateRoi = () => {
+    const daily = Number(roiRange?.value || 150);
+    if (roiVal) roiVal.textContent = `${daily} / hari`;
+    const monthlyLeads = Math.round(daily * 30 * 0.10);
+    if (roiText) {
+      roiText.textContent = `Proyeksi ~${monthlyLeads} leads/bln (estimasi konversi +10% dengan CTA & kalkulator terstruktur).`;
+    }
+  };
+  roiRange?.addEventListener('input', updateRoi);
+  updateRoi();
+
+  const getBriefText = () => {
+    const brand = (document.getElementById('client-brand') as HTMLInputElement | null)?.value.trim() || '-';
+    const notes = (document.getElementById('client-notes') as HTMLTextAreaElement | null)?.value.trim() || '-';
+    const price = document.getElementById('est-price')?.textContent?.trim() || '-';
+    const days = document.getElementById('est-days')?.textContent?.trim() || '-';
+    const mods = Array.from(document.querySelectorAll<HTMLInputElement>('.est-check:checked')).map((c) => `• ${c.value}`);
+    return `NANS DEV BRIEF
+Brand: ${brand}
+Modul:
+${mods.join('
+') || '• Konsultasi'}
+Estimasi: ${price} (${days})
+Palet: ${selectedPalette}
+Catatan: ${notes}`;
+  };
+
+  const copyBtn = document.getElementById('v4-copy-brief-btn');
+  copyBtn?.addEventListener('click', async () => {
+    sfx.playUiClick(680);
+    try {
+      await navigator.clipboard.writeText(getBriefText());
+      if (copyBtn) {
+        const prev = copyBtn.textContent;
+        copyBtn.textContent = 'Tersalin ✓';
+        setTimeout(() => { copyBtn.textContent = prev || 'Salin Brief'; }, 1600);
+      }
+    } catch {}
+  });
+
+  const pdfBtn = document.getElementById('v4-pdf-quote-btn');
+  pdfBtn?.addEventListener('click', () => {
+    sfx.playUiClick(740);
+    const win = window.open('', '_blank');
+    if (!win) return;
+    const text = getBriefText().replace(/
+/g, '<br>');
+    win.document.write(`<!DOCTYPE html><html><head><title>Penawaran Nans Dev</title><style>body{font-family:sans-serif;padding:32px;color:#0f172a;line-height:1.6;}h1{color:#0284c7;margin-bottom:8px;}.box{border:1px solid #cbd5e1;border-radius:12px;padding:20px;background:#f8fafc;}</style></head><body><h1>NANS DEV — Ringkasan Penawaran Proyek</h1><p>Dokumen estimasi layanan web & identitas visual.</p><div class="box">${text}</div><script>window.print();</script></body></html>`);
+    win.document.close();
+  });
 }
 
 function setupAiScopeGenerator(): void {
@@ -960,7 +1093,53 @@ function renderTestimonials(): void {
     </article>`).join('');
 }
 
+function setupVectorLabModes(): void {
+  const labEl = document.querySelector<HTMLElement>('.vector-lab');
+  if (!labEl) return;
+  mountVectorLabModeSwitch(labEl);
+
+  const rasterBox = labEl.querySelector<HTMLElement>('.raster-layer');
+  const vectorBox = labEl.querySelector<HTMLElement>('.vector-layer');
+  const headingEl = labEl.querySelector<HTMLElement>('h3');
+  const descEl = labEl.querySelector<HTMLElement>('p');
+
+  labEl.querySelectorAll<HTMLButtonElement>('.v4-lab-mode-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      sfx.playUiClick(640);
+      labEl.querySelectorAll<HTMLButtonElement>('.v4-lab-mode-btn').forEach((b) => {
+        b.style.borderColor = 'rgba(255,255,255,0.12)';
+        b.style.color = '#94a3b8';
+        b.style.background = 'rgba(255,255,255,0.03)';
+      });
+      btn.style.borderColor = '#38bdf8';
+      btn.style.color = '#f8fafc';
+      btn.style.background = 'rgba(56,189,248,0.16)';
+
+      const isWeb = btn.dataset.labMode === 'web';
+      if (headingEl) {
+        headingEl.textContent = isWeb
+          ? 'Geser Perbandingan Web Jadul vs Arsitektur Modern'
+          : 'Geser untuk Menguji Ketajaman Geometri';
+      }
+      if (descEl) {
+        descEl.textContent = isWeb
+          ? 'Bandingkan layout statis/lambat tanpa struktur konversi dengan sistem web responsif, cepat, dan siap closing WhatsApp.'
+          : 'Bandingkan langsung aset beresolusi rendah dengan hasil rekonstruksi vektor murni yang tetap tajam hingga skala baliho maupun layar Retina.';
+      }
+      if (rasterBox) {
+        const sm = rasterBox.querySelector('small');
+        if (sm) sm.textContent = isWeb ? 'LEGACY WEB (SLOW & CLUTTERED)' : 'LOW-RES RASTER (PECAH)';
+      }
+      if (vectorBox) {
+        const sm = vectorBox.querySelector('small');
+        if (sm) sm.textContent = isWeb ? 'NANS DEV MODERN WEB (60FPS & WA READY)' : '100% VECTOR GEOMETRY (PRESISI)';
+      }
+    });
+  });
+}
+
 function setupVectorSlider(): void {
+  setupVectorLabModes();
   const slider = document.getElementById('vector-range') as HTMLInputElement | null;
   const vectorLayer = document.getElementById('vector-layer'), sliderLine = document.getElementById('slider-line');
   if (!slider || !vectorLayer || !sliderLine) return;
