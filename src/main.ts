@@ -927,8 +927,7 @@ Catatan: ${notes}`;
     sfx.playUiClick(740);
     const win = window.open('', '_blank');
     if (!win) return;
-    const text = getBriefText().replace(/
-/g, '<br>');
+    const text = getBriefText().replace(/\n/g, '<br>');
     win.document.write(`<!DOCTYPE html><html><head><title>Penawaran Nans Dev</title><style>body{font-family:sans-serif;padding:32px;color:#0f172a;line-height:1.6;}h1{color:#0284c7;margin-bottom:8px;}.box{border:1px solid #cbd5e1;border-radius:12px;padding:20px;background:#f8fafc;}</style></head><body><h1>NANS DEV — Ringkasan Penawaran Proyek</h1><p>Dokumen estimasi layanan web & identitas visual.</p><div class="box">${text}</div><script>window.print();</script></body></html>`);
     win.document.close();
   });
