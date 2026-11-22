@@ -41,6 +41,19 @@
         white-space: nowrap !important;
       }
     }
+          html, body {
+      overflow-x: hidden !important;
+      max-width: 100% !important;
+    }
+    #build-time {
+      white-space: nowrap !important;
+      font-size: 11px !important;
+    }
+    @media (max-width: 1100px) {
+      #build-time {
+        display: none !important;
+      }
+    }
   `;
   document.head.appendChild(fixStyle);
 
