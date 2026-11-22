@@ -1387,7 +1387,7 @@ footer {
   );
 }
 /* =========================================================
-   CINEMATIC PRELOADER SPLASH SCREEN
+   CINEMATIC AFTER-EFFECTS PRELOADER LOCKUP
    ========================================================= */
 .preloader-screen {
   position: fixed;
@@ -1408,37 +1408,70 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
+  }
+
+  .pre-ae-lockup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .pre-logo-ring {
-    width: 82px;
-    height: 82px;
-    border-radius: 22px;
-    background: rgba(56, 189, 248, 0.08);
-    border: 1px solid rgba(56, 189, 248, 0.45);
-    box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    background: rgba(56, 189, 248, 0.1);
+    border: 1.5px solid rgba(56, 189, 248, 0.55);
+    box-shadow: 0 0 32px rgba(56, 189, 248, 0.32);
     display: grid;
     place-items: center;
-    animation: prePulse 1.4s ease-in-out infinite;
+    animation: aeLogoPop 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   .pre-stroke {
     stroke-dasharray: 64;
     stroke-dashoffset: 64;
-    animation: drawLogo 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: drawLogo 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
-  .pre-brand {
-    font-size: 1.35rem;
+  .pre-wordmark {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 1.55rem;
     font-weight: 800;
-    letter-spacing: 0.14em;
-    color: #f8fafc;
-    span { color: #38bdf8; }
+    letter-spacing: 0.12em;
+    animation: aeExpandTrack 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+
+    i {
+      font-style: normal;
+      display: inline-block;
+      opacity: 0;
+      transform: translateX(-12px) scale(0.92);
+      filter: blur(4px);
+      animation: aeLetterReveal 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .wm-nans { color: #f8fafc; }
+    .wm-dev { color: #38bdf8; text-shadow: 0 0 18px rgba(56, 189, 248, 0.55); }
+
+    .wm-nans i:nth-child(1) { animation-delay: 0.62s; }
+    .wm-nans i:nth-child(2) { animation-delay: 0.69s; }
+    .wm-nans i:nth-child(3) { animation-delay: 0.76s; }
+    .wm-nans i:nth-child(4) { animation-delay: 0.83s; }
+    .wm-dev  i:nth-child(1) { animation-delay: 0.92s; }
+    .wm-dev  i:nth-child(2) { animation-delay: 0.99s; }
+    .wm-dev  i:nth-child(3) { animation-delay: 1.06s; }
   }
 
   .pre-bar {
-    width: 170px;
+    width: 190px;
     height: 3px;
     border-radius: 99px;
     background: rgba(255, 255, 255, 0.08);
@@ -1449,18 +1482,20 @@ footer {
       height: 100%;
       background: linear-gradient(90deg, #38bdf8, #818cf8);
       transform-origin: left;
-      animation: fillProgress 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation: fillProgress 1.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
   }
 
   .pre-status {
     font-family: monospace;
-    font-size: 0.68rem;
+    font-size: 0.66rem;
     letter-spacing: 0.12em;
     color: #64748b;
   }
 }
 
 @keyframes drawLogo { to { stroke-dashoffset: 0; } }
+@keyframes aeLogoPop { from { transform: scale(0.78); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes aeExpandTrack { to { max-width: 240px; opacity: 1; padding-left: 14px; } }
+@keyframes aeLetterReveal { to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); } }
 @keyframes fillProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes prePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
