@@ -761,24 +761,88 @@ function setupArchitectureBlueprint(): void {
   if (!nodes.length || !inspector) return;
 
   const steps = [
-    { title: '01. High-Impact UI/UX & Interactive 3D', desc: 'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.', code: 'renderTarget: "60FPS Mobile" | assets: ["SVG", "WebGL2", "SCSS"]' },
-    { title: '02. Modular TypeScript & Python Engine', desc: 'Arsitektur kode terstruktur, bersih dari script berlebih, dan siap dikembangkan untuk katalog maupun kalkulator bisnis.', code: 'pipeline: "Python JSON Builder -> Strict TypeScript Bundle"' },
-    { title: '03. Automated WhatsApp & Payment Flow', desc: 'Integrasi kalkulator pesanan otomatis yang mengubah pilihan pelanggan menjadi format invoice/brief langsung ke WhatsApp.', code: 'checkoutBridge: "Dynamic Cart -> Encoded WhatsApp API"' },
-    { title: '04. Global Edge CDN & Zero-Downtime CI/CD', desc: 'Otomatisasi build dan deployment dengan kompresi aset statis super cepat untuk akses instan dari berbagai wilayah.', code: 'status: "DEPLOYED" | uptime: "99.9%" | ttfb: "<45ms"' },
+    {
+      title: '01. High-Impact UI/UX & Interactive 3D',
+      sla: 'ESTIMASI: HARI 1',
+      desc: 'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.',
+      deliverables: [
+        'Wireframe & Layout Responsif Desktop + Mobile',
+        'Rekonstruksi Logo & Ikon Vektor Presisi (SVG)',
+        'Integrasi Elemen Interaktif & Micro-Animations',
+        'Kalibrasi Palet Warna Brand & Tipografi Korporat',
+      ],
+      code: 'renderTarget: "60FPS Mobile" | assets: ["SVG", "WebGL2", "SCSS"]',
+    },
+    {
+      title: '02. Modular TypeScript & Python Engine',
+      sla: 'ESTIMASI: HARI 2',
+      desc: 'Arsitektur kode terstruktur, bersih dari script berlebih, dan siap dikembangkan untuk katalog maupun kalkulator bisnis.',
+      deliverables: [
+        'Struktur Data Produk / Layanan Berbasis JSON',
+        'Kalkulator Harga & Simulasi Paket Otomatis',
+        'Filter Kategori Real-Time & Pencarian Cepat',
+        'Optimasi Bundle Script Ringan Tanpa Lag di HP',
+      ],
+      code: 'pipeline: "Python JSON Builder -> Strict TypeScript Bundle"',
+    },
+    {
+      title: '03. Automated WhatsApp & Payment Flow',
+      sla: 'ESTIMASI: HARI 2–3',
+      desc: 'Integrasi kalkulator pesanan otomatis yang mengubah pilihan pelanggan menjadi format invoice/brief langsung ke WhatsApp.',
+      deliverables: [
+        'Generator Format Pesan Order & Invoice WA Otomatis',
+        'Tombol CTA Multi-Titik & Floating Quick Contact',
+        'Validasi Input Klien & Ringkasan Estimasi Biaya',
+        'Dukungan Multi-Mata Uang (IDR / USD) Siap Ekspor',
+      ],
+      code: 'checkoutBridge: "Dynamic Cart -> Encoded WhatsApp API"',
+    },
+    {
+      title: '04. Global Edge CDN & Zero-Downtime CI/CD',
+      sla: 'ESTIMASI: RILIS LIVE',
+      desc: 'Otomatisasi build dan deployment dengan kompresi aset statis super cepat untuk akses instan dari berbagai wilayah.',
+      deliverables: [
+        'Deploy Otomatis via GitHub Actions & Edge CDN',
+        'Konfigurasi SEO Meta, Sitemap XML & Schema.org',
+        'Audit Skor Lighthouse & Kompresi Aset Produksi',
+        'Panduan Pengelolaan & Serah Terima Source Code',
+      ],
+      code: 'status: "DEPLOYED" | uptime: "99.9%" | ttfb: "<45ms"',
+    },
   ];
 
   const showStep = (i: number) => {
     const s = steps[i] || steps[0];
-    inspector.innerHTML = `<div class="bp-title">${s.title}</div><p class="bp-desc">${s.desc}</p><div class="bp-code">${s.code}</div>`;
+    const listHtml = s.deliverables
+      .map(
+        (item, idx) =>
+          `<div class="bp-deliv-item" style="--i:${idx};"><span class="bp-check">✓</span><span>${item}</span></div>`
+      )
+      .join('');
+
+    inspector.innerHTML = `
+      <div class="bp-head-row">
+        <div class="bp-title">${s.title}</div>
+        <span class="bp-sla-pill">${s.sla}</span>
+      </div>
+      <p class="bp-desc">${s.desc}</p>
+      <div class="bp-deliv-label">OUTPUT & DELIVERABLES TAHAP INI:</div>
+      <div class="bp-deliverables">${listHtml}</div>
+      <div class="bp-code" style="--i:${s.deliverables.length};">${s.code}</div>
+    `;
   };
+
   showStep(0);
-  nodes.forEach((n) => n.addEventListener('click', () => {
-    sfx.playUiClick(600);
-    nodes.forEach((b) => b.classList.remove('active'));
-    n.classList.add('active');
-    showStep(Number(n.dataset.step || 0));
-  }));
+  nodes.forEach((n) =>
+    n.addEventListener('click', () => {
+      sfx.playUiClick(600);
+      nodes.forEach((b) => b.classList.remove('active'));
+      n.classList.add('active');
+      showStep(Number(n.dataset.step || 0));
+    })
+  );
 }
+
 
 async function loadRustWasmEngine(): Promise<any> {
   try {
