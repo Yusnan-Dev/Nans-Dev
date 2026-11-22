@@ -30,18 +30,14 @@
     deferredPrompt = null;
   });
 
-  // Kamus Lengkap Seluruh Halaman (Header, Hero, Cards, Pipeline, Portofolio, Estimator)
   const dict: Record<string, Record<string, string>> = {
     en: {
-      'Menu Cepat': 'Quick Menu',
-      'Arsitektur': 'Architecture',
-      'Portofolio': 'Portfolio',
+      'Menu Cepat': 'Quick Menu', 'Arsitektur': 'Architecture', 'Portofolio': 'Portfolio',
       'AI Scope & Estimasi': 'AI Scope & Estimator',
       '2 Slot Proyek Tersedia Minggu Ini': '2 Project Slots Available This Week',
       'Rekayasa website custom berperforma tinggi, desain antarmuka modern, dan rekonstruksi aset vektor presisi untuk akselerasi bisnis digital Anda.':
         'High-performance custom web engineering, modern UI architecture, and precision vector asset reconstruction to accelerate your digital business.',
-      'Rakit Proyek Anda': 'Build Your Project',
-      'Eksplorasi Demo ↗': 'Explore Demos ↗',
+      'Rakit Proyek Anda': 'Build Your Project', 'Eksplorasi Demo ↗': 'Explore Demos ↗',
       'Pengembangan Company Profile korporat, E-Commerce, hingga Learning Management System (LMS) dengan arsitektur bersih dan cepat.':
         'Corporate company profiles, E-Commerce, and Learning Management Systems (LMS) engineered with clean, ultra-fast architecture.',
       'Konversi logo pecah menjadi vektor tajam (SVG/EPS/AI) serta perancangan sistem identitas visual brand berstandar industri.':
@@ -51,19 +47,17 @@
       'Arsitektur Pipeline & Audit Performa Live': 'Pipeline Architecture & Live Performance Audit',
       'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.':
         'Modern Mobile-First responsive UI design crafted with razor-sharp vector assets and lightweight 3D WebGL accents.',
-      'Portofolio & Arsitektur Live': 'Live Portfolio & Architecture',
-      'Semua Sistem': 'All Systems'
+      'Portofolio & Arsitektur Live': 'Live Portfolio & Architecture', 'Semua Sistem': 'All Systems',
+      'Sistem web layanan laundry ekspres dengan kalkulator estimasi biaya multi-item otomatis dan panel pengaturan interaktif.':
+        'Express laundry service web system with automated multi-item cost estimator calculator and interactive settings panel.'
     },
     ja: {
-      'Menu Cepat': 'クイックメニュー',
-      'Arsitektur': 'アーキテクチャ',
-      'Portofolio': 'ポートフォリオ',
+      'Menu Cepat': 'クイックメニュー', 'Arsitektur': 'アーキテクチャ', 'Portofolio': 'ポートフォリオ',
       'AI Scope & Estimasi': 'AI見積もり・要件定義',
       '2 Slot Proyek Tersedia Minggu Ini': '今週対応可能なプロジェクト枠：残り2件',
       'Rekayasa website custom berperforma tinggi, desain antarmuka modern, dan rekonstruksi aset vektor presisi untuk akselerasi bisnis digital Anda.':
         '高性能カスタムWeb開発、モダンUI設計、精密ベクター資産の再構築でデジタルビジネスを加速します。',
-      'Rakit Proyek Anda': 'プロジェクトを相談する',
-      'Eksplorasi Demo ↗': 'デモを見る ↗',
+      'Rakit Proyek Anda': 'プロジェクトを相談する', 'Eksplorasi Demo ↗': 'デモを見る ↗',
       'Pengembangan Company Profile korporat, E-Commerce, hingga Learning Management System (LMS) dengan arsitektur bersih dan cepat.':
         '企業サイト、ECサイト、学習管理システム（LMS）を高速かつクリーンな設計で開発します。',
       'Konversi logo pecah menjadi vektor tajam (SVG/EPS/AI) serta perancangan sistem identitas visual brand berstandar industri.':
@@ -71,21 +65,17 @@
       'Perancangan sistem desain antarmuka web maupun mobile beserta aset visual berkarakter untuk meningkatkan daya jual produk.':
         '商品の訴求力を高めるWeb・モバイルUIデザインシステムと独自ビジュアル資産の構築。',
       'Arsitektur Pipeline & Audit Performa Live': 'パイプライン設計とリアルタイム性能監査',
-      'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.':
-        '鮮明なベクター素材と軽量3D WebGLを備えたモバイルファーストの最新UI設計。',
-      'Portofolio & Arsitektur Live': '実績とライブシステム',
-      'Semua Sistem': 'すべて表示'
+      'Portofolio & Arsitektur Live': '実績とライブシステム', 'Semua Sistem': 'すべて表示',
+      'Sistem web layanan laundry ekspres dengan kalkulator estimasi biaya multi-item otomatis dan panel pengaturan interaktif.':
+        '自動料金計算機とインタラクティブ設定パネルを備えた宅配クリーニングWebシステム。'
     },
     ar: {
-      'Menu Cepat': 'القائمة السريعة',
-      'Arsitektur': 'الهندسة البرمجية',
-      'Portofolio': 'أعمالنا',
+      'Menu Cepat': 'القائمة السريعة', 'Arsitektur': 'الهندسة البرمجية', 'Portofolio': 'أعمالنا',
       'AI Scope & Estimasi': 'تقدير التكلفة بالذكاء الاصطناعي',
       '2 Slot Proyek Tersedia Minggu Ini': 'متاح مكانان لمشاريع جديدة هذا الأسبوع',
       'Rekayasa website custom berperforma tinggi, desain antarmuka modern, dan rekonstruksi aset vektor presisi untuk akselerasi bisnis digital Anda.':
         'هندسة مواقع مخصصة عالية الأداء، تصميم واجهات عصرية، وإعادة بناء الشعارات الفيكتور بدقة لتسريع أعمالك الرقمية.',
-      'Rakit Proyek Anda': 'ابدأ مشروعك الآن',
-      'Eksplorasi Demo ↗': 'استكشف العروض ↗',
+      'Rakit Proyek Anda': 'ابدأ مشروعك الآن', 'Eksplorasi Demo ↗': 'استكشف العروض ↗',
       'Pengembangan Company Profile korporat, E-Commerce, hingga Learning Management System (LMS) dengan arsitektur bersih dan cepat.':
         'تطوير مواقع الشركات والمتاجر الإلكترونية وأنظمة إدارة التعلم ببنية برمجية نظيفة وفائقة السرعة.',
       'Konversi logo pecah menjadi vektor tajam (SVG/EPS/AI) serta perancangan sistem identitas visual brand berstandar industri.':
@@ -93,21 +83,17 @@
       'Perancangan sistem desain antarmuka web maupun mobile beserta aset visual berkarakter untuk meningkatkan daya jual produk.':
         'تصميم واجهات الويب والجوال مع أصول بصرية مميزة لزيادة جاذبية ومبيعات منتجك.',
       'Arsitektur Pipeline & Audit Performa Live': 'هندسة النظام وتدقيق الأداء المباشر',
-      'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.':
-        'تصميم واجهات متجاوبة للهواتف أولاً بأصول فيكتور حادة وتأثيرات ثلاثية الأبعاد خفيفة.',
-      'Portofolio & Arsitektur Live': 'معرض الأعمال والأنظمة الحية',
-      'Semua Sistem': 'جميع الأنظمة'
+      'Portofolio & Arsitektur Live': 'معرض الأعمال والأنظمة الحية', 'Semua Sistem': 'جميع الأنظمة',
+      'Sistem web layanan laundry ekspres dengan kalkulator estimasi biaya multi-item otomatis dan panel pengaturan interaktif.':
+        'نظام ويب لخدمات الغسيل السريع مزود بحاسبة تكلفة تلقائية ولوحة إعدادات تفاعلية.'
     },
     fr: {
-      'Menu Cepat': 'Menu Rapide',
-      'Arsitektur': 'Architecture',
-      'Portofolio': 'Portfolio',
+      'Menu Cepat': 'Menu Rapide', 'Arsitektur': 'Architecture', 'Portofolio': 'Portfolio',
       'AI Scope & Estimasi': 'Estimation & Scope IA',
       '2 Slot Proyek Tersedia Minggu Ini': '2 Créneaux Projets Disponibles Cette Semaine',
       'Rekayasa website custom berperforma tinggi, desain antarmuka modern, dan rekonstruksi aset vektor presisi untuk akselerasi bisnis digital Anda.':
         'Ingénierie web sur mesure haute performance, design UI moderne et reconstruction vectorielle de précision pour accélérer votre activité.',
-      'Rakit Proyek Anda': 'Lancer Votre Projet',
-      'Eksplorasi Demo ↗': 'Explorer les Démos ↗',
+      'Rakit Proyek Anda': 'Lancer Votre Projet', 'Eksplorasi Demo ↗': 'Explorer les Démos ↗',
       'Pengembangan Company Profile korporat, E-Commerce, hingga Learning Management System (LMS) dengan arsitektur bersih dan cepat.':
         'Développement de sites vitrines, E-Commerce et plateformes LMS avec une architecture rapide et épurée.',
       'Konversi logo pecah menjadi vektor tajam (SVG/EPS/AI) serta perancangan sistem identitas visual brand berstandar industri.':
@@ -115,21 +101,17 @@
       'Perancangan sistem desain antarmuka web maupun mobile beserta aset visual berkarakter untuk meningkatkan daya jual produk.':
         'Conception d’interfaces web et mobiles avec des actifs visuels distinctifs pour maximiser l’impact commercial.',
       'Arsitektur Pipeline & Audit Performa Live': 'Architecture Pipeline & Audit de Performance',
-      'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.':
-        'Conception d’interfaces modernes Mobile-First avec des actifs vectoriels nets et des accents 3D WebGL légers.',
-      'Portofolio & Arsitektur Live': 'Portfolio & Architecture Live',
-      'Semua Sistem': 'Tous les Systèmes'
+      'Portofolio & Arsitektur Live': 'Portfolio & Architecture Live', 'Semua Sistem': 'Tous les Systèmes',
+      'Sistem web layanan laundry ekspres dengan kalkulator estimasi biaya multi-item otomatis dan panel pengaturan interaktif.':
+        'Système web de blanchisserie express avec calculateur de devis multi-articles et panneau interactif.'
     },
     es: {
-      'Menu Cepat': 'Menú Rápido',
-      'Arsitektur': 'Arquitectura',
-      'Portofolio': 'Portafolio',
+      'Menu Cepat': 'Menú Rápido', 'Arsitektur': 'Arquitectura', 'Portofolio': 'Portafolio',
       'AI Scope & Estimasi': 'Alcance y Cotizador IA',
       '2 Slot Proyek Tersedia Minggu Ini': '2 Cupos de Proyecto Disponibles Esta Semana',
       'Rekayasa website custom berperforma tinggi, desain antarmuka modern, dan rekonstruksi aset vektor presisi untuk akselerasi bisnis digital Anda.':
         'Ingeniería web personalizada de alto rendimiento, diseño UI moderno y reconstrucción vectorial de precisión para impulsar tu negocio.',
-      'Rakit Proyek Anda': 'Armar Tu Proyecto',
-      'Eksplorasi Demo ↗': 'Explorar Demos ↗',
+      'Rakit Proyek Anda': 'Armar Tu Proyecto', 'Eksplorasi Demo ↗': 'Explorar Demos ↗',
       'Pengembangan Company Profile korporat, E-Commerce, hingga Learning Management System (LMS) dengan arsitektur bersih dan cepat.':
         'Desarrollo de sitios corporativos, E-Commerce y plataformas LMS con arquitectura limpia y ultrarrápida.',
       'Konversi logo pecah menjadi vektor tajam (SVG/EPS/AI) serta perancangan sistem identitas visual brand berstandar industri.':
@@ -137,10 +119,9 @@
       'Perancangan sistem desain antarmuka web maupun mobile beserta aset visual berkarakter untuk meningkatkan daya jual produk.':
         'Sistemas de diseño UI web y móvil con activos visuales distintivos para potenciar las ventas de tu producto.',
       'Arsitektur Pipeline & Audit Performa Live': 'Arquitectura Pipeline y Auditoría en Vivo',
-      'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.':
-        'Diseño de interfaces modernas Mobile-First con activos vectoriales nítidos y acentos 3D WebGL ligeros.',
-      'Portofolio & Arsitektur Live': 'Portafolio y Arquitectura en Vivo',
-      'Semua Sistem': 'Todos los Sistemas'
+      'Portofolio & Arsitektur Live': 'Portafolio y Arquitectura en Vivo', 'Semua Sistem': 'Todos los Sistemas',
+      'Sistem web layanan laundry ekspres dengan kalkulator estimasi biaya multi-item otomatis dan panel pengaturan interaktif.':
+        'Sistema web de lavandería exprés con calculadora automática multi-artículo y panel interactivo.'
     }
   };
 
@@ -168,10 +149,12 @@
   });
 
   const applyLang = (code: string) => {
+    localStorage.setItem('nans_selected_lang', code);
+    langBox.value = code;
     document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
     const map = dict[code] || {};
     document.querySelectorAll('h1, h2, h3, h4, p, a, button, span, div, label').forEach((el) => {
-      if (el.children.length > 0) return;
+      if (langBox.contains(el) || el.children.length > 0) return;
       const raw = (el.textContent || '').replace(/\s+/g, ' ').trim();
       if (!raw) return;
       if (!originalTexts.has(el)) originalTexts.set(el, raw);
@@ -182,11 +165,9 @@
         el.textContent = map[base];
       }
     });
-    langBox.value = code;
-    localStorage.setItem('nans_selected_lang', code);
   };
 
-  langBox.addEventListener('change', (e) => applyLang((e.target as HTMLSelectElement).value));
+  langBox.addEventListener('change', () => applyLang(langBox.value));
 
   const mountInsideHamburger = () => {
     const navContainer =
@@ -204,12 +185,12 @@
     }
   };
 
-    window.addEventListener('DOMContentLoaded', () => {
+  window.addEventListener('DOMContentLoaded', () => {
     mountInsideHamburger();
     const saved = localStorage.getItem('nans_selected_lang') || 'id';
+    langBox.value = saved;
     if (saved !== 'id') setTimeout(() => applyLang(saved), 600);
 
-    // Pengaman anti-macet: paksa tutup preloader maksimal 2.2 detik
     setTimeout(() => {
       const pre = document.getElementById('nans-preloader');
       if (pre) {
@@ -219,9 +200,9 @@
       }
     }, 2200);
 
-    // Pantau perubahan konten tanpa mengganggu preloader
     let timer: any = null;
-    const observer = new MutationObserver(() => {
+    const observer = new MutationObserver((mutations) => {
+      if (mutations.every((m) => langBox.contains(m.target))) return;
       const active = localStorage.getItem('nans_selected_lang') || 'id';
       if (active === 'id') return;
       clearTimeout(timer);
