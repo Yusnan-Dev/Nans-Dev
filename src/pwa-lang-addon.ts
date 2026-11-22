@@ -61,9 +61,23 @@
       font-size: 12px !important;
       white-space: nowrap !important;
     }
-    #nans-pwa-install-btn {
+    #nans-install-btn {
       padding: 5px 10px !important;
       font-size: 11.5px !important;
+      white-space: nowrap !important;
+    }
+    @media (max-width: 1180px) {
+      .nav-links {
+        gap: 8px !important;
+      }
+      .nav-links a {
+        font-size: 11px !important;
+      }
+      #cmd-trigger {
+        padding: 5px 8px !important;
+        font-size: 11px !important;
+        white-space: nowrap !important;
+      }
     }
     
   `;
@@ -73,7 +87,7 @@
   const installItem = document.createElement('button');
   installItem.id = 'nans-install-btn';
   installItem.type = 'button';
-  installItem.textContent = '📲 Install App';
+  installItem.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;flex-shrink:0;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Install App';
   Object.assign(installItem.style, {
     display: 'none', width: '100%', textAlign: 'left', padding: '10px 14px',
     marginTop: '8px', borderRadius: '10px', border: '1px solid #38bdf8',
@@ -205,7 +219,7 @@
     let current: Node | null;
     while ((current = walker.nextNode())) {
       const parent = current.parentElement;
-      if (!parent || langBox.contains(parent)) continue;
+      if (!parent || langBox.contains(parent) || installItem.contains(parent)) continue;
       if (['SCRIPT', 'STYLE', 'CODE', 'PRE', 'NOSCRIPT'].includes(parent.tagName)) continue;
       const clean = (current.nodeValue || '').replace(/\s+/g, ' ').trim();
       if (!clean || clean.length < 3 || /^[\d\s.%+\-/•⌘K()]+$/.test(clean)) continue;    
@@ -236,6 +250,7 @@
         })
       );
     }
+    installItem.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;flex-shrink:0;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Install App';
   };
 
   ['click', 'touchstart', 'mousedown'].forEach((evt) =>
