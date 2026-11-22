@@ -816,5 +816,5 @@ window.addEventListener('load', () => {
   setTimeout(() => {
     preloader.classList.add('hide');
     setTimeout(() => preloader.remove(), 600);
-  }, 1300);
+  }, 1950);
 });
