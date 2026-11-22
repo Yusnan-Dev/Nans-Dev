@@ -349,8 +349,8 @@ function initPhotorealisticEarth(): void {
   const flameCore = new THREE.Mesh(new THREE.ConeGeometry(0.068, 0.52, 16), new THREE.MeshBasicMaterial({ color: 0xffffff }));
   flameCore.rotation.x = Math.PI; flameCore.position.y = -0.92; rocketGroup.add(flameCore);
 
-  const smokeMatCool = new THREE.SpriteMaterial({ map: smokeTexture, color: 0xe2e8f0, transparent: true, opacity: 0.55, depthWrite: false });
-  const smokeMatWarm = new THREE.SpriteMaterial({ map: smokeTexture, color: 0xfed7aa, transparent: true, opacity: 0.55, depthWrite: false });
+  const smokeMatCool = new THREE.SpriteMaterial({ map: smokeTexture, color: 0xe2e8f0, transparent: true, opacity: 0.28, depthWrite: false });
+  const smokeMatWarm = new THREE.SpriteMaterial({ map: smokeTexture, color: 0xfed7aa, transparent: true, opacity: 0.28, depthWrite: false });
   const sparkMatOrange = new THREE.SpriteMaterial({ map: smokeTexture, color: 0xfb923c, transparent: true, opacity: 0.9, depthWrite: false });
   const sparkMatYellow = new THREE.SpriteMaterial({ map: smokeTexture, color: 0xfef08a, transparent: true, opacity: 0.9, depthWrite: false });
 
@@ -363,12 +363,12 @@ function initPhotorealisticEarth(): void {
     smoke.position.copy(origin);
     smoke.position.x += (Math.random() - 0.5) * 0.14 * rocketScale;
     smoke.position.y += (Math.random() - 0.5) * 0.14 * rocketScale;
-    const initialSize = (0.24 + Math.random() * 0.14) * rocketScale;
+    const initialSize = (0.09 + Math.random() * 0.05) * rocketScale;
     smoke.scale.set(initialSize, initialSize, 1);
     ovScene.add(smoke);
     const backwardVel = tangent.clone().multiplyScalar(-(0.035 + Math.random() * 0.03) * rocketScale);
     backwardVel.x += (Math.random() - 0.5) * 0.025; backwardVel.y += (Math.random() - 0.5) * 0.025;
-    particles.push({ sprite: smoke, vel: backwardVel, life: 1.0, decay: 0.022 + Math.random() * 0.01, baseScale: initialSize, growRate: 0.042 * rocketScale });
+    particles.push({ sprite: smoke, vel: backwardVel, life: 1.0, decay: 0.032 + Math.random() * 0.012, baseScale: initialSize, growRate: 0.012 * rocketScale });
 
     if (particles.length < 65 && Math.random() > 0.35) {
       const spark = new THREE.Sprite(Math.random() > 0.4 ? sparkMatOrange : sparkMatYellow);
@@ -415,8 +415,8 @@ function initPhotorealisticEarth(): void {
     }
 
     startWorldPos = screenToOverlayWorld(lx, ly, 1.5);
-    endWorldPos = screenToOverlayWorld(window.innerWidth * (0.35 + Math.random() * 0.3), -150, 7.8);
-    midControlPos = new THREE.Vector3((startWorldPos.x + endWorldPos.x) * 0.5 + (Math.random() - 0.5) * 1.4, (startWorldPos.y + endWorldPos.y) * 0.48, 5.2);
+    endWorldPos = screenToOverlayWorld(window.innerWidth * (0.35 + Math.random() * 0.3), -150, 4.4);
+    midControlPos = new THREE.Vector3((startWorldPos.x + endWorldPos.x) * 0.5 + (Math.random() - 0.5) * 1.2, (startWorldPos.y + endWorldPos.y) * 0.48, 3.1);
 
     rocketActive = true; launchProgress = 0;
     overlayCanvas.style.display = 'block';
@@ -476,7 +476,7 @@ function initPhotorealisticEarth(): void {
         if (tangent.lengthSq() > 0.0001) rocketGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
 
         rocketGroup.position.copy(pos); rocketGroup.rotateY(t * 7);
-        const currentScale = 0.16 + ease * 1.02;
+        const currentScale = 0.14 + ease * 0.32;
         rocketGroup.scale.setScalar(currentScale);
         flameRed.scale.set(0.95 + Math.random() * 0.15, 0.85 + Math.random() * 0.5, 0.95 + Math.random() * 0.15);
         flameOrange.scale.set(1, 0.8 + Math.random() * 0.45, 1);
