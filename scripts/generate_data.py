@@ -64,7 +64,16 @@ payload = {
             "title": "UI/UX Prototyping & Visual Assets",
             "desc": "Perancangan sistem desain antarmuka web maupun mobile beserta aset visual berkarakter untuk meningkatkan daya jual produk.",
             "specs": ["Interactive Component System", "Dark & Light Theme Ready", "Conversion-Focused Layout"]
-        }
+        },
+        {
+            "code": "04",
+            "title": "PWA Architecture & Technical SEO",
+            "desc": "Optimasi kecepatan muat sub-detik, instalasi aplikasi web langsung di layar HP pelanggan, dan struktur SEO ramah mesin pencari.",
+            "specs": [
+            "Installable Progressive Web App (PWA)",
+            "Sub-Second Edge Caching & Compression",
+            "Schema & Local Search Optimization"]
+      }     
     ]
 }
 
