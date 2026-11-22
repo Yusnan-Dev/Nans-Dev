@@ -1100,6 +1100,76 @@ function setupVectorLabModes(): void {
   const vectorBox = labEl.querySelector<HTMLElement>('.vector-layer');
   const headingEl = labEl.querySelector<HTMLElement>('h3');
   const descEl = labEl.querySelector<HTMLElement>('p');
+  const rangeEl = document.getElementById('vector-range');
+  const axisSpans = rangeEl?.nextElementSibling?.querySelectorAll('span');
+
+  const logoRasterSvg = rasterBox?.querySelector('svg')?.outerHTML || '';
+  const logoVectorSvg = vectorBox?.querySelector('svg')?.outerHTML || '';
+
+  const legacyWebSvg = `
+    <svg width="210" height="132" viewBox="0 0 210 132" fill="none" style="border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,0.55);">
+      <rect x="1" y="1" width="208" height="130" rx="5" fill="#d1d5db" stroke="#6b7280" stroke-width="2"/>
+      <rect x="2" y="2" width="206" height="18" fill="#4b5563"/>
+      <rect x="8" y="6" width="120" height="9" fill="#e5e7eb"/>
+      <rect x="176" y="6" width="24" height="9" fill="#ef4444"/>
+      <rect x="8" y="25" width="194" height="16" fill="#1e3a8a"/>
+      <text x="14" y="36" fill="#fef08a" font-family="monospace" font-size="8" font-weight="bold">SELAMAT DATANG DI WEB KAMI...</text>
+      <rect x="8" y="46" width="54" height="76" fill="#9ca3af" stroke="#4b5563"/>
+      <rect x="13" y="52" width="44" height="8" fill="#374151"/>
+      <rect x="13" y="65" width="44" height="8" fill="#374151"/>
+      <rect x="13" y="78" width="44" height="8" fill="#374151"/>
+      <rect x="68" y="46" width="134" height="44" fill="#f3f4f6" stroke="#6b7280"/>
+      <line x1="74" y1="56" x2="188" y2="56" stroke="#4b5563" stroke-width="3"/>
+      <line x1="74" y1="66" x2="165" y2="66" stroke="#6b7280" stroke-width="2.5"/>
+      <line x1="74" y1="75" x2="192" y2="75" stroke="#6b7280" stroke-width="2.5"/>
+      <rect x="68" y="95" width="84" height="27" fill="#fee2e2" stroke="#dc2626"/>
+      <text x="74" y="107" fill="#b91c1c" font-family="monospace" font-size="7" font-weight="bold">NO MOBILE VIEW</text>
+      <text x="74" y="117" fill="#b91c1c" font-family="monospace" font-size="7">LOAD: 6.4s (!)</text>
+      <rect x="157" y="95" width="45" height="27" fill="#e5e7eb" stroke="#6b7280"/>
+      <text x="163" y="111" fill="#374151" font-family="monospace" font-size="7">NO CTA</text>
+    </svg>`;
+
+  const modernWebSvg = `
+    <svg width="210" height="132" viewBox="0 0 210 132" fill="none" style="border-radius:8px;filter:drop-shadow(0 8px 20px rgba(56,189,248,0.28));">
+      <defs>
+        <linearGradient id="modCardGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1e293b"/>
+          <stop offset="100%" stop-color="#0f172a"/>
+        </linearGradient>
+        <linearGradient id="modBtnGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#818cf8"/>
+          <stop offset="100%" stop-color="#38bdf8"/>
+        </linearGradient>
+      </defs>
+      <rect x="1" y="1" width="208" height="130" rx="8" fill="#070b14" stroke="#38bdf8" stroke-width="1.5"/>
+      <rect x="2" y="2" width="206" height="17" rx="7" fill="#0d1424"/>
+      <circle cx="11" cy="10.5" r="2.5" fill="#ef4444"/>
+      <circle cx="19" cy="10.5" r="2.5" fill="#f59e0b"/>
+      <circle cx="27" cy="10.5" r="2.5" fill="#10b981"/>
+      <rect x="52" y="6.5" width="106" height="8" rx="4" fill="#1e293b"/>
+      <rect x="168" y="6.5" width="32" height="8" rx="4" fill="rgba(52,211,153,0.2)" stroke="#34d399" stroke-width="0.8"/>
+      <text x="173" y="12.5" fill="#34d399" font-family="monospace" font-size="6" font-weight="bold">99 FPS</text>
+      <rect x="10" y="24" width="190" height="50" rx="6" fill="url(#modCardGrad)" stroke="rgba(56,189,248,0.35)"/>
+      <rect x="18" y="31" width="54" height="7" rx="3.5" fill="rgba(56,189,248,0.22)"/>
+      <rect x="18" y="42" width="110" height="7" rx="3.5" fill="#f8fafc"/>
+      <rect x="18" y="52" width="84" height="5" rx="2.5" fill="#94a3b8"/>
+      <rect x="18" y="60" width="58" height="9" rx="4.5" fill="url(#modBtnGrad)"/>
+      <text x="26" y="66.5" fill="#05070c" font-family="sans-serif" font-size="6" font-weight="800">ORDER WA ↗</text>
+      <circle cx="166" cy="49" r="16" fill="rgba(56,189,248,0.12)" stroke="#38bdf8" stroke-width="1.2"/>
+      <path d="M159 55V43L166 50L173 43V55" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="10" y="80" width="60" height="42" rx="6" fill="#0d1424" stroke="rgba(255,255,255,0.1)"/>
+      <rect x="16" y="87" width="26" height="5" rx="2.5" fill="#38bdf8"/>
+      <rect x="16" y="96" width="46" height="4" rx="2" fill="#64748b"/>
+      <rect x="16" y="104" width="38" height="4" rx="2" fill="#64748b"/>
+      <rect x="75" y="80" width="60" height="42" rx="6" fill="#0d1424" stroke="rgba(255,255,255,0.1)"/>
+      <rect x="81" y="87" width="26" height="5" rx="2.5" fill="#818cf8"/>
+      <rect x="81" y="96" width="46" height="4" rx="2" fill="#64748b"/>
+      <rect x="81" y="104" width="38" height="4" rx="2" fill="#64748b"/>
+      <rect x="140" y="80" width="60" height="42" rx="6" fill="#0d1424" stroke="rgba(52,211,153,0.35)"/>
+      <rect x="146" y="87" width="30" height="5" rx="2.5" fill="#34d399"/>
+      <rect x="146" y="96" width="46" height="4" rx="2" fill="#cbd5e1"/>
+      <rect x="146" y="104" width="40" height="8" rx="4" fill="rgba(52,211,153,0.18)"/>
+    </svg>`;
 
   labEl.querySelectorAll<HTMLButtonElement>('.v4-lab-mode-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -1124,11 +1194,19 @@ function setupVectorLabModes(): void {
           ? 'Bandingkan layout statis/lambat tanpa struktur konversi dengan sistem web responsif, cepat, dan siap closing WhatsApp.'
           : 'Bandingkan langsung aset beresolusi rendah dengan hasil rekonstruksi vektor murni yang tetap tajam hingga skala baliho maupun layar Retina.';
       }
+      if (axisSpans && axisSpans.length >= 2) {
+        axisSpans[0].textContent = isWeb ? '← WEB JADUL' : '← RASTER BLUR';
+        axisSpans[1].textContent = isWeb ? 'WEB MODERN →' : 'VECTOR SHARP →';
+      }
       if (rasterBox) {
+        const oldSvg = rasterBox.querySelector('svg');
+        if (oldSvg) oldSvg.outerHTML = isWeb ? legacyWebSvg : logoRasterSvg;
         const sm = rasterBox.querySelector('small');
         if (sm) sm.textContent = isWeb ? 'LEGACY WEB (SLOW & CLUTTERED)' : 'LOW-RES RASTER (PECAH)';
       }
       if (vectorBox) {
+        const oldSvg = vectorBox.querySelector('svg');
+        if (oldSvg) oldSvg.outerHTML = isWeb ? modernWebSvg : logoVectorSvg;
         const sm = vectorBox.querySelector('small');
         if (sm) sm.textContent = isWeb ? 'NANS DEV MODERN WEB (60FPS & WA READY)' : '100% VECTOR GEOMETRY (PRESISI)';
       }
