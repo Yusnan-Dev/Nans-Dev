@@ -1,2 +1,2 @@
 # Nans-Dev
-"Personal portfolio website showcasing my web development projects and UI/UX designs. Built with HTML, CSS, and JavaScript.
+"A personal portfolio showcasing web development and UI/UX design projects. Created using various programming languages.
