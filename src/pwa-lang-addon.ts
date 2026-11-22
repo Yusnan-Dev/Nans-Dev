@@ -65,6 +65,8 @@
       'Perancangan sistem desain antarmuka web maupun mobile beserta aset visual berkarakter untuk meningkatkan daya jual produk.':
         '商品の訴求力を高めるWeb・モバイルUIデザインシステムと独自ビジュアル資産の構築。',
       'Arsitektur Pipeline & Audit Performa Live': 'パイプライン設計とリアルタイム性能監査',
+      'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.':
+        '鮮明なベクター素材と軽量3D WebGLを備えたモバイルファーストの最新UI設計。',
       'Portofolio & Arsitektur Live': '実績とライブシステム', 'Semua Sistem': 'すべて表示',
       'Sistem web layanan laundry ekspres dengan kalkulator estimasi biaya multi-item otomatis dan panel pengaturan interaktif.':
         '自動料金計算機とインタラクティブ設定パネルを備えた宅配クリーニングWebシステム。'
@@ -125,8 +127,8 @@
     }
   };
 
-  const originalTexts = new WeakMap<Element, string>();
   const langBox = document.createElement('select');
+  langBox.id = 'nans-lang-switcher';
   langBox.setAttribute('aria-label', 'Pilih Bahasa');
   Object.assign(langBox.style, {
     width: '100%', padding: '10px 12px', marginTop: '10px', borderRadius: '10px',
@@ -149,25 +151,29 @@
   });
 
   const applyLang = (code: string) => {
-    localStorage.setItem('nans_selected_lang', code);
-    langBox.value = code;
     document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
     const map = dict[code] || {};
     document.querySelectorAll('h1, h2, h3, h4, p, a, button, span, div, label').forEach((el) => {
       if (langBox.contains(el) || el.children.length > 0) return;
       const raw = (el.textContent || '').replace(/\s+/g, ' ').trim();
-      if (!raw) return;
-      if (!originalTexts.has(el)) originalTexts.set(el, raw);
-      const base = originalTexts.get(el) || raw;
-      if (code === 'id') {
-        el.textContent = base;
-      } else if (map[base]) {
-        el.textContent = map[base];
-      }
+      if (raw && map[raw]) el.textContent = map[raw];
     });
   };
 
-  langBox.addEventListener('change', () => applyLang(langBox.value));
+  ['click', 'touchstart', 'mousedown'].forEach((evt) =>
+    langBox.addEventListener(evt, (e) => e.stopPropagation())
+  );
+
+  langBox.addEventListener('change', (e) => {
+    e.stopPropagation();
+    const chosen = langBox.value;
+    localStorage.setItem('nans_selected_lang', chosen);
+    if (chosen === 'id') {
+      window.location.reload();
+      return;
+    }
+    applyLang(chosen);
+  });
 
   const mountInsideHamburger = () => {
     const navContainer =
