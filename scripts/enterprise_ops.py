@@ -110,11 +110,19 @@ def generate_pwa_manifest(out_path: str = "manifest.json") -> str:
         "background_color": "#060b14",
         "theme_color": "#38bdf8",
         "description": "Pengembangan sistem web modern, katalog interaktif, dan rekonstruksi identitas vektor presisi.",
+        "icons": [
+            {
+                "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%2338bdf8'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='900' font-size='300' fill='%23060b14'%3EN%3C/text%3E%3C/svg%3E",
+                "sizes": "192x192 512x512",
+                "type": "image/svg+xml",
+                "purpose": "any maskable"
+            }
+        ],
+
     }
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
     return out_path
-
 
 # 8. Generate JSON-LD Schema.org untuk Rich Results Google
 def generate_json_ld_schema(out_path: str = "schema.json") -> str:
