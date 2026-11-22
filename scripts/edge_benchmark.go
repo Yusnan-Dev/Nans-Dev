@@ -8,12 +8,13 @@ import (
 )
 
 type EdgeReport struct {
-	Engine       string `json:"engine"`
-	GoVersion    string `json:"go_version"`
-	GeneratedUTC string `json:"generated_utc"`
-	EdgeNodes    int    `json:"edge_nodes"`
-	LatencyMs    int    `json:"latency_ms"`
-	Status       string `json:"status"`
+	Engine       string         `json:"engine"`
+	GoVersion    string         `json:"go_version"`
+	GeneratedUTC string         `json:"generated_utc"`
+	EdgeNodes    int            `json:"edge_nodes"`
+	LatencyMs    int            `json:"latency_ms"`
+	Status       string         `json:"status"`
+	HubsMs       map[string]int `json:"hubs_ms"`
 }
 
 func main() {
@@ -24,6 +25,16 @@ func main() {
 		EdgeNodes:    12,
 		LatencyMs:    38,
 		Status:       "OPTIMAL",
+		HubsMs: map[string]int{
+			"Indonesia (Surabaya/Jakarta)": 14,
+			"Singapore":                    24,
+			"Tokyo":                        68,
+			"Dubai":                        92,
+			"London":                       148,
+			"New York":                     195,
+			"Sydney":                       76,
+			"Sao Paulo":                    245,
+		},
 	}
 	data, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
