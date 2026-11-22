@@ -5,43 +5,6 @@
     });
   }
 
-    // Penyadap WebGL & 2D: Kecilkan ukuran roket 3D & kepulan asap saat mendekat (Mobile & Desktop)
-  const origGetContext = HTMLCanvasElement.prototype.getContext;
-  (HTMLCanvasElement.prototype as any).getContext = function (type: string, attrs?: any) {
-    const ctx = origGetContext.call(this, type, attrs);
-    const canvasEl = this as HTMLCanvasElement;
-    const isOverlay = () => canvasEl.width >= window.innerWidth * 0.7 && canvasEl.height >= window.innerHeight * 0.7;
-
-    if (ctx && (type === 'webgl' || type === 'webgl2') && !(this as any).__nansGlPatched) {
-      (this as any).__nansGlPatched = true;
-      const gl = ctx as WebGLRenderingContext;
-      const origUniform1f = gl.uniform1f.bind(gl);
-      const origUniformMatrix4fv = gl.uniformMatrix4fv.bind(gl);
-
-      gl.uniform1f = function (loc: WebGLUniformLocation | null, val: number) {
-        if (isOverlay() && val > 1.2) {
-          return origUniform1f(loc, Math.min(val * 0.35, 1.2));
-        }
-        return origUniform1f(loc, val);
-      };
-
-      gl.uniformMatrix4fv = function (loc: WebGLUniformLocation | null, transpose: boolean, data: Float32List) {
-        if (isOverlay() && data && data.length === 16) {
-          const sx = Math.hypot(data[0], data[1], data[2]);
-          if (sx > 0.65) {
-            const factor = 0.42;
-            const copy = new Float32Array(data as any);
-            for (let i = 0; i < 12; i++) copy[i] *= factor;
-            return origUniformMatrix4fv(loc, transpose, copy);
-          }
-        }
-        return origUniformMatrix4fv(loc, transpose, data);
-      };
-    }
-    return ctx;
-  };
-  
-
   // CSS Responsif Navbar Desktop agar Sejajar & Tidak Bertumpuk
   const fixStyle = document.createElement('style');
   fixStyle.textContent = `
