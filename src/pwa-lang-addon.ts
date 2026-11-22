@@ -5,27 +5,37 @@
     });
   }
 
-  // Suntikkan CSS Responsif: Navbar Desktop Sejajar + Roket & Asap Tetap Mungil di Mobile & Desktop
+  // Penyadap otomatis untuk mengecilkan roket & kepulan asap pada kanvas overlay (Mobile & Desktop)
+  const origGetContext = HTMLCanvasElement.prototype.getContext;
+  (HTMLCanvasElement.prototype as any).getContext = function (type: string, attrs?: any) {
+    const ctx = origGetContext.call(this, type, attrs);
+    if (ctx && type === '2d' && !(this as any).__nansPatched) {
+      (this as any).__nansPatched = true;
+      const canvasEl = this as HTMLCanvasElement;
+      const origScale = (ctx as CanvasRenderingContext2D).scale.bind(ctx);
+      const origArc = (ctx as CanvasRenderingContext2D).arc.bind(ctx);
+
+      (ctx as CanvasRenderingContext2D).scale = function (x: number, y: number) {
+        const isOverlay = canvasEl.width >= window.innerWidth * 0.8 && canvasEl.height >= window.innerHeight * 0.8;
+        if (isOverlay && (x > 0.65 || y > 0.65)) {
+          return origScale(Math.min(x * 0.42, 0.65), Math.min(y * 0.42, 0.65));
+        }
+        return origScale(x, y);
+      };
+
+      (ctx as CanvasRenderingContext2D).arc = function (x: number, y: number, r: number, s: number, e: number, ccw?: boolean) {
+        const isOverlay = canvasEl.width >= window.innerWidth * 0.8 && canvasEl.height >= window.innerHeight * 0.8;
+        const nextR = isOverlay && r > 18 ? r * 0.35 : r;
+        return origArc(x, y, nextR, s, e, ccw);
+      };
+    }
+    return ctx;
+  };
+
+  // CSS Responsif Navbar Desktop agar Sejajar & Tidak Bertumpuk
   const fixStyle = document.createElement('style');
   fixStyle.textContent = `
-    /* Global (Mobile & Desktop): Roket & kepulan asap tetap proporsional saat mendekat */
-    #rocket-canvas, .rocket-3d, .rocket-overlay, [class*="rocket"], [id*="rocket"],
-    [class*="smoke"], [id*="smoke"], [class*="exhaust"] {
-      max-width: 140px !important;
-      max-height: 140px !important;
-      right: 16px !important;
-      left: auto !important;
-      opacity: 0.72 !important;
-      pointer-events: none !important;
-    }
-
     @media (min-width: 769px) {
-      #rocket-canvas, .rocket-3d, .rocket-overlay, [class*="rocket"], [id*="rocket"],
-      [class*="smoke"], [id*="smoke"], [class*="exhaust"] {
-        max-width: 175px !important;
-        max-height: 175px !important;
-        right: 28px !important;
-      }
       header nav, .nav-links {
         display: flex !important;
         align-items: center !important;
@@ -60,25 +70,6 @@
     }
   `;
   document.head.appendChild(fixStyle);
-
-  // Penahan skala dinamis di Mobile & Desktop saat roket melesat mendekat
-  const clampRocketZoom = () => {
-    const maxScale = window.innerWidth >= 769 ? 0.55 : 0.45;
-    document
-      .querySelectorAll('#rocket-canvas, .rocket-3d, .rocket-overlay, [class*="rocket"], [id*="rocket"]')
-      .forEach((node) => {
-        const el = node as HTMLElement;
-        const inlineTransform = el.style.transform || '';
-        const match = inlineTransform.match(/scale\(([\d.]+)\)/);
-        if (match && parseFloat(match[1]) > maxScale) {
-          el.style.transform = inlineTransform.replace(/scale\([\d.]+\)/, `scale(${maxScale})`);
-        } else if (!match) {
-          el.style.transform = `scale(${maxScale})`;
-        }
-      });
-    requestAnimationFrame(clampRocketZoom);
-  };
-  requestAnimationFrame(clampRocketZoom);
 
   let deferredPrompt: any = null;
   const installItem = document.createElement('button');
@@ -297,4 +288,3 @@
     }, 2200);
   });
 })();
-      
