@@ -31,10 +31,88 @@ interface EnterpriseData {
 
 const WHATSAPP_NUMBER = '6283187521130'; // Ganti nomor WA lu (diawali 62)
 
+/* =====================================================================
+   FUTURISTIC WEB AUDIO SYNTHESIZER (Zero external audio files needed)
+   ===================================================================== */
+class SoundEngine {
+  private ctx: AudioContext | null = null;
+  public enabled = false;
+
+  public toggle(): boolean {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtx) this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+    this.enabled = !this.enabled;
+    if (this.enabled) this.playUiClick(680);
+    return this.enabled;
+  }
+
+  public playUiClick(freq = 540): void {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.45, now + 0.06);
+
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.075);
+  }
+
+  public playRocketLaunch(): void {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const duration = 2.4;
+
+    // White noise thruster rumble
+    const bufferSize = this.ctx.sampleRate * duration;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(140, now);
+    filter.frequency.exponentialRampToValueAtTime(620, now + 0.7);
+    filter.frequency.exponentialRampToValueAtTime(90, now + duration);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.01, now);
+    gain.gain.linearRampToValueAtTime(0.22, now + 0.45);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    noise.start(now);
+    noise.stop(now + duration);
+  }
+}
+
+const sfx = new SoundEngine();
+
 async function bootApp(): Promise<void> {
+  setupAudioToggle();
   setupMobileNav();
   initPhotorealisticEarth();
   setupVectorSlider();
+  renderTestimonials();
   setupEstimator();
 
   try {
@@ -54,7 +132,21 @@ async function bootApp(): Promise<void> {
   }
 }
 
-/* Generate Realistic Aerospace Hull Texture (White Fuselage, Carbon Interstage, Red Stripes, Panel Lines) */
+function setupAudioToggle(): void {
+  const btn = document.getElementById('audio-toggle');
+  const icon = document.getElementById('audio-icon');
+  const label = document.getElementById('audio-label');
+  if (!btn || !icon || !label) return;
+
+  btn.addEventListener('click', () => {
+    const isOn = sfx.toggle();
+    btn.classList.toggle('active', isOn);
+    icon.textContent = isOn ? '🔊' : '🔇';
+    label.textContent = isOn ? 'SFX ON' : 'SFX OFF';
+  });
+}
+
+/* Generate Realistic Aerospace Hull Texture */
 function createRocketHullTexture(): any {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
@@ -104,7 +196,6 @@ function createRocketHullTexture(): any {
   return tex;
 }
 
-/* Soft Radial Smoke Puff Texture */
 function createSmokeTexture(): any {
   const canvas = document.createElement('canvas');
   canvas.width = 128;
@@ -198,7 +289,7 @@ function initPhotorealisticEarth(): void {
   }
 
   const hubs = [
-    { lat: -7.25, lon: 112.75 }, // Index 0: Indonesia Launchpad
+    { lat: -7.25, lon: 112.75 },
     { lat: -6.2, lon: 106.8 },
     { lat: 1.35, lon: 103.8 },
     { lat: 35.68, lon: 139.69 },
@@ -294,9 +385,7 @@ function initPhotorealisticEarth(): void {
     laserArcs.push(createLaserArc(i));
   }
 
-  /* =====================================================================
-     FULL-VIEWPORT REALISTIC 3D ROCKET OVERLAY
-     ===================================================================== */
+  /* Full-Viewport Realistic 3D Rocket Overlay */
   const overlayCanvas = document.createElement('canvas');
   overlayCanvas.style.position = 'fixed';
   overlayCanvas.style.inset = '0';
@@ -531,7 +620,6 @@ function initPhotorealisticEarth(): void {
     if (rocketActive) return;
 
     const rect = renderer.domElement.getBoundingClientRect();
-    // Skip launch if Earth container is scrolled out of the visible viewport
     if (rect.bottom < 80 || rect.top > window.innerHeight) return;
 
     let launchScreenX = rect.left + rect.width * 0.52;
@@ -566,6 +654,7 @@ function initPhotorealisticEarth(): void {
 
     shockMat.opacity = 0.95;
     shockRing.scale.setScalar(1);
+    sfx.playRocketLaunch();
   }
 
   setTimeout(triggerRocketLaunch, 2500);
@@ -751,7 +840,10 @@ function setupMobileNav(): void {
   const links = document.getElementById('nav-links');
   if (!toggle || !links) return;
 
-  toggle.addEventListener('click', () => links.classList.toggle('open'));
+  toggle.addEventListener('click', () => {
+    sfx.playUiClick(520);
+    links.classList.toggle('open');
+  });
   links.querySelectorAll('a').forEach((a) => {
     a.addEventListener('click', () => links.classList.remove('open'));
   });
@@ -865,6 +957,73 @@ function renderServices(services: ServiceItem[]): void {
     .join('');
 }
 
+/* Tailored Interactive UI Mockups + Desktop/Mobile Toggle per Project */
+function getProjectMockupHTML(p: ProjectItem): string {
+  const titleLower = p.title.toLowerCase();
+
+  if (titleLower.includes('klinpro') || titleLower.includes('laundry')) {
+    return `
+      <div class="frame-top">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="frame-url">klinpro-express.io</span>
+      </div>
+      <div class="ui-mock-body">
+        <div class="ui-banner">🧺 Kalkulator Kiloan & Express</div>
+        <div class="ui-grid">
+          <div class="ui-widget">Cuci Kering</div>
+          <div class="ui-widget">Setrika Uap</div>
+          <div class="ui-widget ui-chip-hide">Order WA</div>
+        </div>
+      </div>`;
+  }
+
+  if (titleLower.includes('tokobuk') || titleLower.includes('toko')) {
+    return `
+      <div class="frame-top">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="frame-url">tokobukyul.store</span>
+      </div>
+      <div class="ui-mock-body">
+        <div class="ui-banner">📚 Katalog Buku & Checkout</div>
+        <div class="ui-grid">
+          <div class="ui-widget">Best Seller</div>
+          <div class="ui-widget">Keranjang</div>
+          <div class="ui-widget ui-chip-hide">Promo</div>
+        </div>
+      </div>`;
+  }
+
+  if (titleLower.includes('bizsnap') || p.category === 'system') {
+    return `
+      <div class="frame-top">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="frame-url">bizsnap.id/directory</span>
+      </div>
+      <div class="ui-mock-body">
+        <div class="ui-banner">📍 Direktori Cafe & Bisnis Lokal</div>
+        <div class="ui-grid">
+          <div class="ui-widget">Malang</div>
+          <div class="ui-widget">Batu</div>
+          <div class="ui-widget ui-chip-hide">Jawa</div>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="frame-top">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <span class="frame-url">vector-hd.svg</span>
+    </div>
+    <div class="ui-mock-body">
+      <div class="ui-banner">✒️ Kurva Bezier & Print-Ready</div>
+      <div class="ui-grid">
+        <div class="ui-widget">SVG / EPS</div>
+        <div class="ui-widget">CMYK / RGB</div>
+        <div class="ui-widget ui-chip-hide">300 DPI</div>
+      </div>
+    </div>`;
+}
+
 function renderProjects(projects: ProjectItem[], filter: string): void {
   const container = document.getElementById('projects-grid');
   if (!container) return;
@@ -877,12 +1036,13 @@ function renderProjects(projects: ProjectItem[], filter: string): void {
       (p) => `
       <article class="project-card">
         <div>
-          <div class="mockup-3d">
-            <div class="win-dots"><span></span><span></span><span></span></div>
-            <div class="win-bars">
-              <div class="bar-main"></div>
-              <div class="bar-sub"></div>
-              <div class="bar-grid"><div></div><div></div><div></div></div>
+          <div class="preview-stage">
+            <div class="device-toggle">
+              <button type="button" class="dev-btn active" data-mode="desktop">🖥 Desktop</button>
+              <button type="button" class="dev-btn" data-mode="mobile">📱 HP</button>
+            </div>
+            <div class="device-frame">
+              ${getProjectMockupHTML(p)}
             </div>
           </div>
           <span class="p-badge">${p.badge}</span>
@@ -900,17 +1060,83 @@ function renderProjects(projects: ProjectItem[], filter: string): void {
       </article>`
     )
     .join('');
+
+  // Wire Desktop / Mobile switcher inside each card
+  container.querySelectorAll<HTMLElement>('.preview-stage').forEach((stage) => {
+    const frame = stage.querySelector<HTMLElement>('.device-frame');
+    const btns = stage.querySelectorAll<HTMLButtonElement>('.dev-btn');
+    if (!frame) return;
+
+    btns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        sfx.playUiClick(620);
+        btns.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        frame.classList.toggle('mobile-mode', btn.dataset.mode === 'mobile');
+      });
+    });
+  });
 }
 
 function setupProjectFilters(projects: ProjectItem[]): void {
   const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
+      sfx.playUiClick(580);
       buttons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       renderProjects(projects, btn.dataset.filter || 'all');
     });
   });
+}
+
+/* Social Proof / Verified Track Record */
+function renderTestimonials(): void {
+  const container = document.getElementById('reviews-grid');
+  if (!container) return;
+
+  const reviews = [
+    {
+      quote:
+        '"Tampilan website usaha kami langsung naik kelas, ringan dibuka di HP pelanggan, dan fitur kalkulator otomatisnya bikin order lewat WhatsApp jauh lebih praktis."',
+      name: 'Owner KlinPro Laundry',
+      role: 'UMKM Jasa & Layanan',
+      platform: 'WEB CUSTOM',
+    },
+    {
+      quote:
+        '"Logo lama yang pecah direkonstruksi ulang jadi vektor super tajam. Garisnya rapi banget dan file master lengkap siap cetak ukuran spanduk besar."',
+      name: 'Klien Desain Identitas',
+      role: 'Brand & Retail',
+      platform: 'FASTWORK ✓',
+    },
+    {
+      quote:
+        '"Komunikasi responsif, struktur katalog bersih, dan revisi dikerjakan cepat sesuai arahan. Sangat direkomendasikan untuk pengembangan web bisnis."',
+      name: 'Pengelola Katalog Online',
+      role: 'E-Commerce & Direktori',
+      platform: 'VERIFIED ORDER',
+    },
+  ];
+
+  container.innerHTML = reviews
+    .map(
+      (r) => `
+      <article class="review-card">
+        <div>
+          <div class="stars">★★★★★</div>
+          <blockquote>${r.quote}</blockquote>
+        </div>
+        <div class="reviewer">
+          <div>
+            <div class="rev-name">${r.name}</div>
+            <div class="rev-role">${r.role}</div>
+          </div>
+          <span class="rev-platform">${r.platform}</span>
+        </div>
+      </article>`
+    )
+    .join('');
 }
 
 function setupVectorSlider(): void {
@@ -928,37 +1154,114 @@ function setupVectorSlider(): void {
   slider.addEventListener('input', update);
 }
 
+/* Dual-Currency Estimator (IDR / USD) + Structured WhatsApp Brief */
 function setupEstimator(): void {
   const checkboxes = document.querySelectorAll<HTMLInputElement>('.est-check');
+  const currButtons = document.querySelectorAll<HTMLButtonElement>('.curr-btn');
+  const priceDisplay = document.getElementById('est-price');
   const timeDisplay = document.getElementById('est-days');
+  const brandInput = document.getElementById('client-brand') as HTMLInputElement | null;
+  const notesInput = document.getElementById('client-notes') as HTMLTextAreaElement | null;
   const sendBtn = document.getElementById('est-wa-btn');
-  if (!timeDisplay || !sendBtn) return;
+
+  if (!priceDisplay || !timeDisplay || !sendBtn) return;
+
+  let activeCurrency: 'IDR' | 'USD' = 'IDR';
+
+  const formatMoney = (amount: number, curr: 'IDR' | 'USD'): string => {
+    if (curr === 'IDR') {
+      return 'Rp ' + amount.toLocaleString('id-ID');
+    }
+    return '$' + amount.toLocaleString('en-US') + ' USD';
+  };
 
   const calculate = () => {
     let totalDays = 0;
+    let totalCost = 0;
     const selected: string[] = [];
 
     checkboxes.forEach((cb) => {
       if (cb.checked) {
         totalDays += Number(cb.dataset.days || 0);
+        totalCost += Number(
+          activeCurrency === 'IDR' ? cb.dataset.idr || 0 : cb.dataset.usd || 0
+        );
         selected.push(cb.value);
       }
     });
 
-    timeDisplay.textContent = totalDays > 0 ? `${totalDays} Hari Kerja` : 'Pilih Modul';
-    return selected;
+    priceDisplay.textContent =
+      totalCost > 0
+        ? formatMoney(totalCost, activeCurrency)
+        : activeCurrency === 'IDR'
+        ? 'Rp 0'
+        : '$0 USD';
+
+    timeDisplay.textContent =
+      totalDays > 0
+        ? activeCurrency === 'IDR'
+          ? `⏱ Estimasi: ${totalDays} Hari Kerja`
+          : `⏱ Est. Delivery: ${totalDays} Business Days`
+        : 'Pilih minimal 1 modul';
+
+    return { selected, totalDays, totalCost };
   };
 
-  checkboxes.forEach((cb) => cb.addEventListener('change', calculate));
+  currButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      sfx.playUiClick(640);
+      currButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCurrency = (btn.dataset.curr as 'IDR' | 'USD') || 'IDR';
+
+      document.querySelectorAll<HTMLElement>('.meta-tag').forEach((tag) => {
+        tag.textContent =
+          activeCurrency === 'IDR' ? tag.dataset.idr || '' : tag.dataset.usd || '';
+      });
+
+      calculate();
+    });
+  });
+
+  checkboxes.forEach((cb) =>
+    cb.addEventListener('change', () => {
+      sfx.playUiClick(520);
+      calculate();
+    })
+  );
+
   calculate();
 
   sendBtn.addEventListener('click', () => {
-    const items = calculate();
-    const listText = items.length > 0 ? items.join(', ') : 'Konsultasi Umum';
-    const msg = encodeURIComponent(
-      `Halo Nans Dev, saya tertarik diskusi proyek untuk modul: ${listText}.`
+    sfx.playUiClick(740);
+    const { selected, totalDays, totalCost } = calculate();
+    const brand = brandInput?.value.trim() || '-';
+    const notes = notesInput?.value.trim() || '-';
+    const modulesList =
+      selected.length > 0 ? selected.map((m) => `• ${m}`).join('\n') : '• Konsultasi Custom';
+    const estPriceStr = formatMoney(totalCost, activeCurrency);
+
+    const briefMessage =
+      activeCurrency === 'IDR'
+        ? `Halo *Nans Dev*, saya ingin mengajukan brief proyek:\n\n` +
+          `*Nama / Brand:* ${brand}\n` +
+          `*Modul Dipilih:*\n${modulesList}\n\n` +
+          `*Estimasi Biaya:* ${estPriceStr}\n` +
+          `*Estimasi Waktu:* ${totalDays} Hari Kerja\n` +
+          `*Catatan:* ${notes}\n\n` +
+          `Mohon info langkah selanjutnya ya!`
+        : `Hello *Nans Dev*, I would like to discuss a project brief:\n\n` +
+          `*Name / Brand:* ${brand}\n` +
+          `*Selected Modules:*\n${modulesList}\n\n` +
+          `*Estimated Budget:* ${estPriceStr}\n` +
+          `*Estimated Delivery:* ${totalDays} Business Days\n` +
+          `*Notes:* ${notes}\n\n` +
+          `Looking forward to working together!`;
+
+    window.open(
+      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(briefMessage)}`,
+      '_blank'
     );
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
   });
 }
 
