@@ -208,8 +208,8 @@
       if (!parent || langBox.contains(parent)) continue;
       if (['SCRIPT', 'STYLE', 'CODE', 'PRE', 'NOSCRIPT'].includes(parent.tagName)) continue;
       const clean = (current.nodeValue || '').replace(/\s+/g, ' ').trim();
-      if (!clean || clean.length < 3 || /^[\d\s.%+\-/•⌘K()]+$/.test(clean)) continue;
-      if (/^(NANS|DEV|HTML5|CSS3|JavaScript|TypeScript|WebGL2|SCSS|SVG|99\.9%|100\/100)$/i.test(clean)) continue;
+      if (!clean || clean.length < 3 || /^[\d\s.%+\-/•⌘K()]+$/.test(clean)) continue;    
+      if (/^(NANS|DEV|Install App|HTML5|CSS3|JavaScript|TypeScript|WebGL2|SCSS|SVG|PWA|SEO|99\.9%|100\/100)$/i.test(clean)) continue;  
       nodes.push({ node: current as Text, orig: clean });
     }
 
