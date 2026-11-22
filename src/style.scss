@@ -1527,3 +1527,27 @@ footer {
 @keyframes aeLetterReveal { to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); } }
 @keyframes aeSubReveal { to { opacity: 1; transform: translateY(0); } }
 @keyframes fillProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+
+/* =========================================================
+   MOBILE RESPONSIVE PATCH (<= 768px)
+   ========================================================= */
+@media (max-width: 768px) {
+  .hero-3d-stage {
+    min-height: 330px;
+    padding-bottom: 48px;
+  }
+
+  .vector-layer small {
+    font-size: 0.62rem !important;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .est-summary {
+    padding-bottom: 58px !important;
+  }
+}
