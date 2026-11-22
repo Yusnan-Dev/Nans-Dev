@@ -5,10 +5,60 @@
     });
   }
 
+  // Suntikkan CSS Responsif Desktop agar Navbar Sejajar & Roket Tidak Kegedean
+  const fixStyle = document.createElement('style');
+  fixStyle.textContent = `
+    @media (min-width: 769px) {
+      header nav, .nav-links {
+        display: flex !important;
+        align-items: center !important;
+        gap: 14px !important;
+        margin-left: 18px !important;
+      }
+      header nav a, .nav-links a {
+        white-space: nowrap !important;
+        font-size: 13px !important;
+      }
+      #nans-addon-controls {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        padding: 0 !important;
+        margin: 0 0 0 6px !important;
+      }
+      #nans-lang-switcher {
+        width: auto !important;
+        max-width: 135px !important;
+        margin-top: 0 !important;
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+      }
+      #nans-install-btn {
+        width: auto !important;
+        margin-top: 0 !important;
+        padding: 6px 11px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+      }
+      /* Perkecil & rapikan posisi roket 3D saat mode desktop */
+      #rocket-canvas, .rocket-3d, [class*="rocket"], [id*="rocket"] {
+        max-width: 110px !important;
+        max-height: 110px !important;
+        transform: scale(0.48) !important;
+        transform-origin: bottom right !important;
+        right: 24px !important;
+        left: auto !important;
+        pointer-events: none !important;
+      }
+    }
+  `;
+  document.head.appendChild(fixStyle);
+
   let deferredPrompt: any = null;
   const installItem = document.createElement('button');
+  installItem.id = 'nans-install-btn';
   installItem.type = 'button';
-  installItem.textContent = '📲 Install App (APK)';
+  installItem.textContent = '📲 Install App';
   Object.assign(installItem.style, {
     display: 'none', width: '100%', textAlign: 'left', padding: '10px 14px',
     marginTop: '8px', borderRadius: '10px', border: '1px solid #38bdf8',
@@ -19,7 +69,7 @@
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    installItem.style.display = 'block';
+    installItem.style.display = 'inline-flex';
   });
 
   installItem.addEventListener('click', async () => {
@@ -30,15 +80,14 @@
     deferredPrompt = null;
   });
 
-  // Kamus Instan 0ms untuk Istilah Teknis & Hero Utama Nans-Dev
   const instantDict: Record<string, Record<string, string>> = {
     en: {
       'Menu Cepat': 'Quick Menu', 'Arsitektur': 'Architecture', 'Portofolio': 'Portfolio',
       'AI Scope & Estimasi': 'AI Scope & Estimator',
       '2 Slot Proyek Tersedia Minggu Ini': '2 Project Slots Available This Week',
-      'Membangun Sistem Web & Identitas Visual Presisi Tinggi.': 'Engineering High-Precision Web Systems & Visual Identity.',
+      'Membangun Sistem Web & Identitas Visual Standar Korporat.': 'Engineering Corporate-Standard Web Systems & Visual Identity.',
       'Rakit Proyek Anda': 'Build Your Project', 'Eksplorasi Demo ↗': 'Explore Demos ↗',
-      'Arsitektur Layanan Digital': 'Digital Service Architecture',
+      'Infrastruktur Layanan Digital': 'Digital Service Infrastructure',
       'Arsitektur Pipeline & Audit Performa Live': 'Pipeline Architecture & Live Performance Audit',
       'Live Portfolio & Deployments': 'Live Portfolio & Deployments', 'Semua Sistem': 'All Systems'
     },
@@ -46,9 +95,9 @@
       'Menu Cepat': 'クイックメニュー', 'Arsitektur': 'アーキテクチャ', 'Portofolio': 'ポートフォリオ',
       'AI Scope & Estimasi': 'AI見積もり・要件定義',
       '2 Slot Proyek Tersedia Minggu Ini': '今週対応可能なプロジェクト枠：残り2件',
-      'Membangun Sistem Web & Identitas Visual Presisi Tinggi.': '高精度Webシステムとビジュアルアイデンティティの構築。',
+      'Membangun Sistem Web & Identitas Visual Standar Korporat.': '法人基準のWebシステムとビジュアルアイデンティティの構築。',
       'Rakit Proyek Anda': 'プロジェクトを相談する', 'Eksplorasi Demo ↗': 'デモを見る ↗',
-      'Arsitektur Layanan Digital': 'デジタルサービス設計',
+      'Infrastruktur Layanan Digital': 'デジタルサービス基盤',
       'Arsitektur Pipeline & Audit Performa Live': 'パイプライン設計とリアルタイム性能監査',
       'Live Portfolio & Deployments': '実績とライブシステム', 'Semua Sistem': 'すべて表示'
     },
@@ -56,9 +105,9 @@
       'Menu Cepat': 'القائمة السريعة', 'Arsitektur': 'الهندسة البرمجية', 'Portofolio': 'أعمالنا',
       'AI Scope & Estimasi': 'تقدير التكلفة بالذكاء الاصطناعي',
       '2 Slot Proyek Tersedia Minggu Ini': 'متاح مكانان لمشاريع جديدة هذا الأسبوع',
-      'Membangun Sistem Web & Identitas Visual Presisi Tinggi.': 'بناء أنظمة الويب عالية الدقة والهوية البصرية المتكاملة.',
+      'Membangun Sistem Web & Identitas Visual Standar Korporat.': 'بناء أنظمة الويب والهوية البصرية بمعايير الشركات.',
       'Rakit Proyek Anda': 'ابدأ مشروعك الآن', 'Eksplorasi Demo ↗': 'استكشف العروض ↗',
-      'Arsitektur Layanan Digital': 'هندسة الخدمات الرقمية',
+      'Infrastruktur Layanan Digital': 'البنية التحتية للخدمات الرقمية',
       'Arsitektur Pipeline & Audit Performa Live': 'هندسة النظام وتدقيق الأداء المباشر',
       'Live Portfolio & Deployments': 'معرض الأعمال والأنظمة الحية', 'Semua Sistem': 'جميع الأنظمة'
     },
@@ -66,9 +115,9 @@
       'Menu Cepat': 'Menu Rapide', 'Arsitektur': 'Architecture', 'Portofolio': 'Portfolio',
       'AI Scope & Estimasi': 'Estimation & Scope IA',
       '2 Slot Proyek Tersedia Minggu Ini': '2 Créneaux Projets Disponibles Cette Semaine',
-      'Membangun Sistem Web & Identitas Visual Presisi Tinggi.': 'Architecture Web Haute Précision & Identité Visuelle.',
+      'Membangun Sistem Web & Identitas Visual Standar Korporat.': 'Architecture Web & Identité Visuelle aux Standards Corporate.',
       'Rakit Proyek Anda': 'Lancer Votre Projet', 'Eksplorasi Demo ↗': 'Explorer les Démos ↗',
-      'Arsitektur Layanan Digital': 'Architecture des Services Numériques',
+      'Infrastruktur Layanan Digital': 'Infrastructure des Services Numériques',
       'Arsitektur Pipeline & Audit Performa Live': 'Architecture Pipeline & Audit de Performance',
       'Live Portfolio & Deployments': 'Portfolio & Déploiements Live', 'Semua Sistem': 'Tous les Systèmes'
     },
@@ -76,15 +125,14 @@
       'Menu Cepat': 'Menú Rápido', 'Arsitektur': 'Arquitectura', 'Portofolio': 'Portafolio',
       'AI Scope & Estimasi': 'Alcance y Cotizador IA',
       '2 Slot Proyek Tersedia Minggu Ini': '2 Cupos de Proyecto Disponibles Esta Semana',
-      'Membangun Sistem Web & Identitas Visual Presisi Tinggi.': 'Construyendo Sistemas Web de Alta Precisión e Identidad Visual.',
+      'Membangun Sistem Web & Identitas Visual Standar Korporat.': 'Construyendo Sistemas Web e Identidad Visual Corporativa.',
       'Rakit Proyek Anda': 'Armar Tu Proyecto', 'Eksplorasi Demo ↗': 'Explorar Demos ↗',
-      'Arsitektur Layanan Digital': 'Arquitectura de Servicios Digitales',
+      'Infrastruktur Layanan Digital': 'Infraestructura de Servicios Digitales',
       'Arsitektur Pipeline & Audit Performa Live': 'Arquitectura Pipeline y Auditoría en Vivo',
       'Live Portfolio & Deployments': 'Portafolio y Despliegues en Vivo', 'Semua Sistem': 'Todos los Sistemas'
     }
   };
 
-  // Cache terjemahan otomatis agar cepat & hemat jaringan
   const trCache: Record<string, string> = JSON.parse(localStorage.getItem('nans_tr_cache') || '{}');
   let saveTimer: any = null;
   const saveCache = () => {
@@ -121,12 +169,12 @@
   });
 
   [
-    ['id', '🌐 Bahasa: 🇮🇩 Indonesia (ID)'],
-    ['en', '🌐 Language: 🇺🇸 English (EN)'],
-    ['ja', '🌐 言語: 🇯🇵 日本語 (JP)'],
-    ['ar', '🌐 اللغة: 🇸🇦 العربية (AR)'],
-    ['fr', '🌐 Langue: 🇫🇷 Français (FR)'],
-    ['es', '🌐 Idioma: 🇪🇸 Español (ES)']
+    ['id', '🌐 🇮🇩 ID'],
+    ['en', '🌐 🇺🇸 EN'],
+    ['ja', '🌐 🇯🇵 JP'],
+    ['ar', '🌐 🇸🇦 AR'],
+    ['fr', '🌐 🇫🇷 FR'],
+    ['es', '🌐 🇪🇸 ES']
   ].forEach(([val, label]) => {
     const opt = document.createElement('option');
     opt.value = val;
@@ -137,8 +185,6 @@
   const applyFullPageLang = async (code: string) => {
     document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
     const fastMap = instantDict[code] || {};
-
-    // Kumpulkan semua text node yang valid dari atas sampai footer
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     const nodes: { node: Text; orig: string }[] = [];
     let current: Node | null;
@@ -147,13 +193,11 @@
       if (!parent || langBox.contains(parent)) continue;
       if (['SCRIPT', 'STYLE', 'CODE', 'PRE', 'NOSCRIPT'].includes(parent.tagName)) continue;
       const clean = (current.nodeValue || '').replace(/\s+/g, ' ').trim();
-      // Lewati angka murni, simbol, atau kode teknis pendek
       if (!clean || clean.length < 3 || /^[\d\s.%+\-/•⌘K()]+$/.test(clean)) continue;
       if (/^(NANS|DEV|HTML5|CSS3|JavaScript|TypeScript|WebGL2|SCSS|SVG|99\.9%|100\/100)$/i.test(clean)) continue;
       nodes.push({ node: current as Text, orig: clean });
     }
 
-    // 1. Terapkan kamus instan dulu agar responsif 0ms
     const pending: { node: Text; orig: string }[] = [];
     for (const item of nodes) {
       if (fastMap[item.orig]) {
@@ -165,11 +209,9 @@
       }
     }
 
-    // 2. Terjemahkan otomatis seluruh sisa teks halaman sampai bawah (paralel ringan)
-    const batchSize = 8;
-    for (let i = 0; i < pending.length; i += batchSize) {
+    for (let i = 0; i < pending.length; i += 8) {
       if ((localStorage.getItem('nans_selected_lang') || 'id') !== code) break;
-      const chunk = pending.slice(i, i + batchSize);
+      const chunk = pending.slice(i, i + 8);
       await Promise.all(
         chunk.map(async ({ node, orig }) => {
           const translated = await translateText(orig, code);
@@ -179,13 +221,6 @@
         })
       );
     }
-
-    // Terjemahkan juga placeholder input/textarea di bagian AI Scope & Estimasi
-    document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(async (el) => {
-      const inp = el as HTMLInputElement;
-      const ph = inp.placeholder.trim();
-      if (ph) inp.placeholder = await translateText(ph, code);
-    });
   };
 
   ['click', 'touchstart', 'mousedown'].forEach((evt) =>
@@ -212,6 +247,7 @@
 
     if (navContainer && !navContainer.contains(langBox)) {
       const wrapper = document.createElement('div');
+      wrapper.id = 'nans-addon-controls';
       wrapper.style.padding = '8px 0 4px';
       wrapper.appendChild(langBox);
       wrapper.appendChild(installItem);
@@ -235,3 +271,4 @@
     }, 2200);
   });
 })();
+          
