@@ -1003,10 +1003,38 @@ function setupCardSpotlight(): void {
 }
 
 function setupMobileNav(): void {
-  const toggle = document.getElementById('menu-toggle'), links = document.getElementById('nav-links');
+  const toggle = document.getElementById('menu-toggle');
+  const links = document.getElementById('nav-links');
   if (!toggle || !links) return;
-  toggle.addEventListener('click', () => { sfx.playUiClick(520); links.classList.toggle('open'); });
-  links.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => links.classList.remove('open')));
+
+  const setOpen = (open: boolean) => {
+    links.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = open ? '✕' : '☰';
+  };
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sfx.playUiClick(520);
+    setOpen(!links.classList.contains('open'));
+  });
+
+  links.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', () => setOpen(false));
+  });
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as Node | null;
+    if (links.classList.contains('open') && target && !links.contains(target) && !toggle.contains(target)) {
+      setOpen(false);
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && links.classList.contains('open')) {
+      setOpen(false);
+    }
+  });
 }
 
 function renderMetrics(metrics: MetricItem[]): void {

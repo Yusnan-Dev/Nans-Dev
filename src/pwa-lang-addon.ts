@@ -5,92 +5,65 @@
     });
   }
 
-  // CSS Responsif Navbar Desktop agar Sejajar & Tidak Terpotong di Tepi Kanan
   const fixStyle = document.createElement('style');
   fixStyle.textContent = `
-    @media (min-width: 769px) {
-      header, .navbar, .nav-container {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-        max-width: 100vw !important;
-        box-sizing: border-box !important;
-      }
-      header nav, .nav-links {
-        display: flex !important;
-        align-items: center !important;
-        gap: 10px !important;
-        margin-left: 10px !important;
-      }
-      header nav a, .nav-links a {
-        white-space: nowrap !important;
-        font-size: 12px !important;
-      }
-      #nans-addon-controls {
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 6px !important;
-        padding: 0 !important;
-        margin: 0 0 0 4px !important;
-      }
-      #nans-lang-switcher {
-        width: auto !important;
-        max-width: 115px !important;
-        margin-top: 0 !important;
-        padding: 5px 8px !important;
-        font-size: 11.5px !important;
-      }
-      #nans-install-btn {
-        width: auto !important;
-        margin-top: 0 !important;
-        padding: 5px 9px !important;
-        font-size: 11.5px !important;
-        white-space: nowrap !important;
-      }
-    }
     html, body {
       overflow-x: hidden !important;
       max-width: 100% !important;
     }
-    #build-time {
-      white-space: nowrap !important;
-      font-size: 11px !important;
+    #nans-addon-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      padding-top: 10px;
+      margin-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
-    @media (max-width: 1180px) {
-      #build-time {
-        display: none !important;
-      }
-      header nav, .nav-links {
-        gap: 6px !important;
-        margin-left: 6px !important;
-      }
-      header nav a, .nav-links a {
-        font-size: 10.5px !important;
-      }
-      #cmd-trigger {
-        padding: 4px 7px !important;
-        font-size: 10.5px !important;
-        white-space: nowrap !important;
-      }
-      #cmd-trigger kbd, #cmd-trigger span:last-child {
-        display: none !important;
-      }
+    html[data-theme="light"] #nans-addon-controls {
+      border-top-color: rgba(15, 23, 42, 0.1);
+    }
+    #nans-lang-switcher {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: #0b1324;
+      color: #f8fafc;
+      font-weight: 600;
+      font-size: 13.5px;
+      cursor: pointer;
+      outline: none;
+    }
+    html[data-theme="light"] #nans-lang-switcher {
+      background: #f8fafc;
+      color: #0f172a;
+      border-color: rgba(15, 23, 42, 0.16);
+    }
+    #nans-install-btn {
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      color: #38bdf8;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
     }
   `;
   document.head.appendChild(fixStyle);
 
-  const svgIcon = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;flex-shrink:0;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
+  const svgIcon = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;flex-shrink:0;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
 
   let deferredPrompt: any = null;
   const installItem = document.createElement('button');
   installItem.id = 'nans-install-btn';
   installItem.type = 'button';
   installItem.innerHTML = `${svgIcon}Install App`;
-  Object.assign(installItem.style, {
-    display: 'none', width: '100%', textAlign: 'left', padding: '10px 14px',
-    marginTop: '8px', borderRadius: '10px', border: '1px solid #38bdf8',
-    background: 'rgba(56, 189, 248, 0.12)', color: '#38bdf8',
-    fontWeight: '700', fontSize: '14px', cursor: 'pointer'
-  });
+  installItem.style.display = 'none';
 
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -115,7 +88,7 @@
       'Rakit Proyek Anda': 'Build Your Project', 'Eksplorasi Demo ↗': 'Explore Demos ↗',
       'Infrastruktur Layanan Digital': 'Digital Service Infrastructure',
       'Arsitektur Pipeline & Audit Performa Live': 'Pipeline Architecture & Live Performance Audit',
-      'Live Portfolio & Deployments': 'Live Portfolio & Deployments', 'Semua Sistem': 'All Systems'
+      'Portofolio & Arsitektur Live': 'Live Portfolio & Architecture', 'Semua Sistem': 'All Systems'
     },
     ja: {
       'Menu Cepat': 'クイックメニュー', 'Arsitektur': 'アーキテクチャ', 'Portofolio': 'ポートフォリオ',
@@ -125,7 +98,7 @@
       'Rakit Proyek Anda': 'プロジェクトを相談する', 'Eksplorasi Demo ↗': 'デモを見る ↗',
       'Infrastruktur Layanan Digital': 'デジタルサービス基盤',
       'Arsitektur Pipeline & Audit Performa Live': 'パイプライン設計とリアルタイム性能監査',
-      'Live Portfolio & Deployments': '実績とライブシステム', 'Semua Sistem': 'すべて表示'
+      'Portofolio & Arsitektur Live': '実績とライブシステム', 'Semua Sistem': 'すべて表示'
     },
     ar: {
       'Menu Cepat': 'القائمة السريعة', 'Arsitektur': 'الهندسة البرمجية', 'Portofolio': 'أعمالنا',
@@ -135,7 +108,7 @@
       'Rakit Proyek Anda': 'ابدأ مشروعك الآن', 'Eksplorasi Demo ↗': 'استكشف العروض ↗',
       'Infrastruktur Layanan Digital': 'البنية التحتية للخدمات الرقمية',
       'Arsitektur Pipeline & Audit Performa Live': 'هندسة النظام وتدقيق الأداء المباشر',
-      'Live Portfolio & Deployments': 'معرض الأعمال والأنظمة الحية', 'Semua Sistem': 'جميع الأنظمة'
+      'Portofolio & Arsitektur Live': 'معرض الأعمال والأنظمة الحية', 'Semua Sistem': 'جميع الأنظمة'
     },
     fr: {
       'Menu Cepat': 'Menu Rapide', 'Arsitektur': 'Architecture', 'Portofolio': 'Portfolio',
@@ -145,7 +118,7 @@
       'Rakit Proyek Anda': 'Lancer Votre Projet', 'Eksplorasi Demo ↗': 'Explorer les Démos ↗',
       'Infrastruktur Layanan Digital': 'Infrastructure des Services Numériques',
       'Arsitektur Pipeline & Audit Performa Live': 'Architecture Pipeline & Audit de Performance',
-      'Live Portfolio & Deployments': 'Portfolio & Déploiements Live', 'Semua Sistem': 'Tous les Systèmes'
+      'Portofolio & Arsitektur Live': 'Portfolio & Déploiements Live', 'Semua Sistem': 'Tous les Systèmes'
     },
     es: {
       'Menu Cepat': 'Menú Rápido', 'Arsitektur': 'Arquitectura', 'Portofolio': 'Portafolio',
@@ -155,7 +128,7 @@
       'Rakit Proyek Anda': 'Armar Tu Proyecto', 'Eksplorasi Demo ↗': 'Explorar Demos ↗',
       'Infrastruktur Layanan Digital': 'Infraestructura de Servicios Digitales',
       'Arsitektur Pipeline & Audit Performa Live': 'Arquitectura Pipeline y Auditoría en Vivo',
-      'Live Portfolio & Deployments': 'Portafolio y Despliegues en Vivo', 'Semua Sistem': 'Todos los Sistemas'
+      'Portofolio & Arsitektur Live': 'Portafolio y Despliegues en Vivo', 'Semua Sistem': 'Todos los Sistemas'
     }
   };
 
@@ -188,11 +161,6 @@
   const langBox = document.createElement('select');
   langBox.id = 'nans-lang-switcher';
   langBox.setAttribute('aria-label', 'Pilih Bahasa');
-  Object.assign(langBox.style, {
-    width: '100%', padding: '10px 12px', marginTop: '10px', borderRadius: '10px',
-    border: '1px solid rgba(56, 189, 248, 0.35)', background: '#0b1324',
-    color: '#f8fafc', fontWeight: '600', fontSize: '14px', cursor: 'pointer', outline: 'none'
-  });
 
   [
     ['id', '🌐 🇮🇩 ID'],
@@ -266,16 +234,10 @@
   });
 
   const mountInsideHamburger = () => {
-    const navContainer =
-      document.querySelector('nav ul, .nav-links, .mobile-menu, header nav') ||
-      Array.from(document.querySelectorAll('a')).find((a) =>
-        /Portofolio|Vector Lab/i.test(a.textContent || '')
-      )?.parentElement?.parentElement;
-
+    const navContainer = document.getElementById('nav-links') || document.querySelector('.nav-links, header nav');
     if (navContainer && !navContainer.contains(langBox)) {
       const wrapper = document.createElement('div');
       wrapper.id = 'nans-addon-controls';
-      wrapper.style.padding = '8px 0 4px';
       wrapper.appendChild(langBox);
       wrapper.appendChild(installItem);
       navContainer.appendChild(wrapper);
@@ -287,15 +249,5 @@
     const saved = localStorage.getItem('nans_selected_lang') || 'id';
     langBox.value = saved;
     if (saved !== 'id') setTimeout(() => applyFullPageLang(saved), 650);
-
-    setTimeout(() => {
-      const pre = document.getElementById('nans-preloader');
-      if (pre) {
-        pre.style.opacity = '0';
-        pre.style.pointerEvents = 'none';
-        setTimeout(() => pre.remove(), 400);
-      }
-    }, 2200);
   });
 })();
-      

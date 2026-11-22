@@ -99,20 +99,22 @@ body {
   padding: 0 5%;
 }
 
-/* Navbar */
+/* Navbar — Unified Dropdown Hamburger (Desktop & Mobile) */
 .navbar {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba($bg-base, 0.82);
+  background: rgba($bg-base, 0.86);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid $border-subtle;
 
   .nav-inner {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 68px;
+    gap: 10px;
   }
 
   .brand {
@@ -124,6 +126,7 @@ body {
     letter-spacing: 0.5px;
     text-decoration: none;
     color: $text-primary;
+    flex-shrink: 0;
 
     .logo-mark {
       width: 30px;
@@ -138,32 +141,67 @@ body {
     span { color: $cyan; }
   }
 
-  .nav-links {
+  .nav-right-cluster {
     display: flex;
-    gap: 1.6rem;
     align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    min-width: 0;
+  }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 295px;
+    background: rgba(10, 15, 28, 0.96);
+    backdrop-filter: blur(20px);
+    border: 1px solid $border-glow;
+    border-radius: 16px;
+    padding: 12px;
+    flex-direction: column;
+    gap: 4px;
+    align-items: stretch;
+    box-shadow: 0 24px 55px rgba(0, 0, 0, 0.72);
+    z-index: 150;
+
+    &.open {
+      display: flex;
+      animation: navDropIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
     a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       color: $text-secondary;
       text-decoration: none;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       font-weight: 600;
-      transition: color 0.2s;
-      &:hover { color: $text-primary; }
+      padding: 10px 12px;
+      border-radius: 10px;
+      transition: background 0.18s, color 0.18s;
+
+      &:hover {
+        background: rgba($cyan, 0.12);
+        color: $text-primary;
+      }
     }
   }
 
   .build-badge {
     font-family: monospace;
     font-size: 0.72rem;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: 5px 10px;
+    border-radius: 8px;
     background: rgba($emerald, 0.1);
     color: $emerald;
     border: 1px solid rgba($emerald, 0.25);
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
 
     .dot {
       width: 6px;
@@ -175,35 +213,63 @@ body {
   }
 
   .menu-toggle {
-    display: none;
-    background: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid $border-subtle;
     color: $text-primary;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 1.1rem;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    line-height: 1;
     cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s, background 0.2s;
+
+    &:hover,
+    &[aria-expanded="true"] {
+      border-color: $cyan;
+      background: rgba($cyan, 0.14);
+    }
+  }
+}
+
+@keyframes navDropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 1040px) {
+  .navbar .build-badge {
+    display: none;
   }
 }
 
 @media (max-width: 768px) {
   .navbar {
-    .nav-links {
-      display: none;
-      position: absolute;
-      top: 68px;
-      left: 0;
-      right: 0;
-      background: $bg-surface;
-      border-bottom: 1px solid $border-subtle;
-      flex-direction: column;
-      padding: 1.25rem 5%;
-      gap: 1rem;
-      align-items: flex-start;
-      &.open { display: flex; }
+    .nav-right-cluster {
+      gap: 6px;
     }
-    .menu-toggle { display: block; }
-    .build-badge { display: none; }
+
+    .nav-links {
+      top: 68px;
+      left: -5.6%;
+      right: -5.6%;
+      width: auto;
+      border-radius: 0 0 18px 18px;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      padding: 1rem 5.6% 1.25rem;
+    }
   }
 }
 
@@ -1596,10 +1662,6 @@ footer {
 /* =========================================================
    TOP NAVBAR THEME SWITCHER + HAMBURGER SPACING + LIGHT MODE
    ========================================================= */
-.navbar .nav-inner {
-  gap: 10px;
-}
-
 .v4-nav-theme {
   display: inline-flex;
   align-items: center;
@@ -1624,6 +1686,7 @@ footer {
   font-size: 0.72rem;
   font-weight: 700;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.2s ease;
 
   &:hover {
@@ -1650,6 +1713,7 @@ footer {
   border: 1.5px solid rgba(255, 255, 255, 0.28);
   padding: 0;
   cursor: pointer;
+  flex-shrink: 0;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 
   &:hover {
@@ -1664,36 +1728,13 @@ footer {
 }
 
 @media (max-width: 768px) {
-  .navbar .nav-inner {
-    gap: 6px;
-  }
-
   .v4-nav-theme {
-    margin-left: auto;
     padding: 3px 7px;
     gap: 5px;
   }
 
-  .navbar .menu-toggle {
-    margin-left: 6px;
-    padding: 6px 10px;
-    flex-shrink: 0;
-  }
-}
-
-@media (max-width: 460px) {
-  .navbar .brand {
-    font-size: 1rem;
-    gap: 7px;
-
-    .logo-mark {
-      width: 26px;
-      height: 26px;
-    }
-  }
-
   .navbar .cmd-btn {
-    padding: 6px 8px;
+    padding: 7px 9px;
     span, kbd {
       display: none;
     }
@@ -1705,6 +1746,18 @@ footer {
 
   .v4-theme-mode-btn {
     padding: 4px 6px;
+  }
+}
+
+@media (max-width: 460px) {
+  .navbar .brand {
+    font-size: 0.98rem;
+    gap: 7px;
+
+    .logo-mark {
+      width: 26px;
+      height: 26px;
+    }
   }
 
   .v4-nav-swatch {
@@ -1727,7 +1780,7 @@ html[data-theme="light"] {
   }
 
   .navbar {
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.9);
     border-bottom-color: rgba(15, 23, 42, 0.1);
 
     .brand {
@@ -1735,14 +1788,16 @@ html[data-theme="light"] {
     }
 
     .nav-links {
-      @media (max-width: 768px) {
-        background: #ffffff;
-        border-bottom-color: rgba(15, 23, 42, 0.12);
-      }
+      background: rgba(255, 255, 255, 0.98);
+      border-color: rgba(15, 23, 42, 0.14);
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.14);
 
       a {
-        color: #475569;
-        &:hover { color: #0f172a; }
+        color: #334155;
+        &:hover {
+          background: rgba(14, 165, 233, 0.1);
+          color: #0f172a;
+        }
       }
     }
 
@@ -1818,38 +1873,53 @@ html[data-theme="light"] {
     color: #0f172a;
   }
 
-  .metric-card,
-  .service-card,
+  .metrics-strip {
+    background: rgba(15, 23, 42, 0.08);
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  }
+
+  .metric-box,
+  .bento-card,
   .blueprint-panel,
   .audit-panel,
   .vector-lab,
   .project-card,
-  .testimonial-card,
+  .review-card,
   .estimator-box {
     background: #ffffff;
     border-color: rgba(15, 23, 42, 0.1);
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
   }
 
-  .metric-card .m-label,
-  .service-card p,
+  .metric-box .val {
+    background: linear-gradient(90deg, #0f172a 20%, #0284c7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .metric-box .lbl,
+  .bento-card p,
   .project-card p,
-  .testimonial-card p,
+  .review-card blockquote,
+  .review-card .rev-role,
   .vector-lab p,
-  .audit-panel p {
+  .audit-panel .audit-sub {
     color: #475569;
   }
 
-  .service-card h3,
+  .bento-card h3,
   .project-card h3,
-  .testimonial-card .t-author strong,
-  .vector-lab h3,
-  .audit-panel h3 {
+  .review-card .rev-name,
+  .vector-lab h3 {
     color: #0f172a;
   }
 
-  .service-card .specs li,
-  .project-card .stack-tags span,
+  .bento-card .spec-list li {
+    color: #334155;
+  }
+
+  .project-card .tags span,
   .filter-btn {
     background: #f1f5f9;
     color: #334155;
@@ -1900,7 +1970,8 @@ html[data-theme="light"] {
   }
 
   .brief-inputs input,
-  .brief-inputs textarea {
+  .brief-inputs textarea,
+  .ai-scope-bar input {
     background: #f8fafc;
     color: #0f172a;
     border-color: rgba(15, 23, 42, 0.14);
@@ -1921,7 +1992,7 @@ html[data-theme="light"] {
     input { color: #0f172a; }
   }
 
-  .footer {
+  footer {
     border-top-color: rgba(15, 23, 42, 0.1);
     color: #64748b;
   }
