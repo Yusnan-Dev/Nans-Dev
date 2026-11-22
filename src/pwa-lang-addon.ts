@@ -5,10 +5,27 @@
     });
   }
 
-  // Suntikkan CSS Responsif Desktop agar Navbar Sejajar & Roket Tidak Kegedean
+  // Suntikkan CSS Responsif: Navbar Desktop Sejajar + Roket & Asap Tetap Mungil di Mobile & Desktop
   const fixStyle = document.createElement('style');
   fixStyle.textContent = `
+    /* Global (Mobile & Desktop): Roket & kepulan asap tetap proporsional saat mendekat */
+    #rocket-canvas, .rocket-3d, .rocket-overlay, [class*="rocket"], [id*="rocket"],
+    [class*="smoke"], [id*="smoke"], [class*="exhaust"] {
+      max-width: 140px !important;
+      max-height: 140px !important;
+      right: 16px !important;
+      left: auto !important;
+      opacity: 0.72 !important;
+      pointer-events: none !important;
+    }
+
     @media (min-width: 769px) {
+      #rocket-canvas, .rocket-3d, .rocket-overlay, [class*="rocket"], [id*="rocket"],
+      [class*="smoke"], [id*="smoke"], [class*="exhaust"] {
+        max-width: 175px !important;
+        max-height: 175px !important;
+        right: 28px !important;
+      }
       header nav, .nav-links {
         display: flex !important;
         align-items: center !important;
@@ -40,19 +57,28 @@
         font-size: 12px !important;
         white-space: nowrap !important;
       }
-      /* Perkecil & rapikan posisi roket 3D saat mode desktop */
-      #rocket-canvas, .rocket-3d, [class*="rocket"], [id*="rocket"] {
-        max-width: 110px !important;
-        max-height: 110px !important;
-        transform: scale(0.48) !important;
-        transform-origin: bottom right !important;
-        right: 24px !important;
-        left: auto !important;
-        pointer-events: none !important;
-      }
     }
   `;
   document.head.appendChild(fixStyle);
+
+  // Penahan skala dinamis di Mobile & Desktop saat roket melesat mendekat
+  const clampRocketZoom = () => {
+    const maxScale = window.innerWidth >= 769 ? 0.55 : 0.45;
+    document
+      .querySelectorAll('#rocket-canvas, .rocket-3d, .rocket-overlay, [class*="rocket"], [id*="rocket"]')
+      .forEach((node) => {
+        const el = node as HTMLElement;
+        const inlineTransform = el.style.transform || '';
+        const match = inlineTransform.match(/scale\(([\d.]+)\)/);
+        if (match && parseFloat(match[1]) > maxScale) {
+          el.style.transform = inlineTransform.replace(/scale\([\d.]+\)/, `scale(${maxScale})`);
+        } else if (!match) {
+          el.style.transform = `scale(${maxScale})`;
+        }
+      });
+    requestAnimationFrame(clampRocketZoom);
+  };
+  requestAnimationFrame(clampRocketZoom);
 
   let deferredPrompt: any = null;
   const installItem = document.createElement('button');
@@ -271,4 +297,4 @@
     }, 2200);
   });
 })();
-          
+      
