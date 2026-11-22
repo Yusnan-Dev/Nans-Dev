@@ -12,9 +12,11 @@
   <div class="ambient-orb orb-1"></div>
   <div class="ambient-orb orb-2"></div>
 
-  <!-- Floating Futuristic Audio Toggle (Default Muted) -->
+  <!-- Floating Futuristic Audio Toggle (SVG Icon) -->
   <button id="audio-toggle" class="audio-fab" aria-label="Toggle Sound FX" title="Nyalakan Efek Suara">
-    <span id="audio-icon">🔇</span>
+    <span id="audio-icon" style="display:inline-flex;align-items:center;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+    </span>
     <span id="audio-label">SFX OFF</span>
   </button>
 
@@ -166,8 +168,8 @@
           <h2>Simulasi Biaya & Brief Proyek</h2>
         </div>
         <div class="currency-switch" role="group" aria-label="Pilih Mata Uang">
-          <button type="button" class="curr-btn active" data-curr="IDR">🇮🇩 IDR (Rp)</button>
-          <button type="button" class="curr-btn" data-curr="USD">🌐 USD ($)</button>
+          <button type="button" class="curr-btn active" data-curr="IDR">IDR (Rp)</button>
+          <button type="button" class="curr-btn" data-curr="USD">USD ($)</button>
         </div>
       </div>
 
@@ -214,7 +216,7 @@
           <div class="est-summary">
             <div class="est-label">Estimasi Investasi & Rilis</div>
             <div class="est-price" id="est-price">Rp 750.000</div>
-            <div class="est-time" id="est-days">⏱ Estimasi: 3 Hari Kerja</div>
+            <div class="est-time" id="est-days">ESTIMASI: 3 HARI KERJA</div>
             <p class="est-note">Detail modul, estimasi biaya, dan brief Anda otomatis terformat rapi saat dialihkan ke WhatsApp.</p>
             <button type="button" id="est-wa-btn" class="btn-primary" style="width:100%;">Kirim Brief via WhatsApp ↗</button>
           </div>
@@ -233,4 +235,4 @@
   <script src="./main.js" defer></script>
 </body>
 </html>
-                
+      
