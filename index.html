@@ -12,7 +12,19 @@
   <div class="ambient-orb orb-1"></div>
   <div class="ambient-orb orb-2"></div>
 
-  <!-- Floating Futuristic Audio Toggle (SVG Icon) -->
+  <!-- Command Palette Modal (⌘K / Ctrl+K) -->
+  <div id="cmd-modal" class="cmd-backdrop" hidden>
+    <div class="cmd-box" role="dialog" aria-modal="true" aria-label="Quick Command">
+      <div class="cmd-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="cmd-input" placeholder="Ketik perintah, demo (KlinPro, bizsnap), atau aksi cepat..." autocomplete="off" />
+        <button type="button" id="cmd-close" class="cmd-esc">ESC</button>
+      </div>
+      <div id="cmd-results" class="cmd-list"></div>
+    </div>
+  </div>
+
+  <!-- Floating Futuristic Audio Toggle -->
   <button id="audio-toggle" class="audio-fab" aria-label="Toggle Sound FX" title="Nyalakan Efek Suara">
     <span id="audio-icon" style="display:inline-flex;align-items:center;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
@@ -33,15 +45,22 @@
 
       <nav class="nav-links" id="nav-links">
         <a href="#services">Arsitektur</a>
-        <a href="#vector-lab">Vector 3D Lab</a>
+        <a href="#blueprint">Pipeline</a>
+        <a href="#vector-lab">Vector Lab</a>
         <a href="#portfolio">Portofolio</a>
-        <a href="#reviews">Ulasan</a>
-        <a href="#estimator">Estimasi</a>
+        <a href="#estimator">AI Scope & Estimasi</a>
       </nav>
 
-      <div class="build-badge">
-        <span class="dot"></span>
-        <span id="build-time">SYS.ONLINE</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button type="button" id="cmd-trigger" class="cmd-btn" title="Quick Command">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Menu Cepat</span>
+          <kbd>⌘K</kbd>
+        </button>
+        <div class="build-badge">
+          <span class="dot"></span>
+          <span id="build-time">SYS.ONLINE</span>
+        </div>
       </div>
 
       <button class="menu-toggle" id="menu-toggle" aria-label="Menu">☰</button>
@@ -89,6 +108,41 @@
       <div class="bento-grid" id="services-bento"></div>
     </section>
 
+    <!-- Enterprise Architecture Pipeline + Live Lighthouse Audit -->
+    <section id="blueprint">
+      <div class="section-header">
+        <div class="kicker">Enterprise Engineering Workflow</div>
+        <h2>Arsitektur Pipeline & Audit Performa Live</h2>
+      </div>
+      <div class="enterprise-grid">
+        <div class="blueprint-panel">
+          <div class="bp-nodes" id="bp-nodes">
+            <button type="button" class="bp-node active" data-step="0">01. UI/UX & 3D</button>
+            <button type="button" class="bp-node" data-step="1">02. Core Engine</button>
+            <button type="button" class="bp-node" data-step="2">03. WA & API</button>
+            <button type="button" class="bp-node" data-step="3">04. Edge CDN</button>
+          </div>
+          <div id="bp-inspector" class="bp-inspector"></div>
+        </div>
+
+        <div class="audit-panel">
+          <div class="audit-head">
+            <div>
+              <div class="audit-kicker">CORE WEB VITALS BENCHMARK</div>
+              <div class="audit-sub">Simulasi Skor Lighthouse Arsitektur Nans Dev</div>
+            </div>
+            <button type="button" id="run-audit-btn" class="audit-run-btn">Run Audit</button>
+          </div>
+          <div class="audit-gauges" id="audit-gauges">
+            <div class="gauge-item"><div class="g-val" data-score="99">99</div><span>Performance</span></div>
+            <div class="gauge-item"><div class="g-val" data-score="100">100</div><span>Accessibility</span></div>
+            <div class="gauge-item"><div class="g-val" data-score="100">100</div><span>Best Practices</span></div>
+            <div class="gauge-item"><div class="g-val" data-score="98">98</div><span>SEO Ready</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="vector-lab">
       <div class="section-header">
         <div class="kicker">Interactive Precision Lab</div>
@@ -116,7 +170,6 @@
             </svg>
             <small>LOW-RES RASTER (PECAH)</small>
           </div>
-
           <div class="layer vector-layer" id="vector-layer">
             <svg class="emblem-sharp" width="120" height="120" viewBox="0 0 120 120">
               <defs>
@@ -131,10 +184,7 @@
             </svg>
             <small>100% VECTOR GEOMETRY (PRESISI)</small>
           </div>
-
-          <div class="slider-line" id="slider-line">
-            <div class="slider-knob">↔</div>
-          </div>
+          <div class="slider-line" id="slider-line"><div class="slider-knob">↔</div></div>
         </div>
       </div>
     </section>
@@ -164,8 +214,8 @@
     <section id="estimator">
       <div class="section-header-row">
         <div class="section-header" style="margin-bottom:0;">
-          <div class="kicker">Project Configurator</div>
-          <h2>Simulasi Biaya & Brief Proyek</h2>
+          <div class="kicker">AI Scope & Configurator</div>
+          <h2>Rekomendasi Otomatis & Simulasi Biaya</h2>
         </div>
         <div class="currency-switch" role="group" aria-label="Pilih Mata Uang">
           <button type="button" class="curr-btn active" data-curr="IDR">IDR (Rp)</button>
@@ -173,43 +223,37 @@
         </div>
       </div>
 
+      <!-- AI Project Scope Generator Bar -->
+      <div class="ai-scope-bar">
+        <input type="text" id="ai-niche-input" placeholder="Ketik jenis bisnis Anda (misal: Laundry Express, Toko Buku, Cafe, Klinik)..." />
+        <button type="button" id="ai-scope-btn" class="btn-secondary">Generate Rekomendasi Sistem</button>
+      </div>
+      <div id="ai-scope-output" class="ai-scope-output" hidden></div>
+
       <div class="estimator-box">
         <div class="est-grid">
           <div class="est-left">
             <div class="est-options">
               <label>
-                <span>
-                  <input type="checkbox" class="est-check" value="Custom Company Profile / Landing Page" data-days="3" data-idr="750000" data-usd="65" checked>
-                  Company Profile / Landing Page
-                </span>
+                <span><input type="checkbox" class="est-check" value="Custom Company Profile / Landing Page" data-days="3" data-idr="750000" data-usd="65" checked> Company Profile / Landing Page</span>
                 <span class="meta-tag" data-idr="Rp 750rb • +3 Hari" data-usd="$65 • +3 Days">Rp 750rb • +3 Hari</span>
               </label>
               <label>
-                <span>
-                  <input type="checkbox" class="est-check" value="E-Commerce / Katalog / Sistem LMS" data-days="5" data-idr="1500000" data-usd="130">
-                  E-Commerce / Katalog / LMS
-                </span>
+                <span><input type="checkbox" class="est-check" value="E-Commerce / Katalog / Sistem LMS" data-days="5" data-idr="1500000" data-usd="130"> E-Commerce / Katalog / LMS</span>
                 <span class="meta-tag" data-idr="Rp 1,5jt • +5 Hari" data-usd="$130 • +5 Days">Rp 1,5jt • +5 Hari</span>
               </label>
               <label>
-                <span>
-                  <input type="checkbox" class="est-check" value="Raster-to-Vector Logo Conversion HD" data-days="1" data-idr="150000" data-usd="15">
-                  Raster-to-Vector Logo HD
-                </span>
+                <span><input type="checkbox" class="est-check" value="Raster-to-Vector Logo Conversion HD" data-days="1" data-idr="150000" data-usd="15"> Raster-to-Vector Logo HD</span>
                 <span class="meta-tag" data-idr="Rp 150rb • +1 Hari" data-usd="$15 • +1 Day">Rp 150rb • +1 Hari</span>
               </label>
               <label>
-                <span>
-                  <input type="checkbox" class="est-check" value="Paket Banner & Aset Media Sosial" data-days="2" data-idr="250000" data-usd="25">
-                  Banner & Aset Visual Sosmed
-                </span>
+                <span><input type="checkbox" class="est-check" value="Paket Banner & Aset Media Sosial" data-days="2" data-idr="250000" data-usd="25"> Banner & Aset Visual Sosmed</span>
                 <span class="meta-tag" data-idr="Rp 250rb • +2 Hari" data-usd="$25 • +2 Days">Rp 250rb • +2 Hari</span>
               </label>
             </div>
-
             <div class="brief-inputs">
               <input type="text" id="client-brand" placeholder="Nama Anda / Nama Brand Bisnis (Opsional)" />
-              <textarea id="client-notes" rows="2" placeholder="Catatan singkat kebutuhan proyek (misal: warna tema, referensi web, atau fitur khusus)..."></textarea>
+              <textarea id="client-notes" rows="2" placeholder="Catatan singkat kebutuhan proyek (warna tema, referensi web, atau fitur khusus)..."></textarea>
             </div>
           </div>
 
@@ -226,13 +270,11 @@
   </main>
 
   <footer>
-    <div class="container">
-      &copy; 2026 Nans Dev Architecture. Engineered with Python, TypeScript, SCSS & GitHub Actions.
-    </div>
+    <div class="container">&copy; 2026 Nans Dev Architecture. Engineered with Python, TypeScript, SCSS & GitHub Actions.</div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="./main.js" defer></script>
 </body>
 </html>
-      
+                
