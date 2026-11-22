@@ -1,9 +1,40 @@
 import { createDomNode } from './StackBadge';
 
+export type ThemeMode = 'dark' | 'light';
+
+export const V4_PALETTES = [
+  { name: 'Cyber Cyan', colors: ['#38bdf8', '#818cf8'] },
+  { name: 'Emerald Ops', colors: ['#34d399', '#10b981'] },
+  { name: 'Royal Gold', colors: ['#fbbf24', '#f59e0b'] },
+  { name: 'Crimson Pro', colors: ['#fb7185', '#f43f5e'] },
+];
+
+export function applyV4ThemeMode(mode: ThemeMode): void {
+  const root = document.documentElement;
+  root.setAttribute('data-theme', mode);
+  try {
+    localStorage.setItem('nans_theme_mode', mode);
+  } catch {}
+
+  const modeBtn = document.getElementById('v4-theme-mode-btn');
+  if (modeBtn) {
+    modeBtn.setAttribute('aria-label', mode === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode');
+    modeBtn.title = mode === 'light' ? 'Ganti ke Dark Mode' : 'Ganti ke Light Mode';
+    modeBtn.innerHTML =
+      mode === 'light'
+        ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="v4-mode-label">Dark</span>`
+        : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg><span class="v4-mode-label">Light</span>`;
+  }
+}
+
 export function applyV4ThemeColors(accent: string, accent2: string): void {
   const root = document.documentElement;
   root.style.setProperty('--v4-accent', accent);
   root.style.setProperty('--v4-accent2', accent2);
+
+  try {
+    localStorage.setItem('nans_theme_accent', JSON.stringify([accent, accent2]));
+  } catch {}
 
   let styleTag = document.getElementById('v4-dynamic-theme-style') as HTMLStyleElement | null;
   if (!styleTag) {
@@ -23,6 +54,60 @@ export function applyV4ThemeColors(accent: string, accent2: string): void {
       border-color: var(--v4-accent) !important;
     }
   `;
+
+  document.querySelectorAll<HTMLButtonElement>('.v4-nav-swatch').forEach((sw) => {
+    const isMatch = sw.dataset.accent === accent;
+    sw.classList.toggle('active', isMatch);
+  });
+}
+
+export function mountNavbarThemeSwitcher(): void {
+  const navInner = document.querySelector<HTMLElement>('.navbar .nav-inner');
+  if (!navInner || navInner.querySelector('#v4-navbar-theme-switcher')) return;
+
+  const switcher = createDomNode(
+    'div',
+    {
+      id: 'v4-navbar-theme-switcher',
+      className: 'v4-nav-theme',
+      role: 'region',
+      'aria-label': 'Theme Switcher',
+    },
+    createDomNode(
+      'button',
+      {
+        type: 'button',
+        id: 'v4-theme-mode-btn',
+        className: 'v4-theme-mode-btn',
+        title: 'Ganti Light / Dark Mode',
+      },
+      'Light'
+    ),
+    createDomNode('span', { className: 'v4-theme-divider', 'aria-hidden': 'true' }),
+    createDomNode(
+      'div',
+      { className: 'v4-swatch-group' },
+      ...V4_PALETTES.map((p, idx) =>
+        createDomNode('button', {
+          type: 'button',
+          className: `v4-nav-swatch${idx === 0 ? ' active' : ''}`,
+          'data-palette': `${p.name} (${p.colors.join(', ')})`,
+          'data-accent': p.colors[0],
+          'data-accent2': p.colors[1],
+          title: `Accent: ${p.name}`,
+          'aria-label': `Accent ${p.name}`,
+          style: `background:linear-gradient(135deg, ${p.colors[0]}, ${p.colors[1]});`,
+        })
+      )
+    )
+  );
+
+  const menuToggle = navInner.querySelector('#menu-toggle');
+  if (menuToggle) {
+    navInner.insertBefore(switcher, menuToggle);
+  } else {
+    navInner.appendChild(switcher);
+  }
 }
 
 export function mountWasmBenchmarkLab(auditPanel: HTMLElement): void {
@@ -130,36 +215,6 @@ export function mountVectorLabModeSwitch(vectorLabEl: HTMLElement): void {
 export function mountV4EstimatorTools(estimatorBox: HTMLElement): void {
   if (estimatorBox.querySelector('.v4-est-suite')) return;
 
-  const palettes = [
-    { name: 'Cyber Cyan', colors: ['#38bdf8', '#818cf8'] },
-    { name: 'Emerald Ops', colors: ['#34d399', '#10b981'] },
-    { name: 'Royal Gold', colors: ['#fbbf24', '#f59e0b'] },
-    { name: 'Crimson Pro', colors: ['#fb7185', '#f43f5e'] },
-  ];
-
-  const paletteRow = createDomNode(
-    'div',
-    { style: 'display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;' },
-    createDomNode('span', { style: 'font-size:11.5px;color:#94a3b8;font-weight:700;' }, 'Theme & Brand Palette:'),
-    ...palettes.map((p) => {
-      const btn = createDomNode(
-        'button',
-        {
-          type: 'button',
-          className: 'v4-palette-btn',
-          'data-palette': `${p.name} (${p.colors.join(', ')})`,
-          'data-accent': p.colors[0],
-          'data-accent2': p.colors[1],
-          style: 'display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);color:#e2e8f0;font-size:11px;font-weight:600;cursor:pointer;',
-        },
-        createDomNode('span', { style: `width:8px;height:8px;border-radius:50%;background:${p.colors[0]};display:inline-block;` }),
-        createDomNode('span', { style: `width:8px;height:8px;border-radius:50%;background:${p.colors[1]};display:inline-block;` }),
-        p.name
-      );
-      return btn;
-    })
-  );
-
   const roiBox = createDomNode(
     'div',
     {
@@ -211,7 +266,7 @@ export function mountV4EstimatorTools(estimatorBox: HTMLElement): void {
     )
   );
 
-  const wrapper = createDomNode('div', { className: 'v4-est-suite' }, paletteRow, roiBox);
+  const wrapper = createDomNode('div', { className: 'v4-est-suite' }, roiBox);
   const briefInputs = estimatorBox.querySelector('.brief-inputs');
   if (briefInputs) briefInputs.appendChild(wrapper);
 
