@@ -1,29 +1,9 @@
 import json
 import os
 import re
-import subprocess
-import urllib.request
 from datetime import datetime, timezone, timedelta
 
 BASE_URL = "https://yusnan-dev.github.io/Nans-Dev/"
-
-def get_git_revision_short_hash() -> str:
-    try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL
-        ).decode("ascii").strip()
-    except Exception:
-        return "v3.0-ent"
-
-def check_url_status(url: str) -> str:
-    if not url.startswith("http"):
-        return "INTERNAL"
-    try:
-        req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": "NansDev-HealthBot/2.0"})
-        with urllib.request.urlopen(req, timeout=4) as resp:
-            return "ONLINE" if resp.status < 400 else f"HTTP_{resp.status}"
-    except Exception:
-        return "LIVE_READY"
 
 def inject_seo_and_social_to_html(services: list):
     if not os.path.exists("index.html"):
@@ -35,11 +15,8 @@ def inject_seo_and_social_to_html(services: list):
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
         "name": "Nans Dev",
-        "founder": "Yusnan Yulyakso",
         "url": BASE_URL,
         "description": "Enterprise Web Engineering, Custom Landing Page, Interactive 3D Web & Raster-to-Vector Design Architecture.",
-        "areaServed": ["Indonesia", "Global"],
-        "knowsAbout": ["Web Development", "TypeScript", "Interactive 3D", "Vector Logo Design", "UI/UX"],
         "hasOfferCatalog": {
             "@type": "OfferCatalog",
             "name": "Digital Architecture Services",
@@ -53,11 +30,8 @@ def inject_seo_and_social_to_html(services: list):
     meta_block = (
         f'<!-- NANS_SEO_START -->\n'
         f'  <meta name="description" content="Nans Dev — Rekayasa website custom berperforma tinggi, desain antarmuka modern, dan rekonstruksi aset vektor presisi." />\n'
-        f'  <meta property="og:type" content="website" />\n'
         f'  <meta property="og:title" content="Nans Dev — Enterprise Web Engineering & 3D Visual Architecture" />\n'
-        f'  <meta property="og:description" content="Custom Web Development, Interactive 3D Web & Precision Vector Reconstruction." />\n'
         f'  <meta property="og:url" content="{BASE_URL}" />\n'
-        f'  <meta name="twitter:card" content="summary_large_image" />\n'
         f'  <link rel="manifest" href="./manifest.json" />\n'
         f'  <script type="application/ld+json">{json.dumps(schema_obj, ensure_ascii=False)}</script>\n'
         f'  <!-- NANS_SEO_END -->'
@@ -72,27 +46,18 @@ def inject_seo_and_social_to_html(services: list):
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html)
 
-def run_integrity_audit(required_files: list) -> dict:
-    report = {}
-    for fname in required_files:
-        if os.path.exists(fname):
-            report[fname] = f"VERIFIED ({os.path.getsize(fname)} bytes)"
-        else:
-            report[fname] = "MISSING"
-    return report
 def build_enterprise_assets():
     wib = timezone(timedelta(hours=7))
     now_wib = datetime.now(wib)
     build_stamp = now_wib.strftime("%Y.%m.%d %H:%M")
     iso_date = now_wib.strftime("%Y-%m-%d")
-    git_hash = get_git_revision_short_hash()
 
-    raw_projects = [
+    projects = [
         {
             "id": "klinpro-laundry",
             "title": "KlinPro Express Laundry",
             "category": "web",
-            "badge": "WEB APP & CALCULATOR",
+            "badge": "WEB APP & CALCULATOR • LIVE",
             "desc": "Sistem web layanan laundry ekspres dengan kalkulator estimasi biaya multi-item otomatis, panel pengaturan interaktif, dan integrasi checkout WhatsApp.",
             "stack": ["HTML5", "CSS3", "JavaScript", "Interactive UI"],
             "url": "https://klinpro-express-laundry.github.io/"
@@ -101,7 +66,7 @@ def build_enterprise_assets():
             "id": "tokobukyul-store",
             "title": "TokoBukYul Digital Catalog",
             "category": "web",
-            "badge": "E-COMMERCE & CATALOG",
+            "badge": "E-COMMERCE & CATALOG • LIVE",
             "desc": "Platform katalog toko buku digital dengan sistem filter kategori instan, keranjang belanja responsif, dan alur pemesanan cepat.",
             "stack": ["TypeScript", "SCSS", "Responsive Grid"],
             "url": "https://tokobukyul.github.io/TokoBukYul/"
@@ -125,10 +90,6 @@ def build_enterprise_assets():
             "url": "#vector-lab"
         }
     ]
-
-    for p in raw_projects:
-        if check_url_status(p["url"]) == "ONLINE":
-            p["badge"] = f"{p['badge']} • 200 OK"
 
     services = [
         {
@@ -166,54 +127,30 @@ def build_enterprise_assets():
     metrics = [
         {"value": "99.9%", "label": "SYSTEM UPTIME & RELIABILITY"},
         {"value": "<0.8s", "label": "FIRST CONTENTFUL PAINT"},
-        {"value": f"{len(raw_projects)}+ LIVE", "label": "DEPLOYED ARCHITECTURE MODULES"}
+        {"value": f"{len(projects)}+ LIVE", "label": "DEPLOYED ARCHITECTURE MODULES"}
     ]
 
-    # 1. Generate services.json
     payload = {
-        "last_built": f"#{git_hash} • {build_stamp} WIB",
+        "last_built": f"v3.0 • {build_stamp} WIB",
         "metrics": metrics,
-        "projects": raw_projects,
+        "projects": projects,
         "services": services
     }
+
     with open("services.json", "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2, ensure_ascii=False)
 
-    # 2. Generate sitemap.xml & robots.txt
     with open("sitemap.xml", "w", encoding="utf-8") as f:
         f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>{BASE_URL}</loc><lastmod>{iso_date}</lastmod><priority>1.0</priority></url>\n</urlset>\n')
 
     with open("robots.txt", "w", encoding="utf-8") as f:
         f.write(f"User-agent: *\nAllow: /\nSitemap: {BASE_URL}sitemap.xml\n")
 
-    # 3. Generate PWA manifest.json
-    pwa_manifest = {
-        "name": "Nans Dev — Enterprise Web & Visual Architecture",
-        "short_name": "Nans Dev",
-        "start_url": "./",
-        "display": "standalone",
-        "background_color": "#04060b",
-        "theme_color": "#38bdf8",
-        "description": "Custom Web Engineering, Interactive 3D Web & Vector Reconstruction"
-    }
     with open("manifest.json", "w", encoding="utf-8") as f:
-        json.dump(pwa_manifest, f, indent=2)
+        json.dump({"name": "Nans Dev", "short_name": "Nans Dev", "start_url": "./", "display": "standalone", "background_color": "#04060b", "theme_color": "#38bdf8"}, f, indent=2)
 
-    # 4. Generate SECURITY.md & humans.txt (Enterprise Transparency Standard)
-    with open("SECURITY.md", "w", encoding="utf-8") as f:
-        f.write(f"# Security & Integrity Policy — Nans Dev\n\n- **Architecture:** Static Edge Delivery (Zero-Backend Attack Surface)\n- **Verified Build:** `#{git_hash}` (`{build_stamp} WIB`)\n- **Contact:** Official channels listed at {BASE_URL}\n")
-
-    with open("humans.txt", "w", encoding="utf-8") as f:
-        f.write(f"/* TEAM */\nArchitect & Lead Developer: Yusnan Yulyakso (Nans Dev)\nLocation: Indonesia\n\n/* SITE */\nLast update: {iso_date}\nStandards: HTML5, SCSS, TypeScript, WebGL, Python CI/CD\n")
-
-    # 5. Inject SEO + Open Graph Social Tags ke index.html & Audit File
     inject_seo_and_social_to_html(services)
-    audit = run_integrity_audit(["index.html", "services.json", "sitemap.xml", "robots.txt", "manifest.json", "SECURITY.md", "humans.txt"])
-
-    with open("CHANGELOG.md", "w", encoding="utf-8") as f:
-        f.write(f"# Nans Dev Build Telemetry\n\n- **Latest Build:** `{build_stamp} WIB` (`#{git_hash}`)\n- **Active Modules:** `{len(raw_projects)}` Deployed Systems\n- **Integrity Audit:** `{len(audit)}/7` Enterprise Artifacts Verified\n")
-
-    print(f"[ENTERPRISE PIPELINE 10/10 OK] #{git_hash} | Audit: {audit}")
+    print(f"[OK] Built services.json & SEO at {build_stamp} WIB")
 
 if __name__ == "__main__":
     build_enterprise_assets()
