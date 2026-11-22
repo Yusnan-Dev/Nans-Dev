@@ -1,5 +1,5 @@
-const CACHE_NAME = 'nans-dev-pwa-v9';
-const ASSETS = ['./', './index.html', './main.js', './style.css', './manifest.json', './perf_engine.wasm'];
+const CACHE_NAME = 'nans-dev-pwa-v11';
+const ASSETS = ['./', './index.html', './main.js', './style.css', './manifest.json', './perf_engine.wasm', './go-telemetry.json'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
