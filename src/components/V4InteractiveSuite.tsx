@@ -103,8 +103,8 @@ export function mountNavbarThemeSwitcher(): void {
   );
 
   const menuToggle = navInner.querySelector('#menu-toggle');
-  if (menuToggle) {
-    navInner.insertBefore(switcher, menuToggle);
+  if (menuToggle && menuToggle.parentElement) {
+    menuToggle.parentElement.insertBefore(switcher, menuToggle);
   } else {
     navInner.appendChild(switcher);
   }
