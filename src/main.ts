@@ -423,7 +423,7 @@ function initPhotorealisticEarth(): void {
   const trailGeo = new THREE.BufferGeometry();
   trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPosArray, 3));
   trailGeo.setDrawRange(0, 0);
-  const trailMat = new THREE.LineBasicMaterial({ color: 0xf1f5f9, transparent: true, opacity: 0.65 });
+  const trailMat = new THREE.LineBasicMaterial({ color: 0xf1f5f9, transparent: true, opacity: 0, visible: false });
   const contrailLine = new THREE.Line(trailGeo, trailMat);
   contrailLine.frustumCulled = false;
   ovScene.add(contrailLine);
@@ -432,36 +432,44 @@ function initPhotorealisticEarth(): void {
   interface ExhaustParticle { sprite: any; mat: any; vel: any; life: number; decay: number; baseScale: number; growRate: number; }
   const particles: ExhaustParticle[] = [];
 
+  let lastNozzlePos: any = null;
   function spawnContrailPuff(origin: any, tangent: any, rocketScale: number): void {
-    if (particles.length >= 110) return;
-    const mat = new THREE.SpriteMaterial({
-      map: smokeTexture,
-      color: Math.random() > 0.3 ? 0xf8fafc : 0xe2e8f0,
-      transparent: true,
-      opacity: 0.48,
-      depthWrite: false
-    });
-    const smoke = new THREE.Sprite(mat);
-    smoke.position.copy(origin);
-    smoke.position.x += (Math.random() - 0.5) * 0.03 * rocketScale;
-    smoke.position.y += (Math.random() - 0.5) * 0.03 * rocketScale;
-    const initialSize = (0.11 + Math.random() * 0.04) * rocketScale;
-    smoke.scale.set(initialSize, initialSize, 1);
-    ovScene.add(smoke);
+    const startPt = lastNozzlePos ? lastNozzlePos.clone() : origin.clone();
+    lastNozzlePos = origin.clone();
+    const steps = 3;
+    for (let s = 1; s <= steps; s++) {
+      if (particles.length >= 260) break;
+      const frac = s / steps;
+      const puffPos = new THREE.Vector3().lerpVectors(startPt, origin, frac);
+      const mat = new THREE.SpriteMaterial({
+        map: smokeTexture,
+        color: Math.random() > 0.25 ? 0xffffff : 0xe2e8f0,
+        transparent: true,
+        opacity: 0.68,
+        depthWrite: false
+      });
+      const smoke = new THREE.Sprite(mat);
+      smoke.position.copy(puffPos);
+      smoke.position.x += (Math.random() - 0.5) * 0.035 * rocketScale;
+      smoke.position.y += (Math.random() - 0.5) * 0.035 * rocketScale;
+      const initialSize = (0.16 + Math.random() * 0.05) * rocketScale;
+      smoke.scale.set(initialSize, initialSize, 1);
+      ovScene.add(smoke);
 
-    // Asap diam mengambang seperti jejak pesawat terbang & memudar perlahan
-    const driftVel = tangent.clone().multiplyScalar(-0.004 * rocketScale);
-    driftVel.x += (Math.random() - 0.5) * 0.004;
-    driftVel.y += (Math.random() - 0.5) * 0.004;
-    particles.push({
-      sprite: smoke,
-      mat,
-      vel: driftVel,
-      life: 1.0,
-      decay: 0.011,
-      baseScale: initialSize,
-      growRate: 0.0045 * rocketScale
-    });
+      // Asap jet rapat menyatu sepanjang jalur lingkaran & memudar perlahan
+      const driftVel = tangent.clone().multiplyScalar(-0.0035 * rocketScale);
+      driftVel.x += (Math.random() - 0.5) * 0.0035;
+      driftVel.y += (Math.random() - 0.5) * 0.0035;
+      particles.push({
+        sprite: smoke,
+        mat,
+        vel: driftVel,
+        life: 1.0,
+        decay: 0.0105,
+        baseScale: initialSize,
+        growRate: 0.006 * rocketScale
+      });
+    }
   }
 
   let rocketActive = false, launchProgress = 0;
@@ -543,6 +551,7 @@ function initPhotorealisticEarth(): void {
     }
 
     launchOrigin = screenToOverlayWorld(lx, ly, 1.5);
+    lastNozzlePos = null;
     trailPoints.length = 0;
     trailGeo.setDrawRange(0, 0);
     trailMat.opacity = 0.65;
@@ -666,8 +675,8 @@ function initPhotorealisticEarth(): void {
         p.life -= p.decay;
         p.baseScale += p.growRate;
         p.sprite.scale.set(p.baseScale, p.baseScale, 1);
-        // Opasitas asap menghilang perlahan seiring life mendekati 0
-        p.mat.opacity = Math.max(0, p.life * 0.48);
+        // Opasitas asap tebal di awal lalu memudar perlahan hingga hilang
+        p.mat.opacity = Math.max(0, p.life * 0.68);
         if (p.life <= 0) {
           ovScene.remove(p.sprite);
           p.mat.dispose();
