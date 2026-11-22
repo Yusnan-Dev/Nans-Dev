@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nans-dev-pwa-v2';
+const CACHE_NAME = 'nans-dev-pwa-v3';
 const ASSETS = ['./', './index.html', './main.js', './style.css', './manifest.json'];
 
 self.addEventListener('install', (e) => {
