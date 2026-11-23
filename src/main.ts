@@ -199,6 +199,7 @@ function createSmokeTexture(): any {
   tex.needsUpdate = true;
   return tex;
 }
+
 function initPhotorealisticEarth(): void {
   const container = document.getElementById('earth-3d-container');
   if (!container || typeof THREE === 'undefined') return;
@@ -327,13 +328,11 @@ function initPhotorealisticEarth(): void {
   const hullTexture = createRocketHullTexture();
   const smokeTexture = createSmokeTexture();
 
-  // Badan utama roket (Stage 1 & Stage 2)
   rocketGroup.add(new THREE.Mesh(
     new THREE.CylinderGeometry(0.145, 0.165, 1.08, 32),
     new THREE.MeshStandardMaterial({ map: hullTexture, metalness: 0.5, roughness: 0.25 })
   ));
 
-  // Cincin interstage & tangki samping (side boosters) biar tampak seperti roket berat asli
   const interstageRing = new THREE.Mesh(
     new THREE.CylinderGeometry(0.152, 0.152, 0.06, 32),
     new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.85, roughness: 0.2 })
@@ -354,7 +353,6 @@ function initPhotorealisticEarth(): void {
     rocketGroup.add(bn);
   });
 
-  // Jendela kabin / sensor avionik berbingkai metalik
   const portFrame = new THREE.Mesh(
     new THREE.TorusGeometry(0.042, 0.01, 12, 24),
     new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.9, roughness: 0.2 })
@@ -368,7 +366,6 @@ function initPhotorealisticEarth(): void {
   portGlass.position.set(0, 0.36, 0.15);
   rocketGroup.add(portGlass);
 
-  // Payload fairing & kerucut hidung aerodinamis + menara escape tower
   const fairingMesh = new THREE.Mesh(
     new THREE.CylinderGeometry(0.128, 0.148, 0.19, 32),
     new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.5, roughness: 0.22 })
@@ -390,7 +387,6 @@ function initPhotorealisticEarth(): void {
   tipMesh.position.y = 1.15;
   rocketGroup.add(tipMesh);
 
-  // Nozzle lonceng mesin utama (Bell Nozzle)
   const nozzleMesh = new THREE.Mesh(
     new THREE.CylinderGeometry(0.082, 0.142, 0.22, 24, 1, true),
     new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.92, roughness: 0.22, side: THREE.DoubleSide })
@@ -398,7 +394,6 @@ function initPhotorealisticEarth(): void {
   nozzleMesh.position.y = -0.63;
   rocketGroup.add(nozzleMesh);
 
-  // 4 Sirip Delta Aerodinamis dengan trim merah
   const finGeo = new THREE.BoxGeometry(0.022, 0.38, 0.23);
   const finMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.25 });
   for (let i = 0; i < 4; i++) {
@@ -409,7 +404,6 @@ function initPhotorealisticEarth(): void {
     rocketGroup.add(fin);
   }
 
-  // Lidah api roket proporsional
   const flameRed = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.85, 18), new THREE.MeshBasicMaterial({ color: 0xea580c, transparent: true, opacity: 0.78 }));
   flameRed.rotation.x = Math.PI; flameRed.position.y = -1.12; rocketGroup.add(flameRed);
 
@@ -419,7 +413,6 @@ function initPhotorealisticEarth(): void {
   const flameCore = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.38, 16), new THREE.MeshBasicMaterial({ color: 0xffffff }));
   flameCore.rotation.x = Math.PI; flameCore.position.y = -0.86; rocketGroup.add(flameCore);
 
-  // Jejak asap panjang seperti contrail pesawat terbang yang memudar perlahan
   const trailPoints: any[] = [];
   const MAX_TRAIL_POINTS = 95;
   const trailPosArray = new Float32Array(MAX_TRAIL_POINTS * 3);
@@ -431,7 +424,6 @@ function initPhotorealisticEarth(): void {
   contrailLine.frustumCulled = false;
   ovScene.add(contrailLine);
 
-  // Sprite asap lembut sepanjang jalur lingkaran yang menghilang perlahan
   interface ExhaustParticle { sprite: any; mat: any; vel: any; life: number; decay: number; baseScale: number; growRate: number; }
   const particles: ExhaustParticle[] = [];
 
@@ -459,7 +451,6 @@ function initPhotorealisticEarth(): void {
       smoke.scale.set(initialSize, initialSize, 1);
       ovScene.add(smoke);
 
-      // Asap jet rapat menyatu sepanjang jalur lingkaran & memudar perlahan
       const driftVel = tangent.clone().multiplyScalar(-0.0035 * rocketScale);
       driftVel.x += (Math.random() - 0.5) * 0.0035;
       driftVel.y += (Math.random() - 0.5) * 0.0035;
@@ -490,7 +481,6 @@ function initPhotorealisticEarth(): void {
     return ovCamera.position.clone().add(dir.multiplyScalar((targetZ - ovCamera.position.z) / dir.z));
   }
 
-  // Kurva parametrik 100% kontinu: terbang dari Bumi ke atas -> berputar melingkar 360 derajat -> lurus menembus atas layar
   function evalFlightPoint(u: number, origin: any): any {
     const isMobile = window.innerWidth < 769;
     const loopRadiusX = isMobile ? 0.95 : 1.45;
@@ -504,29 +494,24 @@ function initPhotorealisticEarth(): void {
     let z = origin.z;
 
     if (u <= 0.24) {
-      // Fase 1: Meluncur naik dari Bumi ke titik masuk lingkaran
       const p = u / 0.24;
       const easeIn = p * p * (2 - p);
       x = origin.x + Math.sin(p * Math.PI * 0.5) * (loopRadiusX * 0.15);
       y = origin.y + easeIn * climbBeforeLoop;
       z = origin.z + easeIn * 0.8;
     } else if (u <= 0.74) {
-      // Fase 2: Berputar melingkar 1 putaran penuh (0 -> 2*PI) di langit atas Bumi
       const p = (u - 0.24) / 0.50;
       const theta = p * Math.PI * 2;
       const entryX = origin.x + loopRadiusX * 0.15;
       const entryY = origin.y + climbBeforeLoop;
-      // Mulai tangen mengarah ke atas, memutar melingkar mulus lalu kembali mengarah lurus ke atas
       x = entryX - loopRadiusX * (1 - Math.cos(theta));
       y = entryY + loopRadiusY * Math.sin(theta) + p * climbDuringLoop;
       z = origin.z + 0.8 + Math.sin(p * Math.PI) * 0.65 + p * 0.5;
     } else {
-      // Fase 3: Sehabis melingkar, langsung melesat lurus ke atas keluar layar tanpa patah arah
       const p = (u - 0.74) / 0.26;
       const exitX = origin.x + loopRadiusX * 0.15;
       const exitY = origin.y + climbBeforeLoop + climbDuringLoop;
       const exitZ = origin.z + 1.3;
-      // Kecepatan tangen keluar lingkaran: dx/du = 0, dy/du = (loopRadiusY * 2*PI + climbDuringLoop) / 0.50
       const exitVelY = (loopRadiusY * Math.PI * 2 + climbDuringLoop) / 0.50;
       const du = u - 0.74;
       x = exitX;
@@ -647,7 +632,6 @@ function initPhotorealisticEarth(): void {
         rocketGroup.position.copy(pos);
         rocketGroup.rotateY(u * 8);
 
-        // Skala roket tetap mungil proporsional dari awal meluncur sampai lurus ke atas
         const currentScale = 0.18 + Math.min(u, 0.85) * 0.22;
         rocketGroup.scale.setScalar(currentScale);
 
@@ -666,7 +650,6 @@ function initPhotorealisticEarth(): void {
           stageBox.style.transform = '';
         }
 
-        // Rekam titik jejak garis contrail melingkar & lurus ke atas
         trailPoints.push(nozzleWorldPos.clone());
         if (trailPoints.length > MAX_TRAIL_POINTS) trailPoints.shift();
         for (let k = 0; k < trailPoints.length; k++) {
@@ -677,7 +660,6 @@ function initPhotorealisticEarth(): void {
         trailGeo.attributes.position.needsUpdate = true;
         trailGeo.setDrawRange(0, trailPoints.length);
 
-        // Munculkan puff asap halus di sepanjang lintasan melingkar & lurus
         spawnContrailPuff(nozzleWorldPos, tangent, currentScale);
 
         if (launchProgress >= 1.02) {
@@ -687,7 +669,6 @@ function initPhotorealisticEarth(): void {
           if (stageBox) stageBox.style.transform = '';
         }
       } else if (trailPoints.length > 0) {
-        // Setelah roket keluar ke atas, garis jejak contrail ikut memudar perlahan hingga hilang
         trailMat.opacity = Math.max(0, trailMat.opacity - 0.012);
         if (trailMat.opacity <= 0.01) {
           trailPoints.length = 0;
@@ -701,7 +682,6 @@ function initPhotorealisticEarth(): void {
         p.life -= p.decay;
         p.baseScale += p.growRate;
         p.sprite.scale.set(p.baseScale, p.baseScale, 1);
-        // Opasitas asap tebal di awal lalu memudar perlahan hingga hilang
         p.mat.opacity = Math.max(0, p.life * 0.68);
         if (p.life <= 0) {
           ovScene.remove(p.sprite);
@@ -717,8 +697,9 @@ function initPhotorealisticEarth(): void {
     }
   }
   animate();
-  }
-    function setupCommandPalette(): void {
+}
+
+function setupCommandPalette(): void {
   const modal = document.getElementById('cmd-modal');
   const trigger = document.getElementById('cmd-trigger');
   const closeBtn = document.getElementById('cmd-close');
@@ -758,26 +739,169 @@ function initPhotorealisticEarth(): void {
 function setupArchitectureBlueprint(): void {
   const nodes = document.querySelectorAll<HTMLButtonElement>('.bp-node');
   const inspector = document.getElementById('bp-inspector');
+  const bpPanel = document.querySelector<HTMLElement>('.blueprint-panel');
   if (!nodes.length || !inspector) return;
 
   const steps = [
-    { title: '01. High-Impact UI/UX & Interactive 3D', desc: 'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.', code: 'renderTarget: "60FPS Mobile" | assets: ["SVG", "WebGL2", "SCSS"]' },
-    { title: '02. Modular TypeScript & Python Engine', desc: 'Arsitektur kode terstruktur, bersih dari script berlebih, dan siap dikembangkan untuk katalog maupun kalkulator bisnis.', code: 'pipeline: "Python JSON Builder -> Strict TypeScript Bundle"' },
-    { title: '03. Automated WhatsApp & Payment Flow', desc: 'Integrasi kalkulator pesanan otomatis yang mengubah pilihan pelanggan menjadi format invoice/brief langsung ke WhatsApp.', code: 'checkoutBridge: "Dynamic Cart -> Encoded WhatsApp API"' },
-    { title: '04. Global Edge CDN & Zero-Downtime CI/CD', desc: 'Otomatisasi build dan deployment dengan kompresi aset statis super cepat untuk akses instan dari berbagai wilayah.', code: 'status: "DEPLOYED" | uptime: "99.9%" | ttfb: "<45ms"' },
+    {
+      title: '01. High-Impact UI/UX & Interactive 3D',
+      desc: 'Perancangan antarmuka modern responsif Mobile-First dengan aset vektor tajam dan aksen 3D WebGL ringan.',
+      code: 'renderTarget: "60FPS Mobile" | assets: ["SVG", "WebGL2", "SCSS"]',
+      short: 'UI / 3D',
+      log: '[0.14s] UI/UX Stage -> WebGL2 & Mobile-First 60FPS layout hydrated ✓',
+    },
+    {
+      title: '02. Modular TypeScript & Python Engine',
+      desc: 'Arsitektur kode terstruktur, bersih dari script berlebih, dan siap dikembangkan untuk katalog maupun kalkulator bisnis.',
+      code: 'pipeline: "Python JSON Builder -> Strict TypeScript Bundle"',
+      short: 'Engine',
+      log: '[0.36s] Core Engine -> Strict TypeScript & JSON data payload verified ✓',
+    },
+    {
+      title: '03. Automated WhatsApp & Payment Flow',
+      desc: 'Integrasi kalkulator pesanan otomatis yang mengubah pilihan pelanggan menjadi format invoice/brief langsung ke WhatsApp.',
+      code: 'checkoutBridge: "Dynamic Cart -> Encoded WhatsApp API"',
+      short: 'WA / API',
+      log: '[0.61s] WA & API -> Dynamic order cart encoded to WhatsApp bridge ✓',
+    },
+    {
+      title: '04. Global Edge CDN & Zero-Downtime CI/CD',
+      desc: 'Otomatisasi build dan deployment dengan kompresi aset statis super cepat untuk akses instan dari berbagai wilayah.',
+      code: 'status: "DEPLOYED" | uptime: "99.9%" | ttfb: "<45ms"',
+      short: 'Edge CDN',
+      log: '[0.84s] Edge CDN -> Global cache HIT (TTFB <45ms) · DEPLOYED ✓',
+    },
   ];
+
+  // Inject Live Data Flow & Packet Simulator into .blueprint-panel
+  let simWrap = bpPanel?.querySelector<HTMLElement>('#bp-flow-simulator') || null;
+  if (bpPanel && !simWrap) {
+    if (!document.getElementById('bp-flow-sim-css')) {
+      const style = document.createElement('style');
+      style.id = 'bp-flow-sim-css';
+      style.textContent = `
+        @keyframes bpPacketPulse {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.55); }
+          50% { transform: scale(1.06); box-shadow: 0 0 14px 2px rgba(56, 189, 248, 0.45); }
+        }
+        #bp-flow-simulator .flow-node.active {
+          border-color: var(--v4-accent, #38bdf8) !important;
+          background: rgba(56, 189, 248, 0.16) !important;
+          color: #f8fafc !important;
+          animation: bpPacketPulse 0.7s ease;
+        }
+        #bp-flow-simulator .flow-node.passed {
+          border-color: #34d399 !important;
+          color: #34d399 !important;
+        }
+        #bp-flow-simulator .flow-wire-fill.active {
+          width: 100% !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    simWrap = document.createElement('div');
+    simWrap.id = 'bp-flow-simulator';
+    simWrap.style.cssText = 'margin-top:14px;padding:12px;border-radius:14px;background:#05070c;border:1px solid rgba(56,189,248,0.22);';
+    simWrap.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;">
+        <span style="font-family:monospace;font-size:0.7rem;font-weight:800;color:var(--v4-accent,#38bdf8);letter-spacing:0.6px;">LIVE DATA FLOW &amp; PACKET SIMULATOR</span>
+        <button type="button" id="bp-sim-btn" style="background:rgba(56,189,248,0.14);border:1px solid var(--v4-accent,#38bdf8);color:var(--v4-accent,#38bdf8);font-size:0.72rem;font-weight:800;padding:5px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;">Simulate Flow ▶</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:center;gap:4px;margin-bottom:10px;">
+        ${steps.map((st, idx) => `
+          <button type="button" class="flow-node${idx === 0 ? ' active' : ''}" data-flow-idx="${idx}" style="padding:7px 4px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);color:#94a3b8;font-family:monospace;font-size:0.64rem;font-weight:700;cursor:pointer;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${st.short}</button>
+          ${idx < steps.length - 1 ? `<div style="width:14px;height:3px;border-radius:99px;background:rgba(255,255,255,0.1);overflow:hidden;"><div class="flow-wire-fill" data-wire-idx="${idx}" style="width:0%;height:100%;background:linear-gradient(90deg,var(--v4-accent2,#818cf8),var(--v4-accent,#38bdf8),#34d399);transition:width 0.35s ease;"></div></div>` : ''}
+        `).join('')}
+      </div>
+      <div id="bp-flow-log" style="font-family:monospace;font-size:0.68rem;line-height:1.55;color:#cbd5e1;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:8px 10px;min-height:68px;">
+        <div style="color:#34d399;">● PACKET STREAM READY</div>
+        <div style="color:#94a3b8;">Klik "Simulate Flow" untuk melacak paket data dari UI ke Edge CDN.</div>
+      </div>
+    `;
+    bpPanel.appendChild(simWrap);
+  }
+
+  const flowNodes = simWrap ? Array.from(simWrap.querySelectorAll<HTMLButtonElement>('.flow-node')) : [];
+  const flowWires = simWrap ? Array.from(simWrap.querySelectorAll<HTMLElement>('.flow-wire-fill')) : [];
+  const flowLog = document.getElementById('bp-flow-log');
+  const simBtn = document.getElementById('bp-sim-btn') as HTMLButtonElement | null;
+
+  const syncFlowDiagram = (activeIdx: number, passedAll = false) => {
+    flowNodes.forEach((fn, idx) => {
+      fn.classList.toggle('active', !passedAll && idx === activeIdx);
+      fn.classList.toggle('passed', passedAll || idx < activeIdx);
+    });
+    flowWires.forEach((fw, idx) => {
+      fw.classList.toggle('active', passedAll || idx < activeIdx);
+    });
+  };
 
   const showStep = (i: number) => {
     const s = steps[i] || steps[0];
+    nodes.forEach((b, idx) => b.classList.toggle('active', idx === i));
     inspector.innerHTML = `<div class="bp-title">${s.title}</div><p class="bp-desc">${s.desc}</p><div class="bp-code">${s.code}</div>`;
+    syncFlowDiagram(i, false);
   };
+
   showStep(0);
+
   nodes.forEach((n) => n.addEventListener('click', () => {
     sfx.playUiClick(600);
-    nodes.forEach((b) => b.classList.remove('active'));
-    n.classList.add('active');
-    showStep(Number(n.dataset.step || 0));
+    const idx = Number(n.dataset.step || 0);
+    showStep(idx);
+    if (flowLog) {
+      flowLog.innerHTML = `<div style="color:var(--v4-accent,#38bdf8);">● NODE 0${idx + 1} INSPECTED</div><div>${steps[idx].log}</div>`;
+    }
   }));
+
+  flowNodes.forEach((fn) => fn.addEventListener('click', () => {
+    sfx.playUiClick(620);
+    const idx = Number(fn.dataset.flowIdx || 0);
+    showStep(idx);
+    if (flowLog) {
+      flowLog.innerHTML = `<div style="color:var(--v4-accent,#38bdf8);">● PACKET HOP 0${idx + 1}</div><div>${steps[idx].log}</div>`;
+    }
+  }));
+
+  let simTimers: number[] = [];
+  simBtn?.addEventListener('click', () => {
+    sfx.playUiClick(740);
+    simTimers.forEach((t) => clearTimeout(t));
+    simTimers = [];
+    if (simBtn) {
+      simBtn.disabled = true;
+      simBtn.textContent = 'Routing Packet...';
+    }
+    if (flowLog) {
+      flowLog.innerHTML = `<div style="color:#fbbf24;">⚡ PACKET DISPATCHED [ID: #ND-${Math.floor(1000 + Math.random() * 9000)}]</div>`;
+    }
+
+    steps.forEach((st, idx) => {
+      const timer = window.setTimeout(() => {
+        sfx.playUiClick(560 + idx * 70);
+        showStep(idx);
+        if (flowLog) {
+          const line = document.createElement('div');
+          line.style.color = idx === steps.length - 1 ? '#34d399' : '#e2e8f0';
+          line.textContent = st.log;
+          flowLog.appendChild(line);
+        }
+        if (idx === steps.length - 1) {
+          const doneTimer = window.setTimeout(() => {
+            syncFlowDiagram(idx, true);
+            if (simBtn) {
+              simBtn.disabled = false;
+              simBtn.textContent = 'Replay Flow ↻';
+            }
+          }, 380);
+          simTimers.push(doneTimer);
+        }
+      }, idx * 520);
+      simTimers.push(timer);
+    });
+  });
 }
 
 async function loadRustWasmEngine(): Promise<any> {
@@ -1333,7 +1457,7 @@ function setupEstimator(): void {
 }
 
 document.addEventListener('DOMContentLoaded', bootApp);
-                          
+
 window.addEventListener('load', () => {
   const preloader = document.getElementById('nans-preloader');
   if (!preloader) return;
