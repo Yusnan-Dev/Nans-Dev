@@ -12,7 +12,62 @@ export interface DropupMountOptions {
   initialSfxEnabled?: boolean;
 }
 
+const AI_WORKER_ENDPOINT = 'https://nans-dev-ai.nanslumbang.workers.dev';
+
 const INTENTS: AssistantIntent[] = [
+  {
+    id: 'greeting',
+    keywords: ['halo', 'hai', 'hei', 'pagi', 'siang', 'sore', 'malam', 'assalamualaikum', 'permisi', 'p', 'tes', 'test', 'bro', 'min', 'admin'],
+    answer: 'Halo bro! Selamat datang di Nans Dev. Mau nanya soal pembuatan website, jasa desain & ubah gambar/logo jadi vektor, simulasi harga & durasi kerja, atau cara order langsung?',
+    actionLabel: 'Eksplorasi Layanan',
+    actionHref: '#services',
+  },
+  {
+    id: 'vector_types',
+    keywords: ['vektor apa', 'vector apa', 'jenis vektor', 'jenis vector', 'kategori vektor', 'macam vektor', 'format vektor', 'file vektor', 'apa aja vektor', 'vektor aja'],
+    answer: 'Layanan vektor di Nans Dev lengkap bro: (1) Raster-to-Vector / Tracing ulang logo, foto, & sketsa buram/pecah jadi garis presisi; (2) Desain logo custom dari nol; (3) Aset grafis siap cetak skala besar (spanduk, baliho, sablon kaos, stiker, & kemasan) dengan file master lengkap (SVG, EPS, AI, PDF, & PNG transparan resolusi tinggi).',
+    actionLabel: 'Uji Ketajaman di Vector Lab',
+    actionHref: '#vector-lab',
+  },
+  {
+    id: 'vector',
+    keywords: [
+      'vektor', 'vector', 'logo', 'gambar', 'ilustrasi', 'desain', 'design', 'pecah',
+      'blur', 'buram', 'svg', 'eps', 'ai', 'cdr', 'png', 'raster', 'tracing',
+      'trace', 'redraw', 'ubah gambar', 'convert', 'konversi', 'cetak', 'baliho',
+      'spanduk', 'kaos', 'sablon', 'kemasan', 'packaging', 'tajam', 'hd', 'resolusi'
+    ],
+    answer: 'Bisa banget bro! Nans Dev ngerjain desain logo/grafis serta ubah gambar, foto, atau logo yang buram/pecah jadi vektor murni yang tajam di segala skala (siap cetak spanduk, sablon kaos, kemasan, maupun layar Retina) lengkap dengan file master siap pakai.',
+    actionLabel: 'Uji di Vector Lab',
+    actionHref: '#vector-lab',
+  },
+  {
+    id: 'web_types',
+    keywords: ['web apa', 'website apa', 'jenis web', 'jenis website', 'kategori web', 'kategori website', 'macam web', 'bikin apa aja', 'buat apa aja', 'fitur web'],
+    answer: 'Kategori website yang dikerjain Nans Dev beragam bro: (1) Landing page produk/jasa konversi tinggi; (2) Toko online & katalog e-commerce interaktif; (3) Company profile bisnis/perusahaan; (4) Direktori bisnis & UMKM lokal; serta (5) Web app custom lengkap dengan kalkulator harga & checkout otomatis langsung ke WhatsApp.',
+    actionLabel: 'Lihat Portofolio Live',
+    actionHref: '#portfolio',
+  },
+  {
+    id: 'web_service',
+    keywords: [
+      'jasa web', 'jasa website', 'bikin web', 'buat web', 'bikin website', 'buat website',
+      'layanan web', 'website', 'web', 'katalog', 'toko online',
+      'ecommerce', 'e-commerce', 'landing page', 'landing', 'company profile', 'profil perusahaan',
+      'direktori', 'umkm', 'cafe', 'laundry', 'aplikasi web', 'web app', 'kalkulator wa',
+      'order wa', 'responsif', 'mobile', 'seo', 'hosting', 'deploy'
+    ],
+    answer: 'Buat jasa pembuatan website, Nans Dev ngerjain berbagai kategori web custom—mulai dari landing page, katalog toko online/e-commerce, company profile, direktori bisnis/UMKM, sampai fitur kalkulator & order otomatis ke WhatsApp dengan desain responsif di HP maupun desktop.',
+    actionLabel: 'Lihat Kalkulator Estimasi',
+    actionHref: '#estimator',
+  },
+  {
+    id: 'pricing_detail',
+    keywords: ['rincian harga', 'daftar harga', 'pricelist', 'price list', 'paket harga', 'mulai dari', 'termurah', 'paling murah', 'diskon', 'nego'],
+    answer: 'Patokan estimasi modul di Nans Dev: Raster-to-Vector Logo HD mulai Rp 150rb (+1 hari), Paket Banner & Aset Sosmed Rp 250rb (+2 hari), Custom Company Profile / Landing Page Rp 750rb (+3 hari), dan E-Commerce / Katalog / Sistem LMS Rp 1,5jt (+5 hari). Lu bisa centang kombinasi modul di kalkulator buat lihat total IDR/USD otomatis.',
+    actionLabel: 'Simulasi di Kalkulator',
+    actionHref: '#estimator',
+  },
   {
     id: 'pricing',
     keywords: [
@@ -24,29 +79,18 @@ const INTENTS: AssistantIntent[] = [
     actionHref: '#estimator',
   },
   {
-    id: 'vector',
-    keywords: [
-      'vektor', 'vector', 'logo', 'gambar', 'ilustrasi', 'desain', 'design', 'pecah',
-      'blur', 'buram', 'svg', 'eps', 'pdf', 'ai', 'cdr', 'png', 'raster', 'tracing',
-      'trace', 'redraw', 'ubah gambar', 'convert', 'konversi', 'cetak', 'baliho',
-      'spanduk', 'kaos', 'sablon', 'kemasan', 'packaging', 'tajam', 'hd', 'resolusi'
-    ],
-    answer: 'Bisa banget bro! Nans Dev ngerjain desain logo/grafis serta ubah gambar, foto, atau logo yang buram/pecah jadi vektor murni yang tajam di segala skala (siap cetak spanduk, sablon kaos, kemasan, maupun layar Retina) lengkap dengan file master siap pakai.',
-    actionLabel: 'Uji di Vector Lab',
-    actionHref: '#vector-lab',
+    id: 'tech_stack',
+    keywords: ['stack', 'teknologi', 'bahasa', 'framework', 'pakai apa', 'pake apa', 'kode', 'coding', 'source code', 'kecepatan', 'performa', 'lighthouse', 'wasm'],
+    answer: 'Arsitektur web Nans Dev dibangun pakai TypeScript, SCSS modern, WebGL2/Three.js buat visual 3D ringan, serta modul Rust WebAssembly & Go telemetry buat performa kencang (target skor Lighthouse 98–100 & loading sub-detik di HP). Source code bersih 100% jadi hak milik klien.',
+    actionLabel: 'Cek Pipeline & Audit',
+    actionHref: '#blueprint',
   },
   {
-    id: 'web_service',
-    keywords: [
-      'jasa web', 'jasa website', 'bikin web', 'buat web', 'bikin website', 'buat website',
-      'layanan web', 'kategori web', 'jenis web', 'website', 'web', 'katalog', 'toko online',
-      'ecommerce', 'e-commerce', 'landing page', 'landing', 'company profile', 'profil perusahaan',
-      'direktori', 'umkm', 'cafe', 'laundry', 'aplikasi web', 'web app', 'kalkulator wa',
-      'order wa', 'responsif', 'mobile', 'seo', 'hosting', 'deploy'
-    ],
-    answer: 'Buat jasa pembuatan website, Nans Dev ngerjain berbagai kategori web custom—mulai dari landing page, katalog toko online/e-commerce, company profile, direktori bisnis/UMKM, sampai fitur kalkulator & order otomatis ke WhatsApp dengan desain responsif di HP maupun desktop.',
-    actionLabel: 'Lihat Kalkulator Estimasi',
-    actionHref: '#estimator',
+    id: 'revision_support',
+    keywords: ['revisi', 'garansi', 'bantuan', 'maintenance', 'perawatan', 'ubah', 'ganti', 'setelah jadi', 'aman', 'terpercaya', 'bukti', 'testimoni'],
+    answer: 'Setiap proyek sudah termasuk revisi desain & tata letak sesuai ruang lingkup modul yang disepakati, plus dukungan teknis & panduan pengelolaan setelah website live. Kalau mau transaksi ekstra aman, bisa pakai rekening bersama Fastwork (@yusnanyulyakso1).',
+    actionLabel: 'Lihat Review Klien',
+    actionHref: '#reviews',
   },
   {
     id: 'order',
@@ -71,13 +115,65 @@ const INTENTS: AssistantIntent[] = [
 
 const QUICK_PROMPTS = [
   'Bisa bikin web apa aja?',
-  'Bisa ubah gambar/logo pecah jadi vektor?',
+  'Vektor apa aja yang dikerjain?',
   'Berapa estimasi biaya & harinya?',
   'Cara order via Fastwork / WA gimana?',
 ];
 
+function inferActionCta(query: string, replyText: string): { actionLabel?: string; actionHref?: string } {
+  const combined = `${query} ${replyText}`.toLowerCase();
+  if (combined.includes('vector') || combined.includes('vektor') || combined.includes('logo') || combined.includes('sablon') || combined.includes('spanduk')) {
+    return { actionLabel: 'Uji di Vector Lab', actionHref: '#vector-lab' };
+  }
+  if (combined.includes('wa') || combined.includes('whatsapp') || combined.includes('0831') || combined.includes('fastwork') || combined.includes('order')) {
+    return { actionLabel: 'Buka WhatsApp Nans Dev', actionHref: 'https://wa.me/6283187521130' };
+  }
+  if (combined.includes('harga') || combined.includes('biaya') || combined.includes('estimasi') || combined.includes('kalkulator') || combined.includes('penawaran')) {
+    return { actionLabel: 'Hitung Estimasi Biaya', actionHref: '#estimator' };
+  }
+  return { actionLabel: 'Lihat Portofolio Live', actionHref: '#portfolio' };
+}
+
+export async function fetchAssistantReply(rawInput: string): Promise<AssistantIntent> {
+  const clean = rawInput.trim();
+  if (!clean) {
+    return matchAssistantReply('');
+  }
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(AI_WORKER_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: clean }),
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+
+    if (res.ok) {
+      const data = await res.json();
+      const aiText = typeof data?.reply === 'string' ? data.reply.trim() : '';
+      if (aiText) {
+        const cta = inferActionCta(clean, aiText);
+        return {
+          id: 'gemini_worker',
+          keywords: [],
+          answer: aiText,
+          actionLabel: cta.actionLabel,
+          actionHref: cta.actionHref,
+        };
+      }
+    }
+  } catch {
+    // Otomatis pakai fallback lokal kalau jaringan bermasalah atau timeout
+  }
+
+  return matchAssistantReply(clean);
+}
+
 export function matchAssistantReply(rawInput: string): AssistantIntent {
-  const q = rawInput.toLowerCase().trim();
+  const q = rawInput.toLowerCase().trim().replace(/[?!.,]+/g, ' ').replace(/\s+/g, ' ');
   if (!q) {
     return {
       id: 'empty',
@@ -93,7 +189,8 @@ export function matchAssistantReply(rawInput: string): AssistantIntent {
     let score = 0;
     for (const kw of item.keywords) {
       if (q.includes(kw)) {
-        score += kw.length >= 6 ? 4 : kw.length >= 4 ? 3 : 2;
+        const isPhrase = kw.includes(' ');
+        score += isPhrase ? 9 : kw.length >= 6 ? 4 : kw.length >= 4 ? 3 : 2;
       }
     }
     if (score > bestScore) {
@@ -180,7 +277,7 @@ export function mountNansSmartAssistant(options?: DropupMountOptions | ((freq?: 
   root.innerHTML = `
     <div id="nans-ai-panel" role="dialog" aria-label="Nans Dev Smart Assistant">
       <div class="nans-ai-head">
-        <div><strong>Nans Dev Smart Q&amp;A</strong><small>Local Knowledge Engine · Zero Limit</small></div>
+        <div><strong>Nans Dev Smart Q&amp;A</strong><small>Gemini Cloud AI · Zero Limit Fallback</small></div>
         <button type="button" id="nans-ai-close" aria-label="Tutup Chat">✕</button>
       </div>
       <div id="nans-ai-messages">
@@ -248,16 +345,21 @@ export function mountNansSmartAssistant(options?: DropupMountOptions | ((freq?: 
     messages.scrollTop = messages.scrollHeight;
   };
 
-  const askQuestion = (text: string) => {
+  const askQuestion = async (text: string) => {
     const clean = text.trim();
     if (!clean) return;
     onClickSound?.(640);
     appendMsg(clean, 'user');
-    const reply = matchAssistantReply(clean);
-    setTimeout(() => {
-      onClickSound?.(740);
-      appendMsg(reply.answer, 'bot', reply.actionLabel, reply.actionHref);
-    }, 180);
+    const thinking = document.createElement('div');
+    thinking.className = 'nans-msg bot';
+    thinking.textContent = 'Sedang mikir...';
+    messages.appendChild(thinking);
+    messages.scrollTop = messages.scrollHeight;
+
+    const reply = await fetchAssistantReply(clean);
+    thinking.remove();
+    onClickSound?.(740);
+    appendMsg(reply.answer, 'bot', reply.actionLabel, reply.actionHref);
   };
 
   toggleBtn.addEventListener('click', () => {
