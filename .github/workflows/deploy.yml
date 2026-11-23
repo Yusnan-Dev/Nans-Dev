@@ -47,7 +47,7 @@ jobs:
           python3 scripts/generate_data.py
           python3 scripts/enterprise_ops.py
           go run scripts/edge_benchmark.go
-          cp -f sitemap.xml robots.txt manifest.json schema.json _headers build-telemetry.json dist/ 2>/dev/null || true
+          cp -f sitemap.xml robots.txt manifest.json icon-192.png icon-512.png schema.json _headers build-telemetry.json dist/ 2>/dev/null || true
 
       - name: Compile Rust WebAssembly, TypeScript/TSX & SCSS into dist
         run: |
