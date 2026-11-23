@@ -1,57 +1,28 @@
 (() => {
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    });
+    navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {});
   }
 
   const fixStyle = document.createElement('style');
   fixStyle.textContent = `
-    html, body {
-      overflow-x: hidden !important;
-      max-width: 100% !important;
-    }
+    html, body { overflow-x: hidden !important; max-width: 100% !important; }
     #nans-addon-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      width: 100%;
-      padding-top: 10px;
-      margin-top: 6px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex; flex-direction: column; gap: 8px; width: 100%;
+      padding-top: 10px; margin-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
-    html[data-theme="light"] #nans-addon-controls {
-      border-top-color: rgba(15, 23, 42, 0.1);
-    }
+    html[data-theme="light"] #nans-addon-controls { border-top-color: rgba(15, 23, 42, 0.1); }
     #nans-lang-switcher {
-      width: 100%;
-      padding: 9px 12px;
-      border-radius: 10px;
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      background: #0b1324;
-      color: #f8fafc;
-      font-weight: 600;
-      font-size: 13.5px;
-      cursor: pointer;
-      outline: none;
+      width: 100%; padding: 9px 12px; border-radius: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.35); background: #0b1324; color: #f8fafc;
+      font-weight: 600; font-size: 13.5px; cursor: pointer; outline: none;
     }
     html[data-theme="light"] #nans-lang-switcher {
-      background: #f8fafc;
-      color: #0f172a;
-      border-color: rgba(15, 23, 42, 0.16);
+      background: #f8fafc; color: #0f172a; border-color: rgba(15, 23, 42, 0.16);
     }
     #nans-install-btn {
-      width: 100%;
-      align-items: center;
-      justify-content: center;
-      padding: 9px 12px;
-      border-radius: 10px;
-      border: 1px solid #38bdf8;
-      background: rgba(56, 189, 248, 0.12);
-      color: #38bdf8;
-      font-weight: 700;
-      font-size: 13.5px;
-      cursor: pointer;
+      width: 100%; align-items: center; justify-content: center; padding: 9px 12px;
+      border-radius: 10px; border: 1px solid #38bdf8; background: rgba(56, 189, 248, 0.12);
+      color: #38bdf8; font-weight: 700; font-size: 13.5px; cursor: pointer;
     }
   `;
   document.head.appendChild(fixStyle);
@@ -72,9 +43,7 @@
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    if (!isStandalone()) {
-      installItem.style.display = 'inline-flex';
-    }
+    if (!isStandalone()) installItem.style.display = 'inline-flex';
   });
 
   window.addEventListener('appinstalled', () => {
@@ -160,11 +129,7 @@
       const res = await fetch(url);
       const data = await res.json();
       const out = (data?.[0] || []).map((item: any) => item?.[0] || '').join('').trim();
-      if (out) {
-        trCache[key] = out;
-        saveCache();
-        return out;
-      }
+      if (out) { trCache[key] = out; saveCache(); return out; }
     } catch {}
     return text;
   };
@@ -172,20 +137,12 @@
   const langBox = document.createElement('select');
   langBox.id = 'nans-lang-switcher';
   langBox.setAttribute('aria-label', 'Pilih Bahasa');
-
-  [
-    ['id', '🌐 🇮🇩 ID'],
-    ['en', '🌐 🇺🇸 EN'],
-    ['ja', '🌐 🇯🇵 JP'],
-    ['ar', '🌐 🇸🇦 AR'],
-    ['fr', '🌐 🇫🇷 FR'],
-    ['es', '🌐 🇪🇸 ES']
-  ].forEach(([val, label]) => {
-    const opt = document.createElement('option');
-    opt.value = val;
-    opt.textContent = label;
-    langBox.appendChild(opt);
-  });
+  [['id', '🌐 🇮🇩 ID'], ['en', '🌐 🇺🇸 EN'], ['ja', '🌐 🇯🇵 JP'], ['ar', '🌐 🇸🇦 AR'], ['fr', '🌐 🇫🇷 FR'], ['es', '🌐 🇪🇸 ES']]
+    .forEach(([val, label]) => {
+      const opt = document.createElement('option');
+      opt.value = val; opt.textContent = label;
+      langBox.appendChild(opt);
+    });
 
   const applyFullPageLang = async (code: string) => {
     document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
@@ -202,49 +159,32 @@
       if (/^(NANS|DEV|Install App|HTML5|CSS3|JavaScript|TypeScript|WebGL2|SCSS|SVG|PWA|SEO|99\.9%|100\/100)$/i.test(clean)) continue;
       nodes.push({ node: current as Text, orig: clean });
     }
-
     const pending: { node: Text; orig: string }[] = [];
     for (const item of nodes) {
-      if (fastMap[item.orig]) {
-        item.node.nodeValue = fastMap[item.orig];
-      } else if (trCache[`${code}:${item.orig}`]) {
-        item.node.nodeValue = trCache[`${code}:${item.orig}`];
-      } else {
-        pending.push(item);
-      }
+      if (fastMap[item.orig]) item.node.nodeValue = fastMap[item.orig];
+      else if (trCache[`${code}:${item.orig}`]) item.node.nodeValue = trCache[`${code}:${item.orig}`];
+      else pending.push(item);
     }
-
     for (let i = 0; i < pending.length; i += 8) {
       if ((localStorage.getItem('nans_selected_lang') || 'id') !== code) break;
-      const chunk = pending.slice(i, i + 8);
-      await Promise.all(
-        chunk.map(async ({ node, orig }) => {
-          const translated = await translateText(orig, code);
-          if ((localStorage.getItem('nans_selected_lang') || 'id') === code) {
-            node.nodeValue = translated;
-          }
-        })
-      );
+      await Promise.all(pending.slice(i, i + 8).map(async ({ node, orig }) => {
+        const translated = await translateText(orig, code);
+        if ((localStorage.getItem('nans_selected_lang') || 'id') === code) node.nodeValue = translated;
+      }));
     }
     installItem.innerHTML = `${svgIcon}Install App`;
   };
 
-  ['click', 'touchstart', 'mousedown'].forEach((evt) =>
-    langBox.addEventListener(evt, (e) => e.stopPropagation())
-  );
-
+  ['click', 'touchstart', 'mousedown'].forEach((evt) => langBox.addEventListener(evt, (e) => e.stopPropagation()));
   langBox.addEventListener('change', (e) => {
     e.stopPropagation();
     const chosen = langBox.value;
     localStorage.setItem('nans_selected_lang', chosen);
-    if (chosen === 'id') {
-      window.location.reload();
-      return;
-    }
+    if (chosen === 'id') { window.location.reload(); return; }
     applyFullPageLang(chosen);
   });
 
-  const mountInsideHamburger = () => {
+  const initAddon = () => {
     const navContainer = document.getElementById('nav-links') || document.querySelector('.nav-links, header nav');
     if (navContainer && !navContainer.contains(langBox)) {
       const wrapper = document.createElement('div');
@@ -253,12 +193,11 @@
       wrapper.appendChild(installItem);
       navContainer.appendChild(wrapper);
     }
-  };
-
-  window.addEventListener('DOMContentLoaded', () => {
-    mountInsideHamburger();
     const saved = localStorage.getItem('nans_selected_lang') || 'id';
     langBox.value = saved;
     if (saved !== 'id') setTimeout(() => applyFullPageLang(saved), 650);
-  });
+  };
+
+  if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', initAddon);
+  else initAddon();
 })();
