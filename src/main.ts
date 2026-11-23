@@ -1,3 +1,4 @@
+import { mountNansSmartAssistant } from './nans-smart-assistant';
 import { renderPolyglotStrip } from './components/StackBadge';
 import { mountWasmBenchmarkLab, mountV4EstimatorTools, applyV4ThemeColors, applyV4ThemeMode, mountNavbarThemeSwitcher, mountGlobeInspectorAndTrigger, mountVectorLabModeSwitch, ThemeMode } from './components/V4InteractiveSuite';
 declare const THREE: any;
@@ -1848,3 +1849,5 @@ window.addEventListener('load', () => {
     setTimeout(() => preloader.remove(), 600);
   }, 2200);
 });
+
+ mountNansSmartAssistant();
