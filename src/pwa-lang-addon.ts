@@ -58,6 +58,10 @@
 
   const svgIcon = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;flex-shrink:0;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
 
+  const isStandalone = () =>
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as any).standalone === true;
+
   let deferredPrompt: any = null;
   const installItem = document.createElement('button');
   installItem.id = 'nans-install-btn';
@@ -68,7 +72,14 @@
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    installItem.style.display = 'inline-flex';
+    if (!isStandalone()) {
+      installItem.style.display = 'inline-flex';
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    installItem.style.display = 'none';
   });
 
   installItem.addEventListener('click', async () => {
