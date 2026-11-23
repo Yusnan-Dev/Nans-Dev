@@ -148,6 +148,7 @@ function createRocketHullTexture(): any {
   ctx.fillStyle = hullGrad;
   ctx.fillRect(0, 0, 512, 512);
 
+  // Strip interstage hitam & merah khas roket orbital (Falcon / Saturn style)
   ctx.fillStyle = '#0f172a';
   ctx.fillRect(0, 36, 512, 42);
   ctx.fillStyle = '#dc2626';
@@ -155,11 +156,13 @@ function createRocketHullTexture(): any {
   ctx.fillStyle = '#f97316';
   ctx.fillRect(0, 108, 512, 8);
 
+  // Tangki oksidator & seksi mesin bawah
   ctx.fillStyle = '#1e293b';
   ctx.fillRect(0, 415, 512, 97);
   ctx.fillStyle = '#dc2626';
   ctx.fillRect(0, 402, 512, 12);
 
+  // Garis panel & paku keling (rivet seams)
   ctx.strokeStyle = 'rgba(15, 23, 42, 0.28)';
   ctx.lineWidth = 2;
   for (let y = 0; y < 512; y += 64) {
@@ -169,6 +172,7 @@ function createRocketHullTexture(): any {
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke();
   }
 
+  // Jalur pipa LOX eksternal (raceway) & kode seri
   ctx.fillStyle = '#334155';
   ctx.fillRect(242, 130, 28, 260);
   ctx.fillStyle = '#0f172a';
@@ -817,53 +821,6 @@ function setupArchitectureBlueprint(): void {
       </div>
     `;
     bpPanel.appendChild(simWrap);
-  }
-
-  // PART 3: Inject Enterprise Security & Uptime Strip with Live Ping
-  if (bpPanel && !bpPanel.querySelector('#bp-security-strip')) {
-    const secStrip = document.createElement('div');
-    secStrip.id = 'bp-security-strip';
-    secStrip.style.cssText = 'margin-top:12px;padding:11px 12px;border-radius:14px;background:#05070c;border:1px solid rgba(52,211,153,0.22);font-family:monospace;';
-    secStrip.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">
-        <span style="font-size:0.68rem;font-weight:800;color:#34d399;letter-spacing:0.6px;">ENTERPRISE SECURITY &amp; UPTIME</span>
-        <span style="display:inline-flex;align-items:center;gap:5px;font-size:0.66rem;font-weight:700;color:#f8fafc;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.35);padding:2px 8px;border-radius:999px;">
-          <span class="live-dot" style="width:6px;height:6px;border-radius:50%;background:#34d399;display:inline-block;"></span>
-          LIVE PING: <strong id="bp-live-ping-val" style="color:#34d399;">14 ms</strong>
-        </span>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
-        <div style="padding:7px 6px;border-radius:9px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.08);text-align:center;">
-          <div style="font-size:0.61rem;color:#34d399;font-weight:800;margin-bottom:2px;">✓ ACTIVE</div>
-          <div style="font-size:0.63rem;color:#e2e8f0;font-weight:700;">SSL/TLS 1.3</div>
-        </div>
-        <div style="padding:7px 6px;border-radius:9px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.08);text-align:center;">
-          <div style="font-size:0.61rem;color:var(--v4-accent,#38bdf8);font-weight:800;margin-bottom:2px;">✓ PROTECTED</div>
-          <div style="font-size:0.63rem;color:#e2e8f0;font-weight:700;">Edge DDoS Shield</div>
-        </div>
-        <div style="padding:7px 6px;border-radius:9px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.08);text-align:center;">
-          <div style="font-size:0.61rem;color:#a855f7;font-weight:800;margin-bottom:2px;">✓ 99.98% SLA</div>
-          <div style="font-size:0.63rem;color:#e2e8f0;font-weight:700;">Zero-Downtime Git</div>
-        </div>
-      </div>
-    `;
-    bpPanel.appendChild(secStrip);
-
-    const pingEl = document.getElementById('bp-live-ping-val');
-    const measureLivePing = async () => {
-      if (document.hidden || !pingEl) return;
-      const t0 = performance.now();
-      try {
-        await fetch('./services.json', { method: 'HEAD', cache: 'no-store' });
-        const rtt = Math.max(9, Math.min(48, Math.round(performance.now() - t0)));
-        pingEl.textContent = `${rtt} ms`;
-      } catch {
-        const jitter = 12 + Math.floor(Math.random() * 7);
-        pingEl.textContent = `${jitter} ms`;
-      }
-    };
-    measureLivePing();
-    window.setInterval(measureLivePing, 4500);
   }
 
   const flowNodes = simWrap ? Array.from(simWrap.querySelectorAll<HTMLButtonElement>('.flow-node')) : [];
