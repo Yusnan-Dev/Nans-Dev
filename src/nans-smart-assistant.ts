@@ -84,7 +84,29 @@ export function matchAssistantReply(rawInput: string): AssistantIntent {
   };
 }
 
+function hideLegacyFloatingSfx(): void {
+  const candidates = Array.from(document.querySelectorAll<HTMLElement>('button, a, div'));
+  for (const el of candidates) {
+    if (el.closest('#nans-smart-assistant-root')) continue;
+    const idOrClass = `${el.id || ''} ${typeof el.className === 'string' ? el.className : ''}`.toLowerCase();
+    const txt = (el.textContent || '').trim().toUpperCase();
+    const isAudioBtn = el.id === 'audio-toggle' || idOrClass.includes('audio-toggle') || txt === 'SFX OFF' || txt === 'SFX ON';
+    if (!isAudioBtn) continue;
+
+    const cs = getComputedStyle(el);
+    if (cs.position === 'fixed' || el.id === 'audio-toggle') {
+      el.style.setProperty('display', 'none', 'important');
+      el.style.setProperty('visibility', 'hidden', 'important');
+      el.style.setProperty('pointer-events', 'none', 'important');
+    }
+  }
+}
+
 export function mountNansSmartAssistant(options?: DropupMountOptions | ((freq?: number) => void)): void {
+  hideLegacyFloatingSfx();
+  setTimeout(hideLegacyFloatingSfx, 150);
+  setTimeout(hideLegacyFloatingSfx, 600);
+
   if (document.getElementById('nans-smart-assistant-root')) return;
 
   const opts: DropupMountOptions = typeof options === 'function' ? { onClickSound: options } : (options || {});
@@ -93,7 +115,9 @@ export function mountNansSmartAssistant(options?: DropupMountOptions | ((freq?: 
   let sfxOn = Boolean(opts.initialSfxEnabled);
 
   const style = document.createElement('style');
+  style.id = 'nans-smart-assistant-css';
   style.textContent = `
+    #audio-toggle, button[id*="audio-toggle"], .audio-toggle-btn { display: none !important; visibility: hidden !important; pointer-events: none !important; }
     #nans-smart-assistant-root{position:fixed;right:14px;bottom:16px;z-index:9985;font-family:inherit;display:flex;flex-direction:column;align-items:flex-end}
     #nans-dropup-menu{display:none;flex-direction:column;gap:8px;margin-bottom:9px;align-items:flex-end}
     #nans-dropup-menu.open{display:flex}
