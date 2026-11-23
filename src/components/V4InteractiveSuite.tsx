@@ -2,12 +2,218 @@ import { createDomNode } from './StackBadge';
 
 export type ThemeMode = 'dark' | 'light';
 
-export const V4_PALETTES = [
-  { name: 'Cyber Cyan', colors: ['#38bdf8', '#818cf8'] },
-  { name: 'Emerald Ops', colors: ['#34d399', '#10b981'] },
-  { name: 'Royal Gold', colors: ['#fbbf24', '#f59e0b'] },
-  { name: 'Crimson Pro', colors: ['#fb7185', '#f43f5e'] },
+export interface V4PaletteSpec {
+  name: string;
+  colors: [string, string];
+  darkBg: string;
+  darkSurface: string;
+  darkMuted: string;
+  lightBg: string;
+  lightSurface: string;
+  lightMuted: string;
+}
+
+export const V4_PALETTES: V4PaletteSpec[] = [
+  {
+    name: 'Cyber Cyan',
+    colors: ['#38bdf8', '#818cf8'],
+    darkBg: '#04060b',
+    darkSurface: '#0a0f1c',
+    darkMuted: '#94a3b8',
+    lightBg: '#f0f7ff',
+    lightSurface: '#ffffff',
+    lightMuted: '#475569',
+  },
+  {
+    name: 'Emerald Ops',
+    colors: ['#34d399', '#10b981'],
+    darkBg: '#03120e',
+    darkSurface: '#071f18',
+    darkMuted: '#99d5c2',
+    lightBg: '#ecfdf5',
+    lightSurface: '#ffffff',
+    lightMuted: '#3f6257',
+  },
+  {
+    name: 'Royal Gold',
+    colors: ['#fbbf24', '#f59e0b'],
+    darkBg: '#1c0508',
+    darkSurface: '#2d0a0f',
+    darkMuted: '#f3c6c6',
+    lightBg: '#fef2f2',
+    lightSurface: '#fffbeb',
+    lightMuted: '#7f1d1d',
+  },
+  {
+    name: 'Crimson Pro',
+    colors: ['#fb7185', '#f43f5e'],
+    darkBg: '#1a1204',
+    darkSurface: '#291c07',
+    darkMuted: '#ead6a8',
+    lightBg: '#fefce8',
+    lightSurface: '#fff1f2',
+    lightMuted: '#713f12',
+  },
 ];
+
+function getActivePalette(): V4PaletteSpec {
+  try {
+    const saved = localStorage.getItem('nans_theme_accent');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed[0]) {
+        const found = V4_PALETTES.find((p) => p.colors[0] === parsed[0]);
+        if (found) return found;
+      }
+    }
+  } catch {}
+  return V4_PALETTES[0];
+}
+
+function renderDynamicThemeStyles(palette: V4PaletteSpec, mode: ThemeMode): void {
+  const isLight = mode === 'light';
+  const [accent, accent2] = palette.colors;
+  const bgBase = isLight ? palette.lightBg : palette.darkBg;
+  const bgSurface = isLight ? palette.lightSurface : palette.darkSurface;
+  const textMain = isLight ? '#0f172a' : '#f8fafc';
+  const textSub = isLight ? palette.lightMuted : palette.darkMuted;
+  const borderCol = isLight ? 'rgba(15, 23, 42, 0.14)' : 'rgba(255, 255, 255, 0.11)';
+
+  let styleTag = document.getElementById('v4-dynamic-theme-style') as HTMLStyleElement | null;
+  if (!styleTag) {
+    styleTag = document.createElement('style');
+    styleTag.id = 'v4-dynamic-theme-style';
+    document.head.appendChild(styleTag);
+  }
+
+  styleTag.textContent = `
+    :root {
+      --v4-accent: ${accent};
+      --v4-accent2: ${accent2};
+      --v4-bg-base: ${bgBase};
+      --v4-bg-surface: ${bgSurface};
+      --v4-text-main: ${textMain};
+      --v4-text-sub: ${textSub};
+    }
+
+    html, body {
+      background-color: var(--v4-bg-base) !important;
+      color: var(--v4-text-main) !important;
+      transition: background-color 0.28s ease, color 0.28s ease;
+    }
+
+    .navbar {
+      background: color-mix(in srgb, var(--v4-bg-base) 88%, transparent) !important;
+      border-bottom-color: ${borderCol} !important;
+    }
+
+    .navbar .nav-links,
+    .cmd-box,
+    .audio-fab {
+      background: var(--v4-bg-surface) !important;
+      border-color: ${borderCol} !important;
+      color: var(--v4-text-main) !important;
+    }
+
+    .metric-box,
+    .bento-card,
+    .blueprint-panel,
+    .audit-panel,
+    .vector-lab,
+    .project-card,
+    .review-card,
+    .estimator-box,
+    .filter-btn,
+    .currency-switch,
+    .ai-scope-bar input {
+      background: var(--v4-bg-surface) !important;
+      border-color: ${borderCol} !important;
+      color: var(--v4-text-main) !important;
+    }
+
+    .est-summary,
+    .bp-inspector,
+    .wasm-lab-box,
+    .audit-gauges .gauge-item,
+    .bento-card .card-graphic,
+    .v4-roi-box {
+      background: color-mix(in srgb, var(--v4-bg-base) 82%, var(--v4-bg-surface)) !important;
+      border-color: ${borderCol} !important;
+      color: var(--v4-text-main) !important;
+    }
+
+    .est-options label,
+    .brief-inputs input,
+    .brief-inputs textarea,
+    .bp-node,
+    .project-card .tags span,
+    .v4-nav-theme,
+    .navbar .cmd-btn,
+    .navbar .menu-toggle {
+      background: color-mix(in srgb, var(--v4-bg-surface) 75%, var(--v4-bg-base)) !important;
+      border-color: ${borderCol} !important;
+      color: var(--v4-text-main) !important;
+    }
+
+    .hero-enterprise p,
+    .metric-box .lbl,
+    .bento-card p,
+    .project-card p,
+    .review-card blockquote,
+    .review-card .rev-role,
+    .vector-lab p,
+    .audit-panel .audit-sub,
+    .bp-inspector .bp-desc,
+    .est-summary .est-note,
+    footer {
+      color: var(--v4-text-sub) !important;
+    }
+
+    .hero-enterprise h1 {
+      background: linear-gradient(135deg, var(--v4-text-main) 25%, var(--v4-accent) 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+    }
+
+    .metric-box .val,
+    .est-summary .est-price {
+      background: linear-gradient(90deg, var(--v4-text-main) 15%, var(--v4-accent) 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+    }
+
+    .btn-primary,
+    .pre-bar .pre-fill,
+    .metric-bar-fill {
+      background: linear-gradient(135deg, var(--v4-accent2), var(--v4-accent)) !important;
+      color: #05070c !important;
+    }
+
+    .section-header .kicker,
+    .p-badge,
+    .p-link,
+    .bp-title,
+    .pill-announcement,
+    .navbar .brand span,
+    .est-options label .meta-tag,
+    .v4-roi-box span:first-child {
+      color: var(--v4-accent) !important;
+    }
+
+    .estimator-box,
+    .bp-node.active,
+    .filter-btn.active,
+    .bento-card:hover,
+    .project-card:hover {
+      border-color: var(--v4-accent) !important;
+    }
+
+    .v4-nav-swatch.active {
+      border-color: ${isLight ? '#0f172a' : '#ffffff'} !important;
+      box-shadow: 0 0 10px var(--v4-accent) !important;
+    }
+  `;
+}
 
 export function applyV4ThemeMode(mode: ThemeMode): void {
   const root = document.documentElement;
@@ -25,6 +231,8 @@ export function applyV4ThemeMode(mode: ThemeMode): void {
         ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="v4-mode-label">Dark</span>`
         : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg><span class="v4-mode-label">Light</span>`;
   }
+
+  renderDynamicThemeStyles(getActivePalette(), mode);
 }
 
 export function applyV4ThemeColors(accent: string, accent2: string): void {
@@ -36,24 +244,9 @@ export function applyV4ThemeColors(accent: string, accent2: string): void {
     localStorage.setItem('nans_theme_accent', JSON.stringify([accent, accent2]));
   } catch {}
 
-  let styleTag = document.getElementById('v4-dynamic-theme-style') as HTMLStyleElement | null;
-  if (!styleTag) {
-    styleTag = document.createElement('style');
-    styleTag.id = 'v4-dynamic-theme-style';
-    document.head.appendChild(styleTag);
-  }
-  styleTag.textContent = `
-    :root { --v4-accent: ${accent}; --v4-accent2: ${accent2}; }
-    .btn-primary, .pre-bar .pre-fill {
-      background: linear-gradient(135deg, var(--v4-accent2), var(--v4-accent)) !important;
-    }
-    .section-header .kicker, .p-badge, .p-link, .bp-title, .pill-announcement, .navbar .brand span {
-      color: var(--v4-accent) !important;
-    }
-    .estimator-box, .bp-node.active, .filter-btn.active {
-      border-color: var(--v4-accent) !important;
-    }
-  `;
+  const currentMode = (root.getAttribute('data-theme') === 'light' ? 'light' : 'dark') as ThemeMode;
+  const matchedPalette = V4_PALETTES.find((p) => p.colors[0] === accent) || V4_PALETTES[0];
+  renderDynamicThemeStyles(matchedPalette, currentMode);
 
   document.querySelectorAll<HTMLButtonElement>('.v4-nav-swatch').forEach((sw) => {
     const isMatch = sw.dataset.accent === accent;
