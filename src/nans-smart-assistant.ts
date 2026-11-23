@@ -6,6 +6,12 @@ export interface AssistantIntent {
   actionHref?: string;
 }
 
+export interface DropupMountOptions {
+  onClickSound?: (freq?: number) => void;
+  onToggleSfx?: () => boolean;
+  initialSfxEnabled?: boolean;
+}
+
 const INTENTS: AssistantIntent[] = [
   {
     id: 'services',
@@ -78,34 +84,43 @@ export function matchAssistantReply(rawInput: string): AssistantIntent {
   };
 }
 
-export function mountNansSmartAssistant(onClickSound?: (freq?: number) => void): void {
+export function mountNansSmartAssistant(options?: DropupMountOptions | ((freq?: number) => void)): void {
   if (document.getElementById('nans-smart-assistant-root')) return;
+
+  const opts: DropupMountOptions = typeof options === 'function' ? { onClickSound: options } : (options || {});
+  const onClickSound = opts.onClickSound;
+  const onToggleSfx = opts.onToggleSfx;
+  let sfxOn = Boolean(opts.initialSfxEnabled);
 
   const style = document.createElement('style');
   style.textContent = `
-    #nans-smart-assistant-root{position:fixed;right:16px;bottom:66px;z-index:9985;font-family:inherit}
-    #nans-ai-fab{display:inline-flex;align-items:center;gap:7px;padding:10px 14px;border-radius:999px;border:1px solid rgba(56,189,248,.5);background:linear-gradient(135deg,#0b1324,#13223d);color:#f8fafc;font-size:.78rem;font-weight:800;cursor:pointer;box-shadow:0 10px 26px rgba(2,6,23,.65);transition:transform .2s,border-color .2s}
-    #nans-ai-fab:hover{transform:translateY(-2px);border-color:var(--v4-accent,#38bdf8)}
-    #nans-ai-fab .ai-dot{width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 8px #34d399}
-    #nans-ai-panel{position:absolute;right:0;bottom:50px;width:min(350px,calc(100vw - 32px));border-radius:16px;background:#070c17;border:1px solid rgba(56,189,248,.35);box-shadow:0 18px 44px rgba(0,0,0,.78);overflow:hidden;display:none;flex-direction:column}
+    #nans-smart-assistant-root{position:fixed;right:14px;bottom:16px;z-index:9985;font-family:inherit;display:flex;flex-direction:column;align-items:flex-end}
+    #nans-dropup-menu{display:none;flex-direction:column;gap:8px;margin-bottom:9px;align-items:flex-end}
+    #nans-dropup-menu.open{display:flex}
+    .nans-up-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:999px;border:1px solid rgba(56,189,248,.42);background:rgba(11,19,36,.95);color:#f8fafc;font-size:.75rem;font-weight:800;cursor:pointer;box-shadow:0 8px 22px rgba(2,6,23,.65);white-space:nowrap}
+    .nans-up-btn:hover{border-color:var(--v4-accent,#38bdf8)}
+    .nans-up-btn .ai-dot{width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 7px #34d399}
+    #nans-dropup-toggle{display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border-radius:999px;border:1px solid rgba(56,189,248,.48);background:linear-gradient(135deg,#0b1324,#13223d);color:#f8fafc;font-size:.76rem;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(2,6,23,.65)}
+    #nans-dropup-toggle:hover{border-color:var(--v4-accent,#38bdf8)}
+    #nans-ai-panel{position:fixed;right:14px;bottom:62px;width:min(346px,calc(100vw - 28px));border-radius:16px;background:#070c17;border:1px solid rgba(56,189,248,.35);box-shadow:0 18px 44px rgba(0,0,0,.78);overflow:hidden;display:none;flex-direction:column;z-index:9990}
     #nans-ai-panel.open{display:flex}
-    .nans-ai-head{padding:12px 14px;background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(129,140,248,.14));border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}
-    .nans-ai-head strong{font-size:.84rem;color:#f8fafc;display:block}
-    .nans-ai-head small{font-size:.69rem;color:#94a3b8}
-    #nans-ai-close{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#e2e8f0;width:28px;height:28px;border-radius:8px;cursor:pointer;font-weight:800}
-    #nans-ai-messages{padding:12px;max-height:255px;overflow-y:auto;display:flex;flex-direction:column;gap:9px}
-    .nans-msg{padding:9px 11px;border-radius:12px;font-size:.77rem;line-height:1.48;max-width:90%}
+    .nans-ai-head{padding:11px 14px;background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(129,140,248,.14));border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}
+    .nans-ai-head strong{font-size:.82rem;color:#f8fafc;display:block}
+    .nans-ai-head small{font-size:.68rem;color:#94a3b8}
+    #nans-ai-close{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#e2e8f0;width:27px;height:27px;border-radius:8px;cursor:pointer;font-weight:800}
+    #nans-ai-messages{padding:11px;max-height:245px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+    .nans-msg{padding:8px 11px;border-radius:12px;font-size:.76rem;line-height:1.45;max-width:90%}
     .nans-msg.bot{align-self:flex-start;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#e2e8f0}
     .nans-msg.user{align-self:flex-end;background:rgba(56,189,248,.2);border:1px solid rgba(56,189,248,.4);color:#f8fafc;font-weight:600}
-    .nans-msg-cta{display:inline-block;margin-top:7px;padding:5px 10px;border-radius:8px;background:rgba(56,189,248,.16);border:1px solid rgba(56,189,248,.45);color:#7dd3fc;text-decoration:none;font-size:.71rem;font-weight:800}
-    #nans-ai-chips{padding:0 12px 9px;display:flex;flex-wrap:wrap;gap:6px}
-    .nans-chip{padding:5px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#cbd5e1;font-size:.69rem;cursor:pointer}
+    .nans-msg-cta{display:inline-block;margin-top:6px;padding:5px 9px;border-radius:8px;background:rgba(56,189,248,.16);border:1px solid rgba(56,189,248,.45);color:#7dd3fc;text-decoration:none;font-size:.7rem;font-weight:800}
+    #nans-ai-chips{padding:0 11px 8px;display:flex;flex-wrap:wrap;gap:5px}
+    .nans-chip{padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#cbd5e1;font-size:.68rem;cursor:pointer}
     .nans-chip:hover{border-color:#38bdf8;color:#f8fafc}
-    #nans-ai-form{padding:9px 12px 12px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:7px}
-    #nans-ai-input{flex:1;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#050811;color:#f8fafc;font-size:.77rem;outline:none}
+    #nans-ai-form{padding:8px 11px 11px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:6px}
+    #nans-ai-input{flex:1;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#050811;color:#f8fafc;font-size:.76rem;outline:none}
     #nans-ai-input:focus{border-color:#38bdf8}
-    #nans-ai-send{padding:8px 12px;border-radius:10px;border:none;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#05070c;font-weight:800;font-size:.76rem;cursor:pointer}
-    @media print{#nans-smart-assistant-root{display:none!important}}
+    #nans-ai-send{padding:8px 11px;border-radius:10px;border:none;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#05070c;font-weight:800;font-size:.75rem;cursor:pointer}
+    @media print{#nans-smart-assistant-root,#nans-ai-panel{display:none!important}}
   `;
   document.head.appendChild(style);
 
@@ -126,21 +141,42 @@ export function mountNansSmartAssistant(onClickSound?: (freq?: number) => void):
         <button type="submit" id="nans-ai-send">Kirim</button>
       </form>
     </div>
-    <button type="button" id="nans-ai-fab" aria-expanded="false"><span class="ai-dot"></span><span>Tanya AI</span></button>
+    <div id="nans-dropup-menu" role="menu">
+      <button type="button" class="nans-up-btn" id="nans-up-ai-btn"><span class="ai-dot"></span><span>Tanya AI</span></button>
+      <button type="button" class="nans-up-btn" id="nans-up-sfx-btn"><span id="nans-up-sfx-text">${sfxOn ? '🔊 SFX ON' : '🔇 SFX OFF'}</span></button>
+    </div>
+    <button type="button" id="nans-dropup-toggle" aria-expanded="false"><span>Menu ▲</span></button>
   `;
   document.body.appendChild(root);
 
-  const fab = document.getElementById('nans-ai-fab') as HTMLButtonElement;
+  const toggleBtn = document.getElementById('nans-dropup-toggle') as HTMLButtonElement;
+  const dropupMenu = document.getElementById('nans-dropup-menu') as HTMLElement;
+  const aiBtn = document.getElementById('nans-up-ai-btn') as HTMLButtonElement;
+  const sfxBtn = document.getElementById('nans-up-sfx-btn') as HTMLButtonElement;
+  const sfxText = document.getElementById('nans-up-sfx-text') as HTMLElement;
   const panel = document.getElementById('nans-ai-panel') as HTMLElement;
   const closeBtn = document.getElementById('nans-ai-close') as HTMLButtonElement;
   const form = document.getElementById('nans-ai-form') as HTMLFormElement;
   const input = document.getElementById('nans-ai-input') as HTMLInputElement;
   const messages = document.getElementById('nans-ai-messages') as HTMLElement;
 
-  const setOpen = (open: boolean) => {
+  const setMenuOpen = (open: boolean) => {
+    dropupMenu.classList.toggle('open', open);
+    toggleBtn.setAttribute('aria-expanded', String(open));
+    toggleBtn.innerHTML = open ? '<span>Menu ▼</span>' : '<span>Menu ▲</span>';
+  };
+
+  const setChatOpen = (open: boolean) => {
     panel.classList.toggle('open', open);
-    fab.setAttribute('aria-expanded', String(open));
-    if (open) setTimeout(() => input.focus(), 40);
+    if (open) {
+      setMenuOpen(false);
+      setTimeout(() => input.focus(), 40);
+    }
+  };
+
+  const syncSfxLabel = (enabled: boolean) => {
+    sfxOn = enabled;
+    sfxText.textContent = enabled ? '🔊 SFX ON' : '🔇 SFX OFF';
   };
 
   const appendMsg = (text: string, sender: 'user' | 'bot', ctaLabel?: string, ctaHref?: string) => {
@@ -153,7 +189,7 @@ export function mountNansSmartAssistant(onClickSound?: (freq?: number) => void):
       link.href = ctaHref;
       link.textContent = ctaLabel;
       if (ctaHref.startsWith('http')) { link.target = '_blank'; link.rel = 'noopener noreferrer'; }
-      else link.addEventListener('click', () => setOpen(false));
+      else link.addEventListener('click', () => setChatOpen(false));
       bubble.appendChild(document.createElement('br'));
       bubble.appendChild(link);
     }
@@ -173,8 +209,28 @@ export function mountNansSmartAssistant(onClickSound?: (freq?: number) => void):
     }, 180);
   };
 
-  fab.addEventListener('click', () => { onClickSound?.(620); setOpen(!panel.classList.contains('open')); });
-  closeBtn.addEventListener('click', () => { onClickSound?.(500); setOpen(false); });
+  toggleBtn.addEventListener('click', () => {
+    onClickSound?.(600);
+    setMenuOpen(!dropupMenu.classList.contains('open'));
+  });
+
+  aiBtn.addEventListener('click', () => {
+    onClickSound?.(650);
+    setChatOpen(!panel.classList.contains('open'));
+  });
+
+  sfxBtn.addEventListener('click', () => {
+    if (onToggleSfx) {
+      syncSfxLabel(onToggleSfx());
+    } else {
+      const legacyBtn = document.getElementById('audio-toggle') as HTMLButtonElement | null;
+      legacyBtn?.click();
+      const active = legacyBtn?.classList.contains('active') ?? !sfxOn;
+      syncSfxLabel(active);
+    }
+  });
+
+  closeBtn.addEventListener('click', () => { onClickSound?.(500); setChatOpen(false); });
   root.querySelectorAll<HTMLButtonElement>('.nans-chip').forEach((c) => c.addEventListener('click', () => askQuestion(c.textContent || '')));
   form.addEventListener('submit', (e) => { e.preventDefault(); askQuestion(input.value); input.value = ''; });
 }
