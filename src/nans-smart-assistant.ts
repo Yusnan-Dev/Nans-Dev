@@ -14,36 +14,55 @@ export interface DropupMountOptions {
 
 const INTENTS: AssistantIntent[] = [
   {
-    id: 'services',
-    keywords: ['layanan', 'jasa', 'bikin apa', 'kategori', 'website', 'web', 'katalog', 'landing', 'company', 'profile', 'aplikasi', 'app'],
-    answer: 'Nans Dev ngerjain custom website (landing page, katalog toko online, company profile, direktori bisnis), fitur kalkulator otomatis, sampai desain & rekonstruksi logo vektor HD.',
-    actionLabel: 'Lihat Kalkulator Estimasi',
-    actionHref: '#estimator',
-  },
-  {
-    id: 'vector',
-    keywords: ['vektor', 'vector', 'logo', 'pecah', 'blur', 'svg', 'eps', 'raster', 'cetak', 'baliho', 'spanduk'],
-    answer: 'Logo lama yang buram atau pecah bisa ditarik ulang jadi geometri vektor murni yang tajam di segala ukuran (siap cetak spanduk, kemasan, maupun layar Retina) dengan file master siap pakai.',
-    actionLabel: 'Uji di Vector Lab',
-    actionHref: '#vector-lab',
-  },
-  {
     id: 'pricing',
-    keywords: ['harga', 'biaya', 'tarif', 'berapa', 'estimasi', 'dp', 'bayar', 'pembayaran', 'hari', 'lama', 'durasi', 'pengerjaan'],
-    answer: 'Biaya & estimasi hari kerja bisa dihitung langsung lewat kalkulator di bawah (tersedia opsi IDR & USD). Umumnya skema DP 50% di awal dan pelunasan 50% sebelum serah terima final, atau lewat rekening bersama Fastwork.',
+    keywords: [
+      'harga', 'biaya', 'tarif', 'berapa', 'estimasi', 'dp', 'bayar', 'pembayaran',
+      'hari', 'lama', 'durasi', 'pengerjaan', 'berapa hari', 'prosesnya', 'cepat'
+    ],
+    answer: 'Estimasi biaya & lama pengerjaan (hitung hari kerja) bisa dicek langsung lewat kalkulator di bawah (tersedia pilihan IDR & USD). Umumnya skema DP 50% mulai kerja dan pelunasan 50% sebelum serah terima final, atau transaksi aman lewat rekening bersama Fastwork (@yusnanyulyakso1).',
     actionLabel: 'Hitung Estimasi Biaya',
     actionHref: '#estimator',
   },
   {
+    id: 'vector',
+    keywords: [
+      'vektor', 'vector', 'logo', 'gambar', 'ilustrasi', 'desain', 'design', 'pecah',
+      'blur', 'buram', 'svg', 'eps', 'pdf', 'ai', 'cdr', 'png', 'raster', 'tracing',
+      'trace', 'redraw', 'ubah gambar', 'convert', 'konversi', 'cetak', 'baliho',
+      'spanduk', 'kaos', 'sablon', 'kemasan', 'packaging', 'tajam', 'hd', 'resolusi'
+    ],
+    answer: 'Bisa banget bro! Nans Dev ngerjain desain logo/grafis serta ubah gambar, foto, atau logo yang buram/pecah jadi vektor murni yang tajam di segala skala (siap cetak spanduk, sablon kaos, kemasan, maupun layar Retina) lengkap dengan file master siap pakai.',
+    actionLabel: 'Uji di Vector Lab',
+    actionHref: '#vector-lab',
+  },
+  {
+    id: 'web_service',
+    keywords: [
+      'jasa web', 'jasa website', 'bikin web', 'buat web', 'bikin website', 'buat website',
+      'layanan web', 'kategori web', 'jenis web', 'website', 'web', 'katalog', 'toko online',
+      'ecommerce', 'e-commerce', 'landing page', 'landing', 'company profile', 'profil perusahaan',
+      'direktori', 'umkm', 'cafe', 'laundry', 'aplikasi web', 'web app', 'kalkulator wa',
+      'order wa', 'responsif', 'mobile', 'seo', 'hosting', 'deploy'
+    ],
+    answer: 'Buat jasa pembuatan website, Nans Dev ngerjain berbagai kategori web custom—mulai dari landing page, katalog toko online/e-commerce, company profile, direktori bisnis/UMKM, sampai fitur kalkulator & order otomatis ke WhatsApp dengan desain responsif di HP maupun desktop.',
+    actionLabel: 'Lihat Kalkulator Estimasi',
+    actionHref: '#estimator',
+  },
+  {
     id: 'order',
-    keywords: ['order', 'pesan', 'hubungi', 'kontak', 'wa', 'whatsapp', 'fastwork', 'email', 'gmail', 'yusnan', 'rekening', 'escrow'],
+    keywords: [
+      'order', 'pesan', 'booking', 'hubungi', 'kontak', 'wa', 'whatsapp', 'fastwork',
+      'email', 'gmail', 'yusnan', 'rekening', 'escrow', 'cara order', 'gimana order'
+    ],
     answer: 'Lu bisa kirim brief langsung ke WhatsApp 0831-8752-1130, order lewat Fastwork (@yusnanyulyakso1) buat transaksi terproteksi, atau kirim detail lewat email yusnanyulyakso29@gmail.com.',
     actionLabel: 'Buka WhatsApp Nans Dev',
     actionHref: 'https://wa.me/6283187521130',
   },
   {
     id: 'proposal',
-    keywords: ['cetak', 'penawaran', 'pdf', 'proposal', 'quotation', 'kertas', 'a4', 'salin', 'brief'],
+    keywords: [
+      'cetak', 'penawaran', 'pdf', 'proposal', 'quotation', 'kertas', 'a4', 'salin', 'brief'
+    ],
     answer: 'Setelah pilih modul & isi nama brand di kalkulator, lu bisa klik "Cetak Penawaran" buat bikin dokumen A4 1 halaman penuh atau "Salin Brief" buat ditempel ke chat.',
     actionLabel: 'Ke Bagian Penawaran',
     actionHref: '#estimator',
@@ -52,8 +71,8 @@ const INTENTS: AssistantIntent[] = [
 
 const QUICK_PROMPTS = [
   'Bisa bikin web apa aja?',
-  'Berapa estimasi biaya & durasinya?',
-  'Bisa rekonstruksi logo pecah jadi vektor?',
+  'Bisa ubah gambar/logo pecah jadi vektor?',
+  'Berapa estimasi biaya & harinya?',
   'Cara order via Fastwork / WA gimana?',
 ];
 
@@ -63,22 +82,30 @@ export function matchAssistantReply(rawInput: string): AssistantIntent {
     return {
       id: 'empty',
       keywords: [],
-      answer: 'Ketik pertanyaan lu soal layanan web, vektor logo, estimasi biaya, atau cara order via WA 0831-8752-1130 & Fastwork @yusnanyulyakso1.',
+      answer: 'Ketik pertanyaan lu soal jasa website, desain/vektor gambar & logo, estimasi biaya & hari, atau cara order via WA 0831-8752-1130 & Fastwork @yusnanyulyakso1.',
     };
   }
+
   let best: AssistantIntent | null = null;
   let bestScore = 0;
+
   for (const item of INTENTS) {
     let score = 0;
     for (const kw of item.keywords) {
-      if (q.includes(kw)) score += kw.length >= 5 ? 3 : 2;
+      if (q.includes(kw)) {
+        score += kw.length >= 6 ? 4 : kw.length >= 4 ? 3 : 2;
+      }
     }
-    if (score > bestScore) { bestScore = score; best = item; }
+    if (score > bestScore) {
+      bestScore = score;
+      best = item;
+    }
   }
+
   return best && bestScore > 0 ? best : {
     id: 'fallback',
     keywords: [],
-    answer: 'Pertanyaan spesifik kayak gitu paling enak dibahas langsung biar pas sama kebutuhan proyek lu. Hubungi WA 0831-8752-1130, Fastwork @yusnanyulyakso1, atau email yusnanyulyakso29@gmail.com.',
+    answer: 'Pertanyaan spesifik kayak gitu paling enak dibahas langsung biar pas sama kebutuhan jasa web atau vektor lu. Hubungi WA 0831-8752-1130, Fastwork @yusnanyulyakso1, atau email yusnanyulyakso29@gmail.com.',
     actionLabel: 'Order via Fastwork (@yusnanyulyakso1)',
     actionHref: 'https://fastwork.id/user/yusnanyulyakso1',
   };
@@ -157,11 +184,11 @@ export function mountNansSmartAssistant(options?: DropupMountOptions | ((freq?: 
         <button type="button" id="nans-ai-close" aria-label="Tutup Chat">✕</button>
       </div>
       <div id="nans-ai-messages">
-        <div class="nans-msg bot">Halo! Ada yang mau lu tanyain soal layanan web, rekonstruksi vektor logo, estimasi biaya, atau cara order via WA &amp; Fastwork?</div>
+        <div class="nans-msg bot">Halo! Ada yang mau lu tanyain soal jasa web, vektor gambar &amp; logo, estimasi biaya &amp; hari, atau cara order via WA &amp; Fastwork?</div>
       </div>
       <div id="nans-ai-chips">${QUICK_PROMPTS.map((q) => `<button type="button" class="nans-chip">${q}</button>`).join('')}</div>
       <form id="nans-ai-form">
-        <input type="text" id="nans-ai-input" placeholder="Tanya soal web, vektor, harga, atau order..." autocomplete="off" />
+        <input type="text" id="nans-ai-input" placeholder="Tanya soal web, vektor, logo, harga, atau order..." autocomplete="off" />
         <button type="submit" id="nans-ai-send">Kirim</button>
       </form>
     </div>
