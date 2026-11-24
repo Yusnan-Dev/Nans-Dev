@@ -1,8 +1,9 @@
 {
+  "id": "/Nans-Dev/",
   "name": "Nans Dev - Enterprise Web & Visual Identity",
   "short_name": "Nans Dev",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "/Nans-Dev/",
+  "scope": "/Nans-Dev/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0a0a",
@@ -11,19 +12,19 @@
   "description": "Nans Dev - Enterprise Web & Visual Identity",
   "icons": [
     {
-      "src": "icon-512.png",
+      "src": "/Nans-Dev/icon-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
     },
     {
-      "src": "icon-192.png",
+      "src": "/Nans-Dev/icon-192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "/Nans-Dev/icon-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
