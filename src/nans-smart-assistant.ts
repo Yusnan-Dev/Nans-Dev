@@ -134,19 +134,27 @@ function inferActionCta(query: string, replyText: string): { actionLabel?: strin
   return { actionLabel: 'Lihat Portofolio Live', actionHref: '#portfolio' };
 }
 
+// Tambahkan variabel global ini di atas fungsi fetchAssistantReply (di luar fungsi)
+let chatHistory: { role: string, text: string }[] = [];
+
 export async function fetchAssistantReply(rawInput: string): Promise<AssistantIntent> {
   const clean = rawInput.trim();
   if (!clean) {
     return matchAssistantReply('');
   }
 
+  // 1. Simpan pesan user ke history
+  chatHistory.push({ role: 'user', text: clean });
+
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 8000);
+    
     const res = await fetch(AI_WORKER_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: clean }),
+      // 2. Kirim pesan BESERTA history-nya ke Cloudflare
+      body: JSON.stringify({ message: clean, history: chatHistory }), 
       signal: controller.signal,
     });
     clearTimeout(timer);
@@ -154,7 +162,16 @@ export async function fetchAssistantReply(rawInput: string): Promise<AssistantIn
     if (res.ok) {
       const data = await res.json();
       const aiText = typeof data?.reply === 'string' ? data.reply.trim() : '';
+      
       if (aiText) {
+        // 3. Simpan jawaban AI ke history biar besok inget
+        chatHistory.push({ role: 'ai', text: aiText });
+
+        // Batasi history maksimal 10 obrolan terakhir biar nggak lemot
+        if (chatHistory.length > 10) {
+          chatHistory = chatHistory.slice(-10);
+        }
+
         const cta = inferActionCta(clean, aiText);
         return {
           id: 'gemini_worker',
@@ -166,7 +183,8 @@ export async function fetchAssistantReply(rawInput: string): Promise<AssistantIn
       }
     }
   } catch {
-    // Otomatis pakai fallback lokal kalau jaringan bermasalah atau timeout
+    // Kalau error, hapus pesan terakhir dari history biar nggak numpuk sampah
+    chatHistory.pop(); 
   }
 
   return matchAssistantReply(clean);
