@@ -1,21 +1,16 @@
-const CACHE_NAME = 'nans-dev-pwa-v15';
+const CACHE_NAME = 'nans-dev-pwa-v16';
 const ASSETS = [
   './',
   './index.html',
-  './main.js',
-  './pwa-lang-addon.js',
-  './style.css',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png',
-  './perf_engine.wasm',
-  './go-telemetry.json'
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
-      Promise.allSettled(ASSETS.map((url) => cache.add(url)))
+      cache.addAll(ASSETS)
     )
   );
   self.skipWaiting();
@@ -30,7 +25,15 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+  // Navigasi / HTML -> Network dulu, fallback cache
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+  // File lain -> Cache dulu, baru network
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    caches.match(e.request).then((res) => res || fetch(e.request))
   );
 });
