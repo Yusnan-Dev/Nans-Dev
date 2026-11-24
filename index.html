@@ -303,8 +303,17 @@
     <div class="container">&copy; 2026 Nans Dev Architecture. Engineered with TypeScript/TSX, Rust (WebAssembly), Go, Python, SCSS &amp; GitHub Actions.</div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-  <script src="./main.js" defer></script>
-  <script src="./pwa-lang-addon.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="./main.js" defer></script>
+<script src="./pwa-lang-addon.js" defer></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then((reg) => console.log('SW aktif:', reg.scope))
+        .catch((err) => console.log('SW gagal:', err));
+    });
+  }
+</script>
 </body>
 </html>
