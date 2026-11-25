@@ -298,8 +298,9 @@ export function mountNansSmartAssistant(options?: DropupMountOptions | ((freq?: 
         <div><strong>Nans Dev Smart Q&amp;A</strong><small>Gemini Cloud AI · Zero Limit Fallback</small></div>
         <button type="button" id="nans-ai-close" aria-label="Tutup Chat">✕</button>
       </div>
-      <div id="nans-ai-messages">
+      <div id="nans-ai-messages">  
         <div class="nans-msg bot">Halo! Ada yang mau lu tanyain soal jasa web, vektor gambar &amp; logo, estimasi biaya &amp; hari, atau cara order via WA &amp; Fastwork?</div>
+        <div class="nans-msg bot">AI Live tidak merespon?</strong> Jika pakai Data Seluler, aktifkan Private DNS: <code>one.one.one.one</code> atau <code>dns.google</code> di pengaturan HP Anda.</div>
       </div>
       <div id="nans-ai-chips">${QUICK_PROMPTS.map((q) => `<button type="button" class="nans-chip">${q}</button>`).join('')}</div>
       <form id="nans-ai-form">
