@@ -34,7 +34,7 @@ payload = {
             "badge": "DIRECTORY PLATFORM",
             "desc": "Direktori bisnis digital terstruktur yang memetakan kafe dan tempat usaha lokal di berbagai kota besar Jawa.",
             "stack": ["Data Architecture", "Search & Filter", "UI System"],
-            "url": "#estimator"
+            "url": "https://nanslumbang-oss.github.io/BizSnap/"
         },
         {
             "id": "vector-suite",
