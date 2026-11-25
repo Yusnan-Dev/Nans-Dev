@@ -40,10 +40,11 @@ jobs:
         run: |
           rustup target add wasm32-unknown-unknown
 
-      - name: Prepare dist & Run Python + Go Pipeline
+       - name: Prepare dist & Run Python + Go Pipeline
         run: |
           mkdir -p dist
           cp index.html sw.js dist/
+          cp -rf images dist/ 2>/dev/null || true
           python3 scripts/generate_data.py
           python3 scripts/enterprise_ops.py
           go run scripts/edge_benchmark.go
