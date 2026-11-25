@@ -1593,12 +1593,54 @@ function renderServices(services: ServiceItem[]): void {
     </article>`).join('');
 }
 
-function getProjectMockupHTML(p: ProjectItem): string {
+function getProjectImages(p: ProjectItem): { desktop: string; mobile: string; url: string } {
   const t = p.title.toLowerCase();
-  if (t.includes('klinpro') || t.includes('laundry')) return `<div class="frame-top"><div class="dots"><span></span><span></span><span></span></div><span class="frame-url">klinpro-express.io</span></div><div class="ui-mock-body"><div class="ui-banner">${SVG_ICONS.calc}Kalkulator Kiloan & Express</div><div class="ui-grid"><div class="ui-widget">Cuci Kering</div><div class="ui-widget">Setrika Uap</div><div class="ui-widget ui-chip-hide">Order WA</div></div></div>`;
-  if (t.includes('tokobuk') || t.includes('toko')) return `<div class="frame-top"><div class="dots"><span></span><span></span><span></span></div><span class="frame-url">tokobukyul.store</span></div><div class="ui-mock-body"><div class="ui-banner">${SVG_ICONS.bag}Katalog Buku & Checkout</div><div class="ui-grid"><div class="ui-widget">Best Seller</div><div class="ui-widget">Keranjang</div><div class="ui-widget ui-chip-hide">Promo</div></div></div>`;
-  if (t.includes('bizsnap') || p.category === 'system') return `<div class="frame-top"><div class="dots"><span></span><span></span><span></span></div><span class="frame-url">bizsnap.id/directory</span></div><div class="ui-mock-body"><div class="ui-banner">${SVG_ICONS.pin}Direktori Cafe & Bisnis Lokal</div><div class="ui-grid"><div class="ui-widget">Malang</div><div class="ui-widget">Batu</div><div class="ui-widget ui-chip-hide">Jawa</div></div></div>`;
-  return `<div class="frame-top"><div class="dots"><span></span><span></span><span></span></div><span class="frame-url">vector-hd.svg</span></div><div class="ui-mock-body"><div class="ui-banner">${SVG_ICONS.pen}Kurva Bezier & Print-Ready</div><div class="ui-grid"><div class="ui-widget">SVG / EPS</div><div class="ui-widget">CMYK / RGB</div><div class="ui-widget ui-chip-hide">300 DPI</div></div></div>`;
+  if (t.includes('klinpro') || t.includes('laundry')) {
+    return {
+      desktop: './images/klinpro-desktop.jpg',
+      mobile: './images/klinpro-hp.jpg',
+      url: 'klinpro-express.io',
+    };
+  }
+  if (t.includes('tokobuk') || t.includes('toko')) {
+    return {
+      desktop: './images/tokobukyul-desktop.jpg',
+      mobile: './images/tokobukyul-hp.jpg',
+      url: 'tokobukyul.store',
+    };
+  }
+  if (t.includes('bizsnap') || p.category === 'system') {
+    return {
+      desktop: './images/bizsnap-desktop.jpg',
+      mobile: './images/bizsnap-hp.jpg',
+      url: 'bizsnap.id/directory',
+    };
+  }
+  return {
+    desktop: './images/vector-desktop.jpg',
+    mobile: './images/vector-hp.jpg',
+    url: 'vector-hd.svg',
+  };
+}
+
+function getProjectMockupHTML(p: ProjectItem): string {
+  const media = getProjectImages(p);
+  return `
+    <div class="frame-top">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <span class="frame-url">${media.url}</span>
+    </div>
+    <div class="ui-mock-body" style="padding:0;overflow:hidden;">
+      <img
+        src="${media.desktop}"
+        data-desktop="${media.desktop}"
+        data-mobile="${media.mobile}"
+        alt="${p.title}"
+        class="project-shot"
+        style="width:100%;height:155px;object-fit:cover;object-position:top;display:block;"
+      />
+    </div>
+  `;
 }
 
 function renderProjects(projects: ProjectItem[], filter: string): void {
@@ -1609,7 +1651,10 @@ function renderProjects(projects: ProjectItem[], filter: string): void {
     <article class="project-card">
       <div>
         <div class="preview-stage">
-          <div class="device-toggle"><button type="button" class="dev-btn active" data-mode="desktop">${SVG_ICONS.desktop}Desktop</button><button type="button" class="dev-btn" data-mode="mobile">${SVG_ICONS.mobile}HP</button></div>
+          <div class="device-toggle">
+            <button type="button" class="dev-btn active" data-mode="desktop">${SVG_ICONS.desktop}Desktop</button>
+            <button type="button" class="dev-btn" data-mode="mobile">${SVG_ICONS.mobile}HP</button>
+          </div>
           <div class="device-frame">${getProjectMockupHTML(p)}</div>
         </div>
         <span class="p-badge">${p.badge}</span><h3>${p.title}</h3><p>${p.desc}</p>
@@ -1622,11 +1667,20 @@ function renderProjects(projects: ProjectItem[], filter: string): void {
 
   container.querySelectorAll<HTMLElement>('.preview-stage').forEach((stage) => {
     const frame = stage.querySelector<HTMLElement>('.device-frame');
+    const img = stage.querySelector<HTMLImageElement>('.project-shot');
     const btns = stage.querySelectorAll<HTMLButtonElement>('.dev-btn');
     if (!frame) return;
+
     btns.forEach((btn) => btn.addEventListener('click', () => {
-      sfx.playUiClick(620); btns.forEach((b) => b.classList.remove('active')); btn.classList.add('active');
-      frame.classList.toggle('mobile-mode', btn.dataset.mode === 'mobile');
+      sfx.playUiClick(620);
+      btns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const isMobile = btn.dataset.mode === 'mobile';
+      frame.classList.toggle('mobile-mode', isMobile);
+      if (img) {
+        img.src = (isMobile ? img.dataset.mobile : img.dataset.desktop) || img.src;
+      }
     }));
   });
 }
