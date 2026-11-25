@@ -40,7 +40,7 @@ jobs:
         run: |
           rustup target add wasm32-unknown-unknown
 
-       - name: Prepare dist & Run Python + Go Pipeline
+      - name: Prepare dist & Run Python + Go Pipeline
         run: |
           mkdir -p dist
           cp index.html sw.js dist/
@@ -76,3 +76,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        
