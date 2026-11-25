@@ -1630,14 +1630,14 @@ function getProjectMockupHTML(p: ProjectItem): string {
       <div class="dots"><span></span><span></span><span></span></div>
       <span class="frame-url">${media.url}</span>
     </div>
-    <div class="ui-mock-body" style="padding:0;overflow:hidden;">
+    <div class="ui-mock-body" style="padding:0 !important;margin:0;overflow:hidden;display:flex;flex:1;">
       <img
         src="${media.desktop}"
         data-desktop="${media.desktop}"
         data-mobile="${media.mobile}"
         alt="${p.title}"
         class="project-shot"
-        style="width:100%;height:155px;object-fit:cover;object-position:top;display:block;"
+        style="width:100%;height:175px;object-fit:cover;object-position:top center;display:block;"
       />
     </div>
   `;
@@ -1655,7 +1655,7 @@ function renderProjects(projects: ProjectItem[], filter: string): void {
             <button type="button" class="dev-btn active" data-mode="desktop">${SVG_ICONS.desktop}Desktop</button>
             <button type="button" class="dev-btn" data-mode="mobile">${SVG_ICONS.mobile}HP</button>
           </div>
-          <div class="device-frame">${getProjectMockupHTML(p)}</div>
+          <div class="device-frame" style="overflow:hidden;display:flex;flex-direction:column;">${getProjectMockupHTML(p)}</div>
         </div>
         <span class="p-badge">${p.badge}</span><h3>${p.title}</h3><p>${p.desc}</p>
       </div>
@@ -1680,6 +1680,7 @@ function renderProjects(projects: ProjectItem[], filter: string): void {
       frame.classList.toggle('mobile-mode', isMobile);
       if (img) {
         img.src = (isMobile ? img.dataset.mobile : img.dataset.desktop) || img.src;
+        img.style.height = isMobile ? '230px' : '175px';
       }
     }));
   });
