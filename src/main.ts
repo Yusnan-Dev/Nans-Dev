@@ -1199,19 +1199,19 @@ Kontak Resmi: WA ${WHATSAPP_DISPLAY} | Fastwork ${FASTWORK_ID} | ${CONTACT_EMAIL
 <head>
   <meta charset="UTF-8" />
   <title>${docNum} — Penawaran Resmi Nans Dev</title>
-  <style>
-    @page { size: A4 portrait; margin: 10mm; }
+    <style>
+    @page { size: A4 portrait; margin: 7mm; }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: #e2e8f0;
       color: #0f172a;
-      font-size: 11.5px;
-      line-height: 1.45;
+      font-size: 11px;
+      line-height: 1.38;
     }
     .sheet {
       width: 210mm;
-      min-height: 277mm;
+      height: 282mm;
       margin: 0 auto;
       background: #ffffff;
       border: 1px solid #cbd5e1;
@@ -1222,94 +1222,95 @@ Kontak Resmi: WA ${WHATSAPP_DISPLAY} | Fastwork ${FASTWORK_ID} | ${CONTACT_EMAIL
     }
     @media print {
       body { background: #ffffff; }
-      .sheet { width: 100%; min-height: 276mm; border: none; margin: 0; }
+      .sheet { width: 100%; height: 282mm; max-height: 282mm; border: none; margin: 0; }
     }
     .header-banner {
       background: linear-gradient(135deg, #060a14 0%, #0f172a 65%, #1e293b 100%);
       color: #f8fafc;
-      padding: 20px 24px;
-      border-bottom: 4px solid ${activeAcc1};
+      padding: 14px 20px;
+      border-bottom: 3.5px solid ${activeAcc1};
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .brand-block { display: flex; align-items: center; gap: 12px; }
+    .brand-block { display: flex; align-items: center; gap: 11px; }
     .brand-logo {
-      width: 42px; height: 42px; border-radius: 10px;
+      width: 38px; height: 38px; border-radius: 9px;
       background: linear-gradient(135deg, ${activeAcc2}, ${activeAcc1});
       display: flex; align-items: center; justify-content: center;
-      font-weight: 900; font-size: 18px; color: #05070c; letter-spacing: -0.5px;
+      font-weight: 900; font-size: 17px; color: #05070c; letter-spacing: -0.5px;
     }
-    .brand-title { font-size: 19px; font-weight: 900; letter-spacing: 0.8px; color: #ffffff; }
-    .brand-sub { font-size: 10.5px; color: #94a3b8; margin-top: 2px; }
-    .doc-meta { text-align: right; font-family: monospace; font-size: 10.5px; }
+    .brand-title { font-size: 17.5px; font-weight: 900; letter-spacing: 0.8px; color: #ffffff; }
+    .brand-sub { font-size: 10px; color: #94a3b8; margin-top: 1px; }
+    .doc-meta { text-align: right; font-family: monospace; font-size: 10px; }
     .doc-badge {
       display: inline-block; background: rgba(52, 211, 153, 0.16); color: #34d399;
       border: 1px solid rgba(52, 211, 153, 0.45); padding: 2px 8px; border-radius: 999px;
-      font-weight: 800; font-size: 9.5px; margin-bottom: 5px;
+      font-weight: 800; font-size: 9px; margin-bottom: 4px;
     }
-    .body-wrap { padding: 18px 24px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; }
-    .info-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 12px; }
+    .body-wrap { padding: 12px 20px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 9px; }
+    .info-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 10px; }
     .card {
-      border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px 14px; background: #f8fafc;
+      border: 1px solid #cbd5e1; border-radius: 9px; padding: 9px 12px; background: #f8fafc;
     }
     .card-label {
-      font-size: 9.5px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase;
-      color: #0284c7; margin-bottom: 6px;
+      font-size: 9px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase;
+      color: #0284c7; margin-bottom: 4px;
     }
-    .swatch-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-    .swatch-box { width: 22px; height: 22px; border-radius: 6px; border: 1px solid rgba(15,23,42,0.2); }
-    table { width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; border-radius: 10px; overflow: hidden; }
+    .swatch-row { display: flex; align-items: center; gap: 7px; margin-top: 6px; }
+    .swatch-box { width: 18px; height: 18px; border-radius: 5px; border: 1px solid rgba(15,23,42,0.2); }
+    table { width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; border-radius: 9px; overflow: hidden; }
     thead th {
-      background: #0f172a; color: #f8fafc; font-size: 10px; text-transform: uppercase;
-      letter-spacing: 0.6px; padding: 9px 10px; text-align: left;
+      background: #0f172a; color: #f8fafc; font-size: 9.5px; text-transform: uppercase;
+      letter-spacing: 0.6px; padding: 7px 9px; text-align: left;
     }
-    tbody td { padding: 9px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+    tbody td { padding: 6px 9px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
     tbody tr:nth-child(even) { background: #f8fafc; }
     tfoot td {
-      background: #eff6ff; padding: 11px 12px; font-weight: 900; font-size: 13px;
+      background: #eff6ff; padding: 8px 10px; font-weight: 900; font-size: 12px;
       color: #0f172a; border-top: 2px solid #0284c7;
     }
     .section-head {
-      font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;
-      color: #0f172a; border-left: 3px solid ${activeAcc1}; padding-left: 8px; margin-bottom: 8px;
+      font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;
+      color: #0f172a; border-left: 3px solid ${activeAcc1}; padding-left: 7px; margin-bottom: 6px;
     }
-    .spec-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .spec-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
     .spec-item {
-      border: 1px solid #cbd5e1; border-radius: 8px; padding: 9px 10px; background: #ffffff;
+      border: 1px solid #cbd5e1; border-radius: 7px; padding: 7px 8px; background: #ffffff;
     }
-    .spec-item strong { display: block; font-size: 10.5px; color: #0f172a; margin-bottom: 2px; }
-    .spec-item span { font-size: 9.5px; color: #475569; line-height: 1.35; display: block; }
-    .timeline-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .spec-item strong { display: block; font-size: 10px; color: #0f172a; margin-bottom: 1px; }
+    .spec-item span { font-size: 9px; color: #475569; line-height: 1.3; display: block; }
+    .timeline-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
     .step-box {
-      background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px;
+      background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 7px; padding: 7px 8px;
     }
-    .step-num { font-family: monospace; font-weight: 900; font-size: 10px; color: #0284c7; }
-    .step-title { font-weight: 800; font-size: 10.5px; color: #0f172a; margin: 2px 0; }
-    .step-desc { font-size: 9.5px; color: #475569; }
+    .step-num { font-family: monospace; font-weight: 900; font-size: 9.5px; color: #0284c7; }
+    .step-title { font-weight: 800; font-size: 10px; color: #0f172a; margin: 1px 0; }
+    .step-desc { font-size: 9px; color: #475569; line-height: 1.3; }
     .terms-box {
-      background: #f8fafc; border: 1px dashed #94a3b8; border-radius: 9px; padding: 10px 14px;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 10px; color: #334155;
+      background: #f8fafc; border: 1px dashed #94a3b8; border-radius: 8px; padding: 8px 12px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 9.5px; color: #334155;
     }
     .sign-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding-top: 6px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 2px;
     }
     .sign-card {
-      border: 1px solid #cbd5e1; border-radius: 10px; padding: 11px 14px; background: #ffffff;
-      display: flex; flex-direction: column; justify-content: space-between; min-height: 92px;
+      border: 1px solid #cbd5e1; border-radius: 9px; padding: 8px 12px; background: #ffffff;
+      display: flex; flex-direction: column; justify-content: space-between; min-height: 72px;
     }
     .stamp {
       display: inline-block; border: 1.5px solid #0284c7; color: #0284c7; font-family: monospace;
-      font-weight: 900; font-size: 9.5px; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px;
+      font-weight: 900; font-size: 9px; padding: 2px 7px; border-radius: 5px; letter-spacing: 0.5px;
       background: rgba(2, 132, 199, 0.06); width: fit-content;
     }
     .footer-bar {
-      background: #060a14; color: #cbd5e1; padding: 11px 24px; font-size: 10px;
+      background: #060a14; color: #cbd5e1; padding: 8px 20px; font-size: 9.5px;
       display: flex; justify-content: space-between; align-items: center;
       border-top: 3px solid ${activeAcc2};
     }
     .footer-bar strong { color: #38bdf8; }
   </style>
+  
 </head>
 <body>
   <div class="sheet">
