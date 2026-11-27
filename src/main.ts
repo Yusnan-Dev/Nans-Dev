@@ -1846,6 +1846,7 @@ function setupVectorSlider(): void {
 
 function setupEstimator(): void {
   const checkboxes = document.querySelectorAll<HTMLInputElement>('.est-check');
+  const parentCheckboxes = document.querySelectorAll<HTMLInputElement>('.est-parent-check');
   const currButtons = document.querySelectorAll<HTMLButtonElement>('.curr-btn');
   const priceDisplay = document.getElementById('est-price'), timeDisplay = document.getElementById('est-days');
   const brandInput = document.getElementById('client-brand') as HTMLInputElement | null;
@@ -1854,7 +1855,22 @@ function setupEstimator(): void {
   if (!priceDisplay || !timeDisplay || !sendBtn) return;
 
   let activeCurrency: 'IDR' | 'USD' = 'IDR';
-  const formatMoney = (amount: number, curr: 'IDR' | 'USD') => curr === 'IDR' ? 'Rp ' + amount.toLocaleString('id-ID') : '$' + amount.toLocaleString('en-US') + ' USD';
+  const formatMoney = (amount: number, curr: 'IDR' | 'USD') =>
+    curr === 'IDR' ? 'Rp ' + amount.toLocaleString('id-ID') : '$' + amount.toLocaleString('en-US') + ' USD';
+
+  const syncDrawers = () => {
+    parentCheckboxes.forEach((parentCb) => {
+      const group = parentCb.closest<HTMLElement>('.est-group');
+      if (!group) return;
+      const isOpen = parentCb.checked;
+      group.classList.toggle('open', isOpen);
+      if (!isOpen) {
+        group.querySelectorAll<HTMLInputElement>('.est-sub-check').forEach((sub) => {
+          sub.checked = false;
+        });
+      }
+    });
+  };
 
   const calculate = () => {
     let totalDays = 0, totalCost = 0;
@@ -1866,19 +1882,37 @@ function setupEstimator(): void {
         selected.push(cb.value);
       }
     });
-    priceDisplay.textContent = totalCost > 0 ? formatMoney(totalCost, activeCurrency) : (activeCurrency === 'IDR' ? 'Rp 0' : '$0 USD');
-    timeDisplay.innerHTML = totalDays > 0 ? (activeCurrency === 'IDR' ? `${SVG_ICONS.clock}Estimasi: ${totalDays} Hari Kerja` : `${SVG_ICONS.clock}Est. Delivery: ${totalDays} Business Days`) : 'Pilih minimal 1 modul';
+    priceDisplay.textContent = totalCost > 0
+      ? formatMoney(totalCost, activeCurrency)
+      : (activeCurrency === 'IDR' ? 'Rp 0' : '$0 USD');
+    timeDisplay.innerHTML = totalDays > 0
+      ? (activeCurrency === 'IDR'
+          ? `${SVG_ICONS.clock}Estimasi: ${totalDays} Hari Kerja`
+          : `${SVG_ICONS.clock}Est. Delivery: ${totalDays} Business Days`)
+      : 'Pilih minimal 1 modul';
     return { selected, totalDays, totalCost };
   };
 
   currButtons.forEach((btn) => btn.addEventListener('click', () => {
-    sfx.playUiClick(640); currButtons.forEach((b) => b.classList.remove('active')); btn.classList.add('active');
+    sfx.playUiClick(640);
+    currButtons.forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
     activeCurrency = (btn.dataset.curr as 'IDR' | 'USD') || 'IDR';
-    document.querySelectorAll<HTMLElement>('.meta-tag').forEach((tag) => { tag.textContent = activeCurrency === 'IDR' ? tag.dataset.idr || '' : tag.dataset.usd || ''; });
+    document.querySelectorAll<HTMLElement>('.meta-tag').forEach((tag) => {
+      tag.textContent = activeCurrency === 'IDR' ? tag.dataset.idr || '' : tag.dataset.usd || '';
+    });
     calculate();
   }));
 
-  checkboxes.forEach((cb) => cb.addEventListener('change', () => { sfx.playUiClick(520); calculate(); }));
+  checkboxes.forEach((cb) => cb.addEventListener('change', () => {
+    sfx.playUiClick(cb.checked ? 620 : 460);
+    if (cb.classList.contains('est-parent-check')) {
+      syncDrawers();
+    }
+    calculate();
+  }));
+
+  syncDrawers();
   calculate();
 
   sendBtn.addEventListener('click', () => {
@@ -1892,7 +1926,8 @@ function setupEstimator(): void {
       : `Hello *Nans Dev*, I would like to discuss a project brief:\n\n*Name / Brand:* ${brand}\n*Selected Modules:*\n${modulesList}\n\n*Estimated Budget:* ${estPriceStr}\n*Estimated Delivery:* ${totalDays} Business Days\n*Notes:* ${notes}\n\nLooking forward to working together!`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(briefMessage)}`, '_blank');
   });
-}
+ }
+        
 
 document.addEventListener('DOMContentLoaded', bootApp);
 
