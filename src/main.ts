@@ -1182,19 +1182,22 @@ Kontak Resmi: WA ${WHATSAPP_DISPLAY} | Fastwork ${FASTWORK_ID} | ${CONTACT_EMAIL
     const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
     const paletteClean = selectedPalette.split('(')[0].trim();
 
-    const rowsHtml = items.map((it, idx) => `
+        const rowsHtml = items.map((it, idx) => {
+      const isSub = it.name.trim().startsWith('↳');
+      return `
       <tr>
         <td style="text-align:center;font-weight:700;color:#475569;">0${idx + 1}</td>
         <td>
-          <div style="font-weight:700;color:#0f172a;">${it.name}</div>
-          <div style="font-size:10px;color:#64748b;margin-top:2px;">Arsitektur modular Mobile-First 60FPS, optimasi aset, dan integrasi siap deploy.</div>
+          <div style="font-weight:${isSub ? '600' : '700'};color:#0f172a;">${it.name}</div>
+          ${isSub ? '' : '<div style="font-size:9px;color:#64748b;margin-top:1px;">Arsitektur modular Mobile-First 60FPS, optimasi aset, dan integrasi siap deploy.</div>'}
         </td>
         <td style="text-align:center;font-weight:600;color:#334155;">${it.days}</td>
         <td style="text-align:right;font-weight:700;color:#0f172a;">${it.price}</td>
       </tr>
-    `).join('');
-
-    win.document.write(`<!DOCTYPE html>
+    `;
+    }).join('');
+    
+ win.document.write(`<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
