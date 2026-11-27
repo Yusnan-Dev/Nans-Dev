@@ -39,8 +39,16 @@ body {
   filter: blur(95px);
   pointer-events: none;
   z-index: -1;
+  will-change: transform;
+  transform: translateZ(0);
   animation: floatOrb 12s ease-in-out infinite alternate;
+
+  @media (max-width: 768px) {
+    filter: blur(48px);
+    opacity: 0.75;
+  }
 }
+
 
 .orb-1 {
   width: 340px;
@@ -1996,13 +2004,12 @@ html[data-theme="light"] {
   }
 }
 /* =========================================================
-   ESTIMATOR SMOOTH ACCORDION SUB-OPTIONS
+   ESTIMATOR 60FPS GPU ACCORDION SUB-OPTIONS
    ========================================================= */
 .est-group {
   display: flex;
   flex-direction: column;
   border-radius: 13px;
-  transition: border-color 0.25s ease;
 
   &.open .est-main-row {
     border-color: var(--v4-accent, $cyan) !important;
@@ -2014,31 +2021,39 @@ html[data-theme="light"] {
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
+    pointer-events: none;
+    will-change: grid-template-rows, opacity;
     transition:
-      grid-template-rows 0.34s cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 0.24s ease,
-      margin-top 0.24s ease;
-    margin-top: 0;
+      grid-template-rows 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.18s ease;
   }
 
   &.open .est-sub-drawer {
     grid-template-rows: 1fr;
     opacity: 1;
-    margin-top: 6px;
+    pointer-events: auto;
   }
 
   .est-sub-inner {
     overflow: hidden;
+    contain: layout style;
     display: grid;
     gap: 6px;
+    padding-top: 6px;
     padding-left: 12px;
     border-left: 2px solid var(--v4-accent, $cyan);
+    transform: translateY(-6px);
+    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &.open .est-sub-inner {
+    transform: translateY(0);
   }
 
   .est-sub-hint {
     font-size: 0.72rem;
     color: var(--v4-text-sub, $text-secondary);
-    padding: 3px 4px 1px;
+    padding: 2px 4px 1px;
     line-height: 1.4;
 
     strong {
@@ -2050,7 +2065,6 @@ html[data-theme="light"] {
     padding: 0.65rem 0.9rem !important;
     font-size: 0.81rem !important;
     border-radius: 10px !important;
-    opacity: 0.94;
 
     input[type="checkbox"] {
       width: 15px !important;
