@@ -1995,3 +1995,70 @@ html[data-theme="light"] {
     color: #64748b;
   }
 }
+/* =========================================================
+   ESTIMATOR SMOOTH ACCORDION SUB-OPTIONS
+   ========================================================= */
+.est-group {
+  display: flex;
+  flex-direction: column;
+  border-radius: 13px;
+  transition: border-color 0.25s ease;
+
+  &.open .est-main-row {
+    border-color: var(--v4-accent, $cyan) !important;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
+  .est-sub-drawer {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.24s ease,
+      margin-top 0.24s ease;
+    margin-top: 0;
+  }
+
+  &.open .est-sub-drawer {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    margin-top: 6px;
+  }
+
+  .est-sub-inner {
+    overflow: hidden;
+    display: grid;
+    gap: 6px;
+    padding-left: 12px;
+    border-left: 2px solid var(--v4-accent, $cyan);
+  }
+
+  .est-sub-hint {
+    font-size: 0.72rem;
+    color: var(--v4-text-sub, $text-secondary);
+    padding: 3px 4px 1px;
+    line-height: 1.4;
+
+    strong {
+      color: var(--v4-accent, $cyan);
+    }
+  }
+
+  .est-sub-row {
+    padding: 0.65rem 0.9rem !important;
+    font-size: 0.81rem !important;
+    border-radius: 10px !important;
+    opacity: 0.94;
+
+    input[type="checkbox"] {
+      width: 15px !important;
+      height: 15px !important;
+    }
+
+    .meta-tag {
+      font-size: 0.68rem !important;
+    }
+  }
+}
