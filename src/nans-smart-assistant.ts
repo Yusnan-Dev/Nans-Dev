@@ -275,7 +275,7 @@ export function mountNansSmartAssistant(options?: DropupMountOptions | ((freq?: 
     .nans-ai-head small{font-size:.68rem;color:#94a3b8}
     #nans-ai-close{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#e2e8f0;width:27px;height:27px;border-radius:8px;cursor:pointer;font-weight:800}
     #nans-ai-messages{padding:11px;max-height:245px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
-    .nans-msg{padding:8px 11px;border-radius:12px;font-size:.76rem;line-height:1.45;max-width:90%}
+    .nans-msg{padding:8px 11px;border-radius:12px;font-size:.76rem;line-height:1.5;max-width:90%;white-space:pre-line;word-break:break-word}
     .nans-msg.bot{align-self:flex-start;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#e2e8f0}
     .nans-msg.user{align-self:flex-end;background:rgba(56,189,248,.2);border:1px solid rgba(56,189,248,.4);color:#f8fafc;font-weight:600}
     .nans-msg-cta{display:inline-block;margin-top:6px;padding:5px 9px;border-radius:8px;background:rgba(56,189,248,.16);border:1px solid rgba(56,189,248,.45);color:#7dd3fc;text-decoration:none;font-size:.7rem;font-weight:800}
@@ -346,10 +346,16 @@ export function mountNansSmartAssistant(options?: DropupMountOptions | ((freq?: 
     sfxText.textContent = enabled ? '🔊 SFX ON' : '🔇 SFX OFF';
   };
 
-  const appendMsg = (text: string, sender: 'user' | 'bot', ctaLabel?: string, ctaHref?: string) => {
+    const appendMsg = (text: string, sender: 'user' | 'bot', ctaLabel?: string, ctaHref?: string) => {
     const bubble = document.createElement('div');
     bubble.className = `nans-msg ${sender}`;
-    bubble.textContent = text;
+    const cleanText = sender === 'bot'
+      ? text
+          .replace(/\*\*/g, '')
+          .replace(/\s+(•|\d+\.)\s+/g, '\n$1 ')
+          .trim()
+      : text;
+    bubble.textContent = cleanText;
     if (sender === 'bot' && ctaLabel && ctaHref) {
       const link = document.createElement('a');
       link.className = 'nans-msg-cta';
@@ -363,7 +369,7 @@ export function mountNansSmartAssistant(options?: DropupMountOptions | ((freq?: 
     messages.appendChild(bubble);
     messages.scrollTop = messages.scrollHeight;
   };
-
+  
   const askQuestion = async (text: string) => {
     const clean = text.trim();
     if (!clean) return;
