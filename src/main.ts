@@ -1908,13 +1908,16 @@ function setupEstimator(): void {
     calculate();
   }));
 
-  checkboxes.forEach((cb) => cb.addEventListener('change', () => {
+    checkboxes.forEach((cb) => cb.addEventListener('change', () => {
     sfx.playUiClick(cb.checked ? 620 : 460);
-    if (cb.classList.contains('est-parent-check')) {
-      syncDrawers();
-    }
-    calculate();
+    requestAnimationFrame(() => {
+      if (cb.classList.contains('est-parent-check')) {
+        syncDrawers();
+      }
+      calculate();
+    });
   }));
+  
 
   syncDrawers();
   calculate();
