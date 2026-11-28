@@ -1,7 +1,7 @@
 import os
 import re
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 BASE_URL = "https://nans-dev.pages.dev/"
 REQUIRED_FILES = [
@@ -115,32 +115,91 @@ def generate_pwa_manifest(out_path: str = "manifest.json") -> str:
                 "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%2338bdf8'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='900' font-size='300' fill='%23060b14'%3EN%3C/text%3E%3C/svg%3E",
                 "sizes": "192x192 512x512",
                 "type": "image/svg+xml",
-                "purpose": "any maskable"
+                "purpose": "any maskable",
             }
         ],
-
     }
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
     return out_path
 
-# 8. Generate JSON-LD Schema.org untuk Rich Results Google
+
+# 8. Generate JSON-LD Multi-Entity (Service + OfferCatalog + FAQPage)
 def generate_json_ld_schema(out_path: str = "schema.json") -> str:
     schema = {
         "@context": "https://schema.org",
-        "@type": "ProfessionalService",
-        "name": "Nans Dev",
-        "url": BASE_URL,
-        "founder": {"@type": "Person", "name": "Yusnan Yulyakso"},
-        "areaServed": "ID",
-        "knowsAbout": ["Web Development", "TypeScript", "Interactive 3D UI", "Vector Logo Reconstruction"],
+        "@graph": [
+            {
+                "@type": "ProfessionalService",
+                "name": "Nans Dev",
+                "url": BASE_URL,
+                "founder": {"@type": "Person", "name": "Yusnan Yulyakso"},
+                "areaServed": "ID",
+                "knowsAbout": ["Web Development", "TypeScript", "Interactive 3D UI", "Vector Logo Reconstruction"],
+                "hasOfferCatalog": {
+                    "@type": "OfferCatalog",
+                    "name": "Layanan Digital Nans Dev",
+                    "itemListElement": [
+                        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Company Profile & Landing Page Modern"}},
+                        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "E-Commerce, Katalog & LMS Interaktif"}},
+                        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Raster-to-Vector Logo Reconstruction HD"}},
+                        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Banner & Aset Visual Sosmed"}},
+                    ],
+                },
+            },
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "Apakah layanan pembuatan website sudah termasuk panduan domain?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Ya, klien dibantu koneksi custom domain secara gratis agar website langsung online siap pakai.",
+                        },
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Berapa lama estimasi pengerjaan website dan desain vektor?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Rata-rata pengerjaan standar selesai dalam 3 sampai 7 hari kerja dengan revisi terstruktur.",
+                        },
+                    },
+                ],
+            },
+        ],
     }
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(schema, f, indent=2, ensure_ascii=False)
     return out_path
 
 
-# 9. Analisis metrik ukuran aset & estimasi performa
+# 9. Generate .well-known/security.txt & humans.txt standar enterprise
+def generate_enterprise_identity() -> list:
+    os.makedirs(".well-known", exist_ok=True)
+    expires = (datetime.now(timezone.utc) + timedelta(days=365)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    sec_path = ".well-known/security.txt"
+    with open(sec_path, "w", encoding="utf-8") as f:
+        f.write(
+            f"Contact: mailto:yusnanyulyakso29@gmail.com\n"
+            f"Expires: {expires}\n"
+            f"Preferred-Languages: id, en\n"
+            f"Canonical: {BASE_URL}.well-known/security.txt\n"
+        )
+    hum_path = "humans.txt"
+    with open(hum_path, "w", encoding="utf-8") as f:
+        f.write(
+            "/* TEAM */\n"
+            "Founder & Lead Architect: Yusnan Yulyakso\n"
+            "Location: Probolinggo, East Java, Indonesia\n\n"
+            "/* TECHNOLOGY */\n"
+            "Stack: TypeScript, HTML5, SCSS, Python Automation, Cloudflare Edge\n"
+        )
+    return [sec_path, hum_path]
+
+
+# 10. Analisis metrik ukuran aset & estimasi performa
 def analyze_bundle_metrics(file_report: dict) -> dict:
     total_bytes = sum(item["bytes"] for item in file_report.values())
     return {
@@ -150,7 +209,7 @@ def analyze_bundle_metrics(file_report: dict) -> dict:
     }
 
 
-# 10. Ekspor laporan telemetri ke build-telemetry.json
+# 11. Ekspor laporan telemetri ke build-telemetry.json
 def export_build_telemetry(out_path: str = "build-telemetry.json") -> dict:
     file_audit = audit_required_files()
     telemetry = {
@@ -165,6 +224,7 @@ def export_build_telemetry(out_path: str = "build-telemetry.json") -> dict:
             generate_sitemap_xml(),
             generate_pwa_manifest(),
             generate_json_ld_schema(),
+            *generate_enterprise_identity(),
         ],
     }
     with open(out_path, "w", encoding="utf-8") as f:
@@ -175,4 +235,4 @@ def export_build_telemetry(out_path: str = "build-telemetry.json") -> dict:
 if __name__ == "__main__":
     result = export_build_telemetry()
     print(f"[NANS-OPS] Build telemetry generated: {result['bundle_metrics']}")
-  
+            
