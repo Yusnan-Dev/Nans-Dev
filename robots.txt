@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://nans-dev.pages.dev/sitemap.xml
