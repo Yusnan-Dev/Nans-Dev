@@ -1599,6 +1599,13 @@ function renderServices(services: ServiceItem[]): void {
 
 function getProjectImages(p: ProjectItem): { desktop: string; mobile: string; url: string } {
   const t = p.title.toLowerCase();
+  if (t.includes('laundrygod') || p.id === 'Laundry-God') {
+    return {
+      desktop: './images/laundrygod-desktop.jpg',
+      mobile: './images/laundrygod-hp.jpg',
+      url: 'laundry-kiloan.io',
+    };
+  }
   if (t.includes('klinpro') || t.includes('laundry')) {
     return {
       desktop: './images/klinpro-desktop.jpg',
@@ -1606,6 +1613,7 @@ function getProjectImages(p: ProjectItem): { desktop: string; mobile: string; ur
       url: 'klinpro-express.io',
     };
   }
+  
   if (t.includes('tokobuk') || t.includes('toko')) {
     return {
       desktop: './images/tokobukyul-desktop.jpg',
