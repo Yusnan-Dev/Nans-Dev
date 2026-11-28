@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nans-dev-pwa-v18.12';
+const CACHE_NAME = 'nans-dev-pwa-v18.14';
 const ASSETS = [
   './',
   './index.html',
