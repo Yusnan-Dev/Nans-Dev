@@ -44,12 +44,13 @@ jobs:
         run: |
           mkdir -p dist
           cp index.html sw.js dist/
-          cp -rf images dist/ 2>/dev/null || true
+          cp -f 404.html dist/ 2>/dev/null || true
           python3 scripts/generate_data.py
           python3 scripts/enterprise_ops.py
           go run scripts/edge_benchmark.go
-          cp -f sitemap.xml robots.txt manifest.json icon-192.png icon-512.png schema.json _headers build-telemetry.json dist/ 2>/dev/null || true
-
+          cp -rf images .well-known dist/ 2>/dev/null || true
+          cp -f sitemap.xml robots.txt manifest.json icon-192.png icon-512.png schema.json _headers humans.txt build-telemetry.json dist/ 2>/dev/null || true
+          
       - name: Compile Rust WebAssembly, TypeScript/TSX & SCSS into dist
         run: |
           rustc --target wasm32-unknown-unknown -O --crate-type=cdylib src/wasm/perf_engine.rs -o dist/perf_engine.wasm
