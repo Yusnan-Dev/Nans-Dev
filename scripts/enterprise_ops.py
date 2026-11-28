@@ -3,7 +3,7 @@ import re
 import json
 from datetime import datetime, timezone
 
-BASE_URL = "https://nans-dev.pages.dev"
+BASE_URL = "https://nans-dev.pages.dev/"
 REQUIRED_FILES = [
     "index.html",
     "src/main.ts",
