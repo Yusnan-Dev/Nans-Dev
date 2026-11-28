@@ -37,6 +37,15 @@ payload = {
             "url": "https://nanslumbang-oss.github.io/BizSnap/"
         },
         {
+            "id": "Laundry-God",
+            "title": "LaundryGod — Smart POS & Kiloan System",
+            "category": "system",
+            "badge": "POS & MANAGEMENT",
+            "desc": "Sistem manajemen operasional dan kasir laundry modern dengan pelacakan status cucian real-time, perhitungan kiloan otomatis, serta integrasi nota WhatsApp.",
+            "stack": ["TypeScript", "POS Engine", "WhatsApp API"],
+            "url": "https://laundry-god.github.io/"
+        },        
+        {
             "id": "vector-suite",
             "title": "Enterprise Brand & Vector Identity",
             "category": "design",
@@ -44,7 +53,8 @@ payload = {
             "desc": "Rekonstruksi logo resolusi rendah menjadi aset vektor murni (SVG/AI/EPS) siap cetak skala baliho maupun antarmuka digital.",
             "stack": ["Vector Geometry", "Brand System", "3D/2D Assets"],
             "url": "#vector-lab"
-        }
+        },
+           
     ],
     "services": [
         {
@@ -67,6 +77,13 @@ payload = {
         },
         {
             "code": "04",
+            "title": "AI Live Assistant & Workflow Automation",
+            "desc": "Integrasi asisten cerdas berbasis cloud AI dan otomasi alur bisnis untuk menjawab pertanyaan pelanggan, kalkulasi estimasi, serta konversi langsung ke WhatsApp secara real-time.",
+            "specs": ["Custom AI Persona & Knowledge Base", "Real-Time Q&A & Lead Capture", "WhatsApp & Omnichannel Handover"]
+        },
+        
+        {
+            "code": "05",
             "title": "PWA Architecture & Technical SEO",
             "desc": "Optimasi kecepatan muat sub-detik, instalasi aplikasi web langsung di layar HP pelanggan, dan struktur SEO ramah mesin pencari.",
             "specs": [
