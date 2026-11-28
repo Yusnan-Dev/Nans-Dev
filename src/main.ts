@@ -709,8 +709,9 @@ function setupCommandPalette(): void {
   if (!modal || !trigger || !closeBtn || !input || !results) return;
 
   const actions = [
-    { label: 'Buka Live Demo: KlinPro Express Laundry', tag: 'WEB APP', run: () => window.open('https://klinpro-express-laundry.github.io/', '_blank') },
-    { label: 'Buka Live Demo: TokoBukYul E-Commerce', tag: 'STORE', run: () => window.open('https://tokobukyul.github.io/TokoBukYul/', '_blank') },
+    { label: 'Buka Portofolio Web: KlinPro Express Laundry', tag: 'WEB APP', run: () => window.open('https://klinpro-express-laundry.github.io/', '_blank') },
+    { label: 'Buka Portofolio Web: TokoBukYul E-Commerce', tag: 'STORE', run: () => window.open('https://tokobukyul.github.io/TokoBukYul/', '_blank') },
+    { label: 'Buka Portofolio Web: Laundry God', tag: 'WEB APP', run: () => window.open('https://laundry-god.github.io/', '_blank') },
     { label: 'Eksplorasi Platform Direktori: bizsnap', tag: 'SYSTEM', run: () => location.assign('#portfolio') },
     { label: 'Jalankan Live Lighthouse Performance Audit', tag: 'BENCHMARK', run: () => { location.assign('#blueprint'); document.getElementById('run-audit-btn')?.click(); } },
     { label: 'Uji Ketajaman Logo di Vector 3D Lab', tag: 'VECTOR', run: () => location.assign('#vector-lab') },
